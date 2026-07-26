@@ -223,6 +223,7 @@ const current = data.current;
 document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
+🌊 Water temperature: ${marineData.current.sea_surface_temperature}°C<br>
 💨 Wind speed: ${current.wind_speed_10m} m/s<br>
 🧭 Wind direction: ${getWindDirection(current.wind_direction_10m)}<br>
 ☁ Conditions: ${getWeatherDescription(current.weather_code)}<br><br>
