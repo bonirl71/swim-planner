@@ -239,7 +239,37 @@ const swimScore = calculateSwimScore(
     current.wind_speed_10m,
     getWindDirection(current.wind_direction_10m)
 );
+const windDirection = getWindDirection(current.wind_direction_10m);
 
+if (windDirection === "West") {
+    reasons.push("✅ Westerly wind - ideal direction");
+}
+else if (windDirection.includes("North")) {
+    reasons.push("⚠️ Northerly wind - less favourable");
+}
+else {
+    reasons.push("ℹ️ Wind direction: " + windDirection);
+}
+
+if (current.wind_speed_10m <= 3) {
+    reasons.push("✅ Light wind (" + current.wind_speed_10m + " m/s)");
+}
+else if (current.wind_speed_10m <= 5) {
+    reasons.push("🟡 Moderate wind (" + current.wind_speed_10m + " m/s)");
+}
+else {
+    reasons.push("🔴 Strong wind (" + current.wind_speed_10m + " m/s)");
+}
+
+if (marineData.current.wave_height <= 0.5) {
+    reasons.push("✅ Small waves (" + marineData.current.wave_height + " m)");
+}
+else if (marineData.current.wave_height <= 1) {
+    reasons.push("🟡 Moderate waves (" + marineData.current.wave_height + " m)");
+}
+else {
+    reasons.push("🔴 Large waves (" + marineData.current.wave_height + " m)");
+}
 let rating;
 
 if (swimScore >= 80) {
@@ -255,7 +285,8 @@ else {
 document.getElementById("recommendation").innerHTML =
 `
 🏊 Swim Score: ${swimScore}/100<br>
-${rating}
+${rating}<br><br>
+${reasons.join("<br>")}
 `;
 }
 
