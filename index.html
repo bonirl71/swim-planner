@@ -90,7 +90,6 @@ Check Swim Conditions
 <script src="locations.js"></script>
 
 <script>
-function getWindDirection(degrees) {
 function getWeatherDescription(code) {
 
 if (code === 0) return "Clear sky ☀️";
@@ -110,6 +109,10 @@ if (code >= 95) return "Thunderstorm ⛈️";
 return "Unknown";
 
 }
+
+
+function getWindDirection(degrees) {
+
 const directions = [
 "North",
 "North-East",
@@ -120,7 +123,6 @@ const directions = [
 "West",
 "North-West"
 ];
-
 return directions[Math.round(degrees / 45) % 8];
 
 }
