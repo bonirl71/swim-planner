@@ -158,12 +158,14 @@ const longitude = selectedLocation.longitude;
 
 const url =
 `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code&wind_speed_unit=ms`;
-
+const marineUrl =
+`https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&current=wave_height,wave_period,wave_direction`;
 try {
 
 const response = await fetch(url);
 const data = await response.json();
-
+const marineResponse = await fetch(marineUrl);
+const marineData = await marineResponse.json();
 const current = data.current;
 
 document.getElementById("conditions").innerHTML =
