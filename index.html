@@ -231,7 +231,8 @@ document.getElementById("conditions").innerHTML =
 ⏱ Wave period: ${marineData.current.wave_period} s<br>
 🌊 Swell direction: ${getCompassDirection(marineData.current.wave_direction)} (${marineData.current.wave_direction.toFixed(0)}°)
 `;
-
+let reasons = [];
+    
 const swimScore = calculateSwimScore(
     marineData.current.wave_height,
     marineData.current.wave_period,
