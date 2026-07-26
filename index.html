@@ -61,8 +61,11 @@ Plan safe and enjoyable open water swims.
 </p>
 
 <div class="card">
-<h2>Swim Location</h2>
-<p>Blackhead Lighthouse → Gleninagh Pier</p>
+<h2>Choose Swim Location</h2>
+
+<select id="locationSelect">
+</select>
+
 </div>
 
 <div class="card">
@@ -86,7 +89,22 @@ Check Swim Conditions
 </div>
 
 <script>
+function loadLocations() {
 
+const select = document.getElementById("locationSelect");
+
+swimLocations.forEach(location => {
+
+const option = document.createElement("option");
+
+option.value = location.id;
+option.textContent = location.name + " (" + location.county + ")";
+
+select.appendChild(option);
+
+});
+
+}
 async function checkConditions() {
 
 document.getElementById("conditions").innerHTML =
@@ -126,7 +144,7 @@ document.getElementById("conditions").innerHTML =
 }
 
 }
-
+loadLocations();
 </script>
 <script src="locations.js"></script>
 </body>
