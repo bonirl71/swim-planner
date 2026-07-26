@@ -8,41 +8,43 @@
 
 <style>
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background: #e8f6ff;
-}
-
-.header {
-    background: #0077b6;
-    color: white;
-    padding: 25px 15px;
-    text-align: center;
+    background: #e8f5ff;
+    margin: 0;
+    padding: 20px;
 }
 
 .container {
-    max-width: 500px;
+    max-width: 600px;
     margin: auto;
-    padding: 15px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #006994;
 }
 
 .card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    background: #f4fbff;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 10px;
 }
 
-.score {
-    font-size: 32px;
-    font-weight: bold;
-    color: green;
+button {
+    background: #0077b6;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
 }
 
-.condition {
-    font-size: 18px;
-    margin: 12px 0;
+button:hover {
+    background: #005f8a;
 }
 </style>
 
@@ -50,69 +52,52 @@ body {
 
 <body>
 
-<div class="header">
-    <h1>🌊 Sea Swim Planner</h1>
-    <p>Black Head Lighthouse → Gleninagh Pier</p>
-</div>
-
-
 <div class="container">
 
-<div class="card">
-<h2>Today's Swim Rating</h2>
-
-<div class="score">
-🟢 GOOD
-</div>
-
-<p>Score: 87 / 100</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>Conditions</h2>
-
-<div class="condition">
-🌬 Wind: <b>8 km/h SE</b>
-</div>
-
-<div class="condition">
-🌊 Waves: <b>0.3 metres</b>
-</div>
-
-<div class="condition">
-🌡 Air temperature: <b>18°C</b>
-</div>
-
-<div class="condition">
-🌊 Sea temperature: <b>16°C</b>
-</div>
-
-<div class="condition">
-🌙 High tide: <b>08:42</b>
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>Swim Plan</h2>
+<h1>🌊 Sea Swim Planner</h1>
 
 <p>
-Distance: <b>Approx 4.5 km</b>
+Plan safe and enjoyable open water swims.
 </p>
 
-<p>
-Expected time: <b>1 hr 30 mins</b>
+<div class="card">
+<h2>Swim Location</h2>
+<p>Blackhead Lighthouse → Gleninagh Pier</p>
+</div>
+
+<div class="card">
+<h2>Current Conditions</h2>
+<p id="conditions">
+Checking conditions...
 </p>
+</div>
+
+<div class="card">
+<h2>Swim Recommendation</h2>
+<p id="recommendation">
+Waiting for data...
+</p>
+</div>
+
+<button onclick="checkConditions()">
+Check Swim Conditions
+</button>
 
 </div>
 
+<script>
 
-</div>
-<p>Hello Brian!</p>
+function checkConditions() {
+
+document.getElementById("conditions").innerHTML =
+"🌡 Water temperature: Loading<br>🌊 Swell: Loading<br>💨 Wind: Loading";
+
+document.getElementById("recommendation").innerHTML =
+"✅ Initial assessment: Good potential swim window (demo mode)";
+
+}
+
+</script>
+
 </body>
 </html>
