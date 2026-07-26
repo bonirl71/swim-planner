@@ -291,11 +291,28 @@ else if (swimScore >= 60) {
 else {
     rating = "🔴 NOT RECOMMENDED";
 }
+let assessment;
 
+if (swimScore >= 85) {
+    assessment = "🟢 Excellent swimming conditions";
+}
+else if (swimScore >= 70) {
+    assessment = "🟢 Good swimming conditions";
+}
+else if (swimScore >= 50) {
+    assessment = "🟡 Challenging conditions";
+}
+else {
+    assessment = "🔴 Poor swimming conditions";
+}
 document.getElementById("recommendation").innerHTML =
 `
+🏊 Swim Assessment<br>
+${assessment}<br><br>
+
 🏊 Swim Score: ${swimScore}/100<br>
 ${rating}<br><br>
+
 ${reasons.join("<br>")}
 `;
 }
