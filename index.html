@@ -224,9 +224,29 @@ document.getElementById("conditions").innerHTML =
 🌊 Swell direction: ${getCompassDirection(marineData.current.wave_direction)} (${marineData.current.wave_direction.toFixed(0)}°)
 `;
 
-document.getElementById("recommendation").innerHTML =
-"🟢 Initial weather check complete - suitable for further sea analysis";
+const swimScore = calculateSwimScore(
+    marineData.current.wave_height,
+    marineData.current.wave_period,
+    current.wind_speed_10m
+);
 
+let rating;
+
+if (swimScore >= 80) {
+    rating = "🟢 GOOD CONDITIONS";
+}
+else if (swimScore >= 60) {
+    rating = "🟡 CAUTION";
+}
+else {
+    rating = "🔴 NOT RECOMMENDED";
+}
+
+document.getElementById("recommendation").innerHTML =
+`
+🏊 Swim Score: ${swimScore}/100<br>
+${rating}
+`;
 }
 
 catch(error) {
