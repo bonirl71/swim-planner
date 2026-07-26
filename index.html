@@ -1,24 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sea Swim Planner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sea Swim Planner</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #e8f6ff;
+}
+
+.header {
+    background: #0077b6;
+    color: white;
+    padding: 25px 15px;
+    text-align: center;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.score {
+    font-size: 32px;
+    font-weight: bold;
+    color: green;
+}
+
+.condition {
+    font-size: 18px;
+    margin: 12px 0;
+}
+</style>
+
 </head>
 
 <body>
 
-<h1>🌊 Sea Swim Planner</h1>
+<div class="header">
+    <h1>🌊 Sea Swim Planner</h1>
+    <p>Black Head Lighthouse → Gleninagh Pier</p>
+</div>
 
-<h2>Black Head → Gleninagh Pier</h2>
 
-<p>Checking swimming conditions...</p>
+<div class="container">
 
-<div>
-    <h3>Conditions</h3>
-    <p>Wind: Coming soon</p>
-    <p>Wave height: Coming soon</p>
-    <p>Tide: Coming soon</p>
-    <p>Swim rating: Coming soon</p>
+<div class="card">
+<h2>Today's Swim Rating</h2>
+
+<div class="score">
+🟢 GOOD
+</div>
+
+<p>Score: 87 / 100</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Conditions</h2>
+
+<div class="condition">
+🌬 Wind: <b>8 km/h SE</b>
+</div>
+
+<div class="condition">
+🌊 Waves: <b>0.3 metres</b>
+</div>
+
+<div class="condition">
+🌡 Air temperature: <b>18°C</b>
+</div>
+
+<div class="condition">
+🌊 Sea temperature: <b>16°C</b>
+</div>
+
+<div class="condition">
+🌙 High tide: <b>08:42</b>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Swim Plan</h2>
+
+<p>
+Distance: <b>Approx 4.5 km</b>
+</p>
+
+<p>
+Expected time: <b>1 hr 30 mins</b>
+</p>
+
+</div>
+
+
 </div>
 
 </body>
