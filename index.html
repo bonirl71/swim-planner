@@ -90,6 +90,22 @@ Check Swim Conditions
 <script src="locations.js"></script>
 
 <script>
+function getWindDirection(degrees) {
+
+const directions = [
+"North",
+"North-East",
+"East",
+"South-East",
+"South",
+"South-West",
+"West",
+"North-West"
+];
+
+return directions[Math.round(degrees / 45) % 8];
+
+}
 function loadLocations() {
 
 const select = document.getElementById("locationSelect");
@@ -121,7 +137,7 @@ const latitude = selectedLocation.latitude;
 const longitude = selectedLocation.longitude;
 
 const url =
-`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code`;
+`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}"&current=temperature_2m,wind_speed_10m,wind_direction_10m&wind_speed_unit=ms";weather_code`;
 
 try {
 
@@ -134,7 +150,7 @@ document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
 💨 Wind speed: ${data.current.wind_speed_10m} m/s<br>
-🧭 Wind direction: ${current.wind_direction_10m}°<br>
+🧭 Wind direction: ${getWindDirection(data.current.wind_direction_10m)}
 ☁ Weather code: ${current.weather_code}
 `;
 
