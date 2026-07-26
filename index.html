@@ -91,7 +91,25 @@ Check Swim Conditions
 
 <script>
 function getWindDirection(degrees) {
+function getWeatherDescription(code) {
 
+if (code === 0) return "Clear sky ☀️";
+
+if ([1,2,3].includes(code)) return "Cloudy ☁️";
+
+if ([45,48].includes(code)) return "Fog 🌫️";
+
+if (code >= 51 && code <= 67) return "Rain 🌧️";
+
+if (code >= 71 && code <= 77) return "Snow ❄️";
+
+if (code >= 80 && code <= 82) return "Rain showers 🌦️";
+
+if (code >= 95) return "Thunderstorm ⛈️";
+
+return "Unknown";
+
+}
 const directions = [
 "North",
 "North-East",
