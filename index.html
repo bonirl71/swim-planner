@@ -138,8 +138,7 @@ const directions = [
 return directions[Math.round(degrees / 22.5) % 16];
 
 }
-function calculateSwimScore(waveHeight, wavePeriod, windSpeed) {
-
+function calculateSwimScore(waveHeight, wavePeriod, windSpeed, windDirection) {
 let score = 100;
 
 // Wave height penalty
@@ -158,12 +157,21 @@ else if (wavePeriod < 7) {
     score -= 10;
 }
 
-// Wind penalty
-if (windSpeed > 8) {
-    score -= 30;
+// Wind speed penalty (Black Head to Gleninagh rules)
+if (windSpeed > 5) {
+    score -= 35;
 }
-else if (windSpeed > 5) {
-    score -= 15;
+else if (windSpeed > 3) {
+    score -= 10;
+}
+
+// Wind direction penalty
+if (windDirection.includes("North")) {
+    score -= 25;
+}
+
+if (windDirection === "West") {
+    score += 5;
 }
 
 return Math.max(score,0);
@@ -227,7 +235,9 @@ document.getElementById("conditions").innerHTML =
 const swimScore = calculateSwimScore(
     marineData.current.wave_height,
     marineData.current.wave_period,
-    current.wind_speed_10m
+    current.wind_speed_10m,
+    getWindDirection(current.wind_direction_10m)
+);
 );
 
 let rating;
