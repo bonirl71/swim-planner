@@ -166,24 +166,19 @@ const response = await fetch(url);
 const data = await response.json();
 const marineResponse = await fetch(marineUrl);
 const marineData = await marineResponse.json();
+console.log(marineData);
 const current = data.current;
-fetch(marineUrl)
-.then(response => response.json())
-.then(marineData => {
 
-    const waveHeight = marineData.hourly.wave_height[0];
-    const wavePeriod = marineData.hourly.wave_period[0];
-
-    console.log("Wave height:", waveHeight);
-    console.log("Wave period:", wavePeriod);
-
-});
 document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
-💨 Wind speed: ${data.current.wind_speed_10m} m/s<br>
-🧭 Wind direction: ${getWindDirection(data.current.wind_direction_10m)}<br>
-☁ Conditions: ${getWeatherDescription(current.weather_code)}
+💨 Wind speed: ${current.wind_speed_10m} m/s<br>
+🧭 Wind direction: ${getWindDirection(current.wind_direction_10m)}<br>
+☁ Conditions: ${getWeatherDescription(current.weather_code)}<br><br>
+
+🌊 Wave height: ${marineData.current.wave_height} m<br>
+⏱ Wave period: ${marineData.current.wave_period} s<br>
+🧭 Wave direction: ${marineData.current.wave_direction}°
 `;
 
 document.getElementById("recommendation").innerHTML =
