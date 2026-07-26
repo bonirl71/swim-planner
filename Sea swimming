@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sea Swim Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<h1>🌊 Sea Swim Planner</h1>
+
+<h2>Black Head → Gleninagh Pier</h2>
+
+<p>Checking swimming conditions...</p>
+
+<div>
+    <h3>Conditions</h3>
+    <p>Wind: Coming soon</p>
+    <p>Wave height: Coming soon</p>
+    <p>Tide: Coming soon</p>
+    <p>Swim rating: Coming soon</p>
+</div>
+
+</body>
+</html>
