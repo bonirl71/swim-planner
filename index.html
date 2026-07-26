@@ -167,7 +167,11 @@ const data = await response.json();
 const marineResponse = await fetch(marineUrl);
 const marineData = await marineResponse.json();
 const current = data.current;
-
+fetch(marineUrl)
+.then(response => response.json())
+.then(marineData => {
+    console.log("Marine data:", marineData);
+});
 document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
