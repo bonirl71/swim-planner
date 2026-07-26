@@ -271,6 +271,15 @@ else if (marineData.current.wave_height <= 1) {
 else {
     reasons.push("🔴 Large waves (" + marineData.current.wave_height + " m)");
 }
+if (marineData.current.sea_surface_temperature >= 15) {
+    reasons.push("✅ Comfortable water temperature (" + marineData.current.sea_surface_temperature + "°C)");
+}
+else if (marineData.current.sea_surface_temperature >= 12) {
+    reasons.push("🟡 Cold water (" + marineData.current.sea_surface_temperature + "°C)");
+}
+else {
+    reasons.push("🔴 Very cold water (" + marineData.current.sea_surface_temperature + "°C)");
+}
 let rating;
 
 if (swimScore >= 80) {
