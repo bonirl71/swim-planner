@@ -170,7 +170,13 @@ const current = data.current;
 fetch(marineUrl)
 .then(response => response.json())
 .then(marineData => {
-    console.log("Marine data:", marineData);
+
+    const waveHeight = marineData.hourly.wave_height[0];
+    const wavePeriod = marineData.hourly.wave_period[0];
+
+    console.log("Wave height:", waveHeight);
+    console.log("Wave period:", wavePeriod);
+
 });
 document.getElementById("conditions").innerHTML =
 `
