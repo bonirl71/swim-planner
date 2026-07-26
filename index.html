@@ -87,13 +87,43 @@ Check Swim Conditions
 
 <script>
 
-function checkConditions() {
+async function checkConditions() {
 
 document.getElementById("conditions").innerHTML =
-"🌡 Water temperature: Loading<br>🌊 Swell: Loading<br>💨 Wind: Loading";
+"⏳ Getting live sea conditions...";
+
+const latitude = 53.148;
+const longitude = -9.265;
+
+const url =
+`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code`;
+
+try {
+
+const response = await fetch(url);
+const data = await response.json();
+
+const current = data.current;
+
+document.getElementById("conditions").innerHTML =
+`
+🌡 Air temperature: ${current.temperature_2m}°C<br>
+💨 Wind speed: ${current.wind_speed_10m} km/h<br>
+🧭 Wind direction: ${current.wind_direction_10m}°<br>
+☁ Weather code: ${current.weather_code}
+`;
 
 document.getElementById("recommendation").innerHTML =
-"✅ Initial assessment: Good potential swim window (demo mode)";
+"🟢 Initial weather check complete - suitable for further sea analysis";
+
+}
+
+catch(error) {
+
+document.getElementById("conditions").innerHTML =
+"⚠️ Unable to load weather data";
+
+}
 
 }
 
