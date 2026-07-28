@@ -243,32 +243,38 @@ function calculateSwimScore(waveHeight, wavePeriod, windSpeed, windDirection) {
 let score = 100;
 
 // Wave height penalty
-if (waveHeight > 1.0) {
+if (waveHeight > 1.5) {
     score -= 40;
 }
+else if (waveHeight > 1.0) {
+    score -= 25;
+}
 else if (waveHeight > 0.5) {
-    score -= 20;
+    score -= 10;
 }
 
 // Wave period penalty
-if (wavePeriod < 5) {
+if (wavePeriod < 4) {
     score -= 20;
 }
-else if (wavePeriod < 7) {
+else if (wavePeriod < 6) {
     score -= 10;
 }
 
-// Wind speed penalty (Black Head to Gleninagh rules)
-if (windSpeed > 5) {
+// Wind speed penalty
+if (windSpeed > 8) {
     score -= 35;
 }
+else if (windSpeed > 5) {
+    score -= 20;
+}
 else if (windSpeed > 3) {
-    score -= 10;
+    score -= 5;
 }
 
 // Wind direction penalty
 if (windDirection.includes("North")) {
-    score -= 25;
+    score -= 15;
 }
 
 if (windDirection === "West") {
@@ -276,7 +282,6 @@ if (windDirection === "West") {
 }
 
 return Math.max(score,0);
-
 }    
 function loadLocations() {
 
@@ -295,7 +300,7 @@ select.appendChild(option);
 
 }
 async function checkConditions() {
-
+console.log("checkConditions started");
 document.getElementById("conditions").innerHTML =
 "⏳ Getting live sea conditions...";
 
