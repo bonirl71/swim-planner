@@ -266,7 +266,7 @@ if (windSpeed > 8) {
     score -= 35;
 }
 else if (windSpeed > 5) {
-    score -= 20;
+    score -= 15;
 }
 else if (windSpeed > 3) {
     score -= 5;
@@ -389,13 +389,16 @@ else {
 let rating;
 
 if (swimScore >= 80) {
-    rating = "🟢 GOOD CONDITIONS";
+    rating = "🟢 EXCELLENT CONDITIONS";
 }
 else if (swimScore >= 60) {
-    rating = "🟡 CAUTION";
+    rating = "🟡 GOOD CONDITIONS";
+}
+else if (swimScore >= 40) {
+    rating = "🟠 CHALLENGING CONDITIONS";
 }
 else {
-    rating = "🔴 NOT RECOMMENDED";
+    rating = "🔴 POOR CONDITIONS";
 }
 let assessment;
 
