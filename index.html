@@ -8,10 +8,35 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: #e8f5ff;
     margin: 0;
     padding: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: linear-gradient(
+        180deg,
+        #9fd6ff 0%,
+        #dff4ff 40%,
+        #f4fbff 100%
+    );
+
+    display: flex;
+    justify-content: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 520px;
+
+    background: white;
+
+    border-radius: 22px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.15);
+
+    margin-bottom: 40px;
 }
 
 .container {
@@ -52,7 +77,7 @@ button:hover {
 
 <body>
 
-<div class="container">
+<div class="app">
 
 <h1>🌊 Sea Swim Planner</h1>
 
@@ -327,5 +352,6 @@ document.getElementById("conditions").innerHTML =
 }
 loadLocations();
 </script>
+</div>
 </body>
 </html>
