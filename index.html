@@ -919,13 +919,21 @@ const nextTide = upcomingTides.length > 0
     ? upcomingTides[0]
     : null;
 
+
+/* =========================
+   TIDE LIST
+   ========================= */
+
 const tideDisplay = upcomingTides
     .slice(0, 6)
     .map(tide => {
 
-        const time = tide.time.toLocaleTimeString(
+        const dateTime = tide.time.toLocaleString(
             "en-IE",
             {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,
@@ -937,10 +945,14 @@ const tideDisplay = upcomingTides
             tide.type === "High Tide" ? "🔵" : "⚪";
 
         return `
-        <div style="margin:8px 0;">
+        <div style="
+            margin:10px 0;
+            padding-bottom:8px;
+            border-bottom:1px solid #e1eef5;
+        ">
             ${icon}
             <strong>${tide.type}</strong>
-            — ${time}
+            — ${dateTime}
             — ${tide.height.toFixed(2)} m
         </div>
         `;
@@ -956,9 +968,12 @@ let nextTideDisplay = "";
 
 if (nextTide) {
 
-    const nextTime = nextTide.time.toLocaleTimeString(
+    const nextDateTime = nextTide.time.toLocaleString(
         "en-IE",
         {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
@@ -971,21 +986,20 @@ if (nextTide) {
 
     nextTideDisplay = `
         <div style="
-            margin-top:15px;
-            padding:12px;
+            margin-top:18px;
+            padding:14px;
             background:#e8f6ff;
             border-radius:10px;
             font-weight:bold;
+            color:#006994;
         ">
-            ➡️ Next tide:
+            ➡️ Next ${nextTide.type}:<br>
             ${nextIcon}
-            ${nextTide.type}
-            at ${nextTime}
-            (${nextTide.height.toFixed(2)} m)
+            ${nextDateTime}
+            — ${nextTide.height.toFixed(2)} m
         </div>
     `;
 }
-
 
 /* =========================
    DISPLAY SEA CONDITIONS
@@ -1009,6 +1023,17 @@ document.getElementById("conditions").innerHTML =
 <h3>🌊 TIDES</h3>
 
 ${tideDisplay}
+
+${nextTideDisplay}
+
+<div style="
+    margin-top:12px;
+    font-size:13px;
+    color:#6b7b88;
+">
+    Marine Institute station:
+    ${selectedLocation.tideStation}
+</div>
 
 `;
 
