@@ -668,6 +668,7 @@ const data = await response.json();
 
 let marineData = null;
 let tideData = null;
+let lakeWaterTemperature = null;
 
 if (selectedLocation.type !== "lake") {
 
@@ -689,6 +690,68 @@ const current = data.current;
    ========================= */
 
 if (selectedLocation.type === "lake") {
+
+    /* =========================
+       OPW LAKE WATER TEMPERATURE
+       Portumna Bridge - Station 25341
+       Sensor 0002
+       ========================= */
+
+    try {
+
+        const waterTempUrl =
+            "https://waterlevel.ie/data/day/25341_0002.csv";
+
+        const waterTempResponse =
+            await fetch(waterTempUrl + "?t=" + Date.now());
+
+        const waterTempText =
+            await waterTempResponse.text();
+
+        const waterTempLines =
+            waterTempText.trim().split(/\r?\n/);
+
+        /* Find the latest valid temperature reading */
+
+        for (
+            let i = waterTempLines.length - 1;
+            i >= 0;
+            i--
+        ) {
+
+            const parts =
+                waterTempLines[i].split(",");
+
+            if (parts.length < 2) {
+                continue;
+            }
+
+            const possibleTemperature =
+                Number(
+                    parts[parts.length - 1].trim()
+                );
+
+            if (Number.isFinite(possibleTemperature)) {
+
+                lakeWaterTemperature =
+                    possibleTemperature;
+
+                break;
+            }
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "OPW WATER TEMPERATURE ERROR:",
+            error
+        );
+
+        lakeWaterTemperature = null;
+
+    }
+
 
     const windSpeed = current.wind_speed_10m;
     const windDegrees = current.wind_direction_10m;
