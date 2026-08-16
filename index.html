@@ -328,8 +328,7 @@ const todayString = today.toISOString().split("T")[0];
 const tomorrowString = tomorrow.toISOString().split("T")[0];
 
 const tideUrl =
-`https://erddap.marine.ie/erddap/tabledap/imiTidePrediction.json?&stationID%3D%22Lahinch_MODELLED%22&time%3E=${todayString}T00%3A00%3A00Z&time%3C=${tomorrowString}T00%3A00%3A00Z`;
-
+`https://erddap.marine.ie/erddap/tabledap/imiTidePredictionEpa.json?&stationID%3D%22${selectedLocation.tideStation}%22&time%3E=${todayString}T00%3A00%3A00Z&time%3C=${tomorrowString}T00%3A00%3A00Z`;
 try {
 
 const response = await fetch(url);
