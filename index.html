@@ -1027,6 +1027,51 @@ if (nextTide) {
     `;
 }
 
+   /* =========================
+   JOURNEY PLANNER
+   ========================= */
+
+const highTideSelect =
+    document.getElementById("highTideSelect");
+
+const travelPlannerCard =
+    document.getElementById("travelPlannerCard");
+
+highTideSelect.innerHTML = "";
+
+const highTides = upcomingTides.filter(
+    tide => tide.type === "High Tide"
+);
+
+highTides.forEach((tide, index) => {
+
+    const option = document.createElement("option");
+
+    option.value = tide.time.toISOString();
+
+    option.textContent =
+        tide.time.toLocaleString(
+            "en-IE",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+                timeZone: "Europe/Dublin"
+            }
+        )
+        + " — "
+        + tide.height.toFixed(2)
+        + " m";
+
+    highTideSelect.appendChild(option);
+
+});
+
+travelPlannerCard.style.display = "block";
+   
 /* =========================
    DISPLAY SEA CONDITIONS
    ========================= */
