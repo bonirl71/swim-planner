@@ -317,11 +317,15 @@ const url =
 `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code&wind_speed_unit=ms`;
 const marineUrl =
 `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&current=wave_height,wave_period,wave_direction,sea_surface_temperature`;
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+
+const todayString = today.toISOString().split("T")[0];
+const tomorrowString = tomorrow.toISOString().split("T")[0];
 
 const tideUrl =
-`https://www.worldtides.info/api/v3?heights&extremes&lat=${latitude}&lon=${longitude}&key=81ec8c07-4111-4535-99e5-8042960548d4
-`;
-
+`https://erddap.marine.ie/erddap/tabledap/imiTidePrediction.json?&stationID%3D%22Lahinch_MODELLED%22&time%3E=${todayString}T00%3A00%3A00Z&time%3C=${tomorrowString}T00%3A00%3A00Z`;
 try {
 
 const response = await fetch(url);
