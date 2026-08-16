@@ -143,41 +143,81 @@ body {
    ========================= */
 
 .user-guide {
-    margin-top: 18px;
-    background: #eef9ff;
-    border: 1px solid #d5ebf6;
-    border-radius: 14px;
-    padding: 0;
+    position: relative;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 .user-guide summary {
-    padding: 16px 18px;
+    width: 70px;
+    height: 70px;
+
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
     cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    color: #006994;
+
+    background:
+        linear-gradient(
+            135deg,
+            #00b4ff,
+            #0077cc
+        );
+
+    color: white;
+
+    box-shadow:
+        0 8px 18px rgba(0,119,204,.25);
+
     list-style: none;
+
+    font-size: 28px;
 }
 
 .user-guide summary::-webkit-details-marker {
     display: none;
 }
 
-.user-guide summary::after {
-    content: "＋";
-    float: right;
-    font-size: 20px;
-}
-
-.user-guide[open] summary::after {
-    content: "−";
+.user-guide summary span {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 2px;
 }
 
 .user-guide-content {
-    padding: 0 18px 18px 18px;
+    position: absolute;
+    right: 0;
+    top: 82px;
+
+    width: min(600px, 80vw);
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 14px;
+
+    border: 1px solid #d7e8f1;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.18);
+
     color: #263f50;
+
     font-size: 15px;
+
     line-height: 1.6;
+
+    z-index: 100;
+}
+
+.user-guide-content h2 {
+    margin-top: 0;
+    color: #006994;
 }
 
 .user-guide-content h3 {
@@ -191,21 +231,25 @@ body {
     margin: 6px 0;
 }
 
-.user-guide-content ul {
-    margin-top: 6px;
-    padding-left: 22px;
+.start-planning {
+    margin-top: 0;
+    margin-bottom: 20px;
 }
 
 .user-guide-warning {
     margin-top: 16px;
     padding: 12px;
+
     background: #fff8e6;
+
     border: 1px solid #f0d98c;
+
     border-radius: 10px;
+
     font-size: 13px;
+
     line-height: 1.5;
-}
-   
+}   
 /* =========================
    CARDS
    ========================= */
@@ -439,7 +483,23 @@ button:active {
     .app-header p {
         font-size: 14px;
     }
+    .user-guide summary {
+        width: 58px;
+        height: 58px;
+        border-radius: 15px;
+        font-size: 24px;
+    }
 
+    .user-guide-content {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+   
     .app > p {
         font-size: 16px;
     }
@@ -519,7 +579,7 @@ button:active {
         🌊
     </div>
 
-    <div>
+    <div class="app-title">
 
         <h1>Open Water Swim Planner</h1>
 
@@ -528,6 +588,101 @@ button:active {
         </p>
 
     </div>
+
+    <details class="user-guide" id="userGuide">
+
+        <summary>
+            📖
+            <span>Guide</span>
+        </summary>
+
+        <div class="user-guide-content">
+
+            <button
+                type="button"
+                class="start-planning"
+                onclick="
+                    document.getElementById('userGuide').removeAttribute('open');
+                    document.getElementById('locationCard').scrollIntoView({behavior:'smooth'});
+                "
+            >
+                🏊 Let's Start Planning
+            </button>
+
+            <h2>How to use the Swim Planner</h2>
+
+            <h3>🌊 Check current conditions</h3>
+
+            <p>
+                Choose a swim location and select
+                <strong>Check Swim Conditions</strong>.
+                The app will show the latest available
+                weather, wind, water and sea conditions.
+            </p>
+
+            <h3>📅 Plan a future sea swim</h3>
+
+            <p>
+                Sea locations show high and low tides for
+                the next 7 days. Select the high tide you
+                want to swim around.
+            </p>
+
+            <h3>🔮 Predict future conditions</h3>
+
+            <p>
+                Select a future high tide and choose
+                <strong>Predict Swim Conditions</strong>.
+                The app will show the expected conditions
+                around that time.
+            </p>
+
+            <div class="user-guide-warning">
+
+                ⚠️ <strong>Forecast guidance only</strong><br><br>
+
+                Forecast conditions, particularly several
+                days in advance, can change significantly.
+                Predictions are a guide only and should not
+                be relied upon as an assessment of swimming
+                safety. Always check the latest forecast and
+                local conditions before swimming.
+
+            </div>
+
+            <h3>🚗 Plan your journey</h3>
+
+            <p>
+                Select your chosen high tide and use
+                <strong>Calculate Journey From My Location</strong>
+                to calculate your driving distance, journey
+                time and recommended departure time.
+            </p>
+
+            <p>
+                The journey planner currently works on the
+                basis of arriving 2 hours before high tide.
+            </p>
+
+            <h3>🏞️ Lake swimming</h3>
+
+            <p>
+                Lake locations don't use tidal information.
+                Instead, the app assesses wind, expected
+                chop, temperature and weather conditions.
+            </p>
+
+            <h3>🔄 Changing location</h3>
+
+            <p>
+                When you change location, any previous
+                Journey Planner and future prediction are
+                automatically cleared.
+            </p>
+
+        </div>
+
+    </details>
 
 </header>
 
@@ -658,7 +813,7 @@ Plan safe and enjoyable open water swims.
 
 </details>   
    
-<div class="card">
+<div class="card" id="locationCard">
 <h2>Choose Swim Location</h2>
 
 <div class="location-controls">
