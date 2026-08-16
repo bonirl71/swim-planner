@@ -46,7 +46,7 @@ const swimLocations = [
     },
     {
         id: 6,
-        name: "Youghal Lake",
+        name: "Youghal Quay",
         county: "Tipperary",
         latitude: 52.898509,
         longitude: -8.310286,
