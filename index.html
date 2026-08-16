@@ -692,65 +692,38 @@ const current = data.current;
 if (selectedLocation.type === "lake") {
 
     /* =========================
-       OPW LAKE WATER TEMPERATURE
-       Portumna Bridge - Station 25341
-       Sensor 0002
-       ========================= */
+   LAKE WATER TEMPERATURE
+   ========================= */
 
-    try {
 
-        const waterTempUrl =
-            "https://waterlevel.ie/data/day/25341_0002.csv";
+try {
 
-        const waterTempResponse =
-            await fetch(waterTempUrl + "?t=" + Date.now());
+    const waterTempResponse =
+        await fetch("lake-temperature.json?t=" + Date.now());
 
-        const waterTempText =
-            await waterTempResponse.text();
+    const waterTempData =
+        await waterTempResponse.json();
 
-        const waterTempLines =
-            waterTempText.trim().split(/\r?\n/);
+    lakeWaterTemperature =
+        Number(waterTempData.temperature);
 
-        /* Find the latest valid temperature reading */
+    console.log(
+        "🌡️ LAKE WATER TEMPERATURE:",
+        lakeWaterTemperature,
+        "°C"
+    );
 
-        for (
-            let i = waterTempLines.length - 1;
-            i >= 0;
-            i--
-        ) {
+}
+catch (error) {
 
-            const parts =
-                waterTempLines[i].split(",");
+    console.error(
+        "LAKE WATER TEMPERATURE ERROR:",
+        error
+    );
 
-            if (parts.length < 2) {
-                continue;
-            }
+    lakeWaterTemperature = null;
 
-            const possibleTemperature =
-                Number(
-                    parts[parts.length - 1].trim()
-                );
-
-            if (Number.isFinite(possibleTemperature)) {
-
-                lakeWaterTemperature =
-                    possibleTemperature;
-
-                break;
-            }
-        }
-
-    }
-    catch (error) {
-
-        console.error(
-            "OPW WATER TEMPERATURE ERROR:",
-            error
-        );
-
-        lakeWaterTemperature = null;
-
-    }
+}
 
 
     const windSpeed = current.wind_speed_10m;
@@ -898,6 +871,11 @@ else {
     document.getElementById("conditions").innerHTML =
     `
     🌡 Air temperature: ${current.temperature_2m}°C<br>
+    🌊 Lake water temperature: ${
+    lakeWaterTemperature !== null
+        ? lakeWaterTemperature.toFixed(1)
+        : "Unavailable"
+}°C<br>
     💨 Wind speed: ${windSpeed} m/s<br>
     🧭 Wind direction: ${windDirection} (${windDegrees.toFixed(0)}°)<br>
     ☁ Conditions: ${getWeatherDescription(current.weather_code)}<br><br>
