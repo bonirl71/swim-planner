@@ -263,32 +263,34 @@ button:active {
 @media (min-width: 800px) {
 
     .app {
+        max-width: 1200px;
         padding: 35px;
     }
 
     /*
-       Put the location card and
-       current conditions beside
-       each other on desktop.
+       Wider desktop layout.
+       Location gets 38%.
+       Conditions gets 62%.
     */
 
     .app .card:nth-of-type(1),
     .app .card:nth-of-type(2) {
         display: inline-block;
-
         vertical-align: top;
-
-        width: calc(50% - 10px);
     }
 
+    /* Swim location */
     .app .card:nth-of-type(1) {
+        width: calc(38% - 10px);
         margin-right: 16px;
     }
 
+    /* Current conditions + tides */
     .app .card:nth-of-type(2) {
-        margin-right: 0;
+        width: calc(62% - 10px);
     }
 
+    /* Swim recommendation */
     .app .card:nth-of-type(3) {
         width: 100%;
     }
