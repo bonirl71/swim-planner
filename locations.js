@@ -6,7 +6,8 @@ const swimLocations = [
         latitude: 53.148,
         longitude: -9.265,
         distance: "2.5 km",
-        type: "sea"
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0100_MODELLED"
     },
     {
         id: 2,
@@ -15,7 +16,8 @@ const swimLocations = [
         latitude: 53.125,
         longitude: -9.290,
         distance: "TBC",
-        type: "sea"
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0100_MODELLED"
     },
     {
         id: 3,
@@ -24,7 +26,8 @@ const swimLocations = [
         latitude: 53.053,
         longitude: -9.344,
         distance: "TBC",
-        type: "sea"
+        type: "sea",
+        tideStation: "IESHBWC100_0000_0100_MODELLED"
     },
     {
         id: 4,
@@ -33,7 +36,8 @@ const swimLocations = [
         latitude: 52.679141,
         longitude: -9.652973,
         distance: "TBC",
-        type: "sea"
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0400_MODELLED"
     },
     {
         id: 5,
@@ -42,7 +46,8 @@ const swimLocations = [
         latitude: 52.747723,
         longitude: -9.549059,
         distance: "TBC",
-        type: "sea"
+        type: "sea",
+        tideStation: "IESHBWC080_0000_0100_MODELLED"
     },
     {
         id: 6,
