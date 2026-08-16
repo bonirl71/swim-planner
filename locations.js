@@ -69,4 +69,3 @@ const swimLocations = [
         tideStation: "IEEABWC020_0000_0200_MODELLED"
     }
 ];
-];
