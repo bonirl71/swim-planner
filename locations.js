@@ -1,7 +1,7 @@
 const swimLocations = [
     {
         id: 1,
-        name: "Blackhead Lighthouse → Gleninagh Pier",
+        name: "Blackhead Lighthouse and Gleninagh Pier",
         county: "Clare",
         latitude: 53.148,
         longitude: -9.265,
