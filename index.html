@@ -471,8 +471,16 @@ Plan safe and enjoyable open water swims.
 <div class="card">
 <h2>Choose Swim Location</h2>
 
-<select id="locationSelect">
-</select>
+<div class="location-controls">
+
+    <select id="locationSelect">
+    </select>
+
+    <button type="button" onclick="checkConditions()">
+        Check Swim Conditions
+    </button>
+
+</div>
 
 </div>
 
@@ -514,9 +522,6 @@ Waiting for data...
 
 </div>
    
-<button onclick="checkConditions()">
-Check Swim Conditions
-</button>
 
 </div>
 <script src="locations.js?v=2"></script>
