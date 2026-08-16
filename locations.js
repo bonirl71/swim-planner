@@ -47,7 +47,7 @@ const swimLocations = [
     {
         id: 6,
         name: "Youghal Lake",
-        county: "Clare",
+        county: "Tipperary",
         latitude: 52.898509,
         longitude: -8.310286,
         distance: "TBC",
