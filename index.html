@@ -335,17 +335,134 @@ try {
 const response = await fetch(url);
 const data = await response.json();
 
-const marineResponse = await fetch(marineUrl);
-const marineData = await marineResponse.json();
+let marineData = null;
+let tideData = null;
 
-const tideResponse = await fetch(tideUrl);
-const tideData = await tideResponse.json();
+if (selectedLocation.type !== "lake") {
+
+    const marineResponse = await fetch(marineUrl);
+    marineData = await marineResponse.json();
+
+    const tideResponse = await fetch(tideUrl);
+    tideData = await tideResponse.json();
+
+}
 
 console.log(tideData);
 console.log(marineData);
 
 const current = data.current;
+/* =========================
+   LAKE CONDITIONS
+   ========================= */
 
+if (selectedLocation.type === "lake") {
+
+    const windSpeed = current.wind_speed_10m;
+    const windDegrees = current.wind_direction_10m;
+    const windDirection = getWindDirection(windDegrees);
+
+    let lakeCondition;
+    let locationImpact;
+    let swimAdvice;
+
+    if (windDirection.includes("South")) {
+
+        lakeCondition = "🟢 CALM TO SLIGHT CHOP";
+        locationImpact =
+            "🟢 Youghal side: Calm<br>" +
+            "🟡 Tomona side: A little choppier";
+        swimAdvice =
+            "Youghal side is the better option in a southerly wind.";
+
+    }
+    else if (windDirection.includes("North")) {
+
+        lakeCondition = "🟢 CALM TO SLIGHT CHOP";
+        locationImpact =
+            "🟡 Youghal side: A little choppier<br>" +
+            "🟢 Tomona side: Calm";
+        swimAdvice =
+            "Tomona side is the better option in a northerly wind.";
+
+    }
+    else if (windDirection.includes("West")) {
+
+        lakeCondition = "🔴 CHOPPY";
+        locationImpact =
+            "🔴 Both sides exposed to chop";
+        swimAdvice =
+            "Westerly wind creates chop across the lake. Swimming towards Caddy's means swimming into the wind.";
+
+    }
+    else if (windDirection.includes("East")) {
+
+        lakeCondition = "🟡 SLIGHTLY CHOPPY";
+        locationImpact =
+            "🟡 Both sides somewhat sheltered";
+        swimAdvice =
+            "Easterly wind is generally better than westerly, but some chop is still expected.";
+
+    }
+    else {
+
+        lakeCondition = "🟡 VARIABLE";
+        locationImpact =
+            "ℹ️ Conditions depend on the exact wind direction";
+        swimAdvice =
+            "Check the wind direction before swimming.";
+
+    }
+
+
+    /* Wind strength adjustment */
+
+    if (windSpeed > 7) {
+
+        lakeCondition = "🔴 CHOPPY / STRONG WIND";
+
+        swimAdvice +=
+            "<br>⚠️ Strong wind — conditions may be significantly rougher than normal.";
+
+    }
+    else if (windSpeed > 5) {
+
+        swimAdvice +=
+            "<br>🟡 Moderate wind — expect increased chop.";
+
+    }
+
+
+    document.getElementById("conditions").innerHTML =
+    `
+    🌡 Air temperature: ${current.temperature_2m}°C<br>
+    💨 Wind speed: ${windSpeed} m/s<br>
+    🧭 Wind direction: ${windDirection} (${windDegrees.toFixed(0)}°)<br>
+    ☁ Conditions: ${getWeatherDescription(current.weather_code)}<br><br>
+
+    <hr>
+
+    <h3>🏊 LAKE CONDITIONS</h3>
+
+    <strong>${lakeCondition}</strong><br><br>
+
+    ${locationImpact}<br><br>
+
+    ${swimAdvice}
+    `;
+
+
+    document.getElementById("recommendation").innerHTML =
+    `
+    🏊 <strong>LAKE SWIM RECOMMENDATION</strong><br><br>
+
+    ${lakeCondition}<br><br>
+
+    ${swimAdvice}
+    `;
+
+    return;
+}
 console.log("TIDE ROWS:", tideData.table.rows);
 console.log("TIDE COLUMNS:", tideData.table.columnNames);
 
