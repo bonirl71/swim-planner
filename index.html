@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Sea Swim Planner</title>
+</style>
+/* =========================
+   GLOBAL
+   ========================= */
 
-<style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 20px;
@@ -19,117 +26,407 @@ body {
         #f4fbff 100%
     );
 
+    min-height: 100vh;
+
     display: flex;
     justify-content: center;
+    align-items: flex-start;
 }
+
+
+/* =========================
+   MAIN APP
+   ========================= */
 
 .app {
     width: 100%;
-    max-width: 520px;
+    max-width: 900px;
 
     background: white;
 
     border-radius: 22px;
 
-    padding: 24px;
+    padding: 30px;
 
     box-shadow:
         0 12px 30px rgba(0,0,0,0.15);
 
     margin-bottom: 40px;
 }
-.app-header{
 
-display:flex;
 
-align-items:center;
+/* =========================
+   HEADER
+   ========================= */
 
-gap:18px;
+.app-header {
+    display: flex;
 
-margin-bottom:28px;
+    align-items: center;
 
-padding-bottom:20px;
+    gap: 18px;
 
-border-bottom:1px solid #e7eef5;
+    margin-bottom: 28px;
 
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #e7eef5;
 }
 
-.logo{
+.logo {
+    width: 70px;
+    height: 70px;
 
-width:64px;
+    flex-shrink: 0;
 
-height:64px;
+    border-radius: 18px;
 
-border-radius:18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-display:flex;
+    font-size: 36px;
 
-align-items:center;
+    background:
+        linear-gradient(
+            135deg,
+            #00b4ff,
+            #0077cc
+        );
 
-justify-content:center;
+    color: white;
 
-font-size:34px;
-
-background:linear-gradient(135deg,#00b4ff,#0077cc);
-
-color:white;
-
-box-shadow:0 8px 18px rgba(0,119,204,.25);
-
+    box-shadow:
+        0 8px 18px rgba(0,119,204,.25);
 }
 
-.app-header h1{
+.app-header h1 {
+    margin: 0;
 
-margin:0;
+    font-size: 34px;
 
-font-size:34px;
-
-color:#0d5f92;
-
+    color: #0d5f92;
 }
 
-.app-header p{
+.app-header p {
+    margin-top: 6px;
+    margin-bottom: 0;
 
-margin-top:6px;
+    color: #6b7b88;
 
-margin-bottom:0;
-
-color:#6b7b88;
-
-font-size:16px;
-
-}
-.container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 16px;
 }
 
-h1 {
-    color: #006994;
+
+/* =========================
+   INTRODUCTION
+   ========================= */
+
+.app > p {
+    font-size: 17px;
+
+    color: #4f6472;
+
+    margin: 0 0 20px 0;
 }
+
+
+/* =========================
+   CARDS
+   ========================= */
 
 .card {
     background: #f4fbff;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 10px;
+
+    padding: 20px;
+
+    margin-top: 18px;
+
+    border-radius: 14px;
+
+    border: 1px solid #e1f0f8;
 }
 
-button {
-    background: #0077b6;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+.card h2 {
+    margin-top: 0;
+
+    color: #006994;
+
+    font-size: 21px;
+}
+
+
+/* =========================
+   LOCATION SELECT
+   ========================= */
+
+select {
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #b8d7e8;
+
+    background: white;
+
+    color: #123;
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   CONDITIONS / RECOMMENDATION
+   ========================= */
+
+#conditions,
+#recommendation {
+    line-height: 1.65;
+
     font-size: 16px;
+
+    color: #263f50;
+}
+
+#conditions hr {
+    border: 0;
+
+    border-top: 1px solid #d7e8f1;
+
+    margin: 20px 0;
+}
+
+#conditions h3 {
+    color: #006994;
+
+    margin-top: 0;
+}
+
+
+/* =========================
+   BUTTON
+   ========================= */
+
+button {
+    display: block;
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    background: #0077b6;
+
+    color: white;
+
+    border: none;
+
+    padding: 15px 20px;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        transform 0.1s;
 }
 
 button:hover {
     background: #005f8a;
+}
+
+button:active {
+    transform: scale(0.99);
+}
+
+
+/* =========================
+   DESKTOP LAYOUT
+   ========================= */
+
+@media (min-width: 800px) {
+
+    .app {
+        padding: 35px;
+    }
+
+    /*
+       Put the location card and
+       current conditions beside
+       each other on desktop.
+    */
+
+    .app .card:nth-of-type(1),
+    .app .card:nth-of-type(2) {
+        display: inline-block;
+
+        vertical-align: top;
+
+        width: calc(50% - 10px);
+    }
+
+    .app .card:nth-of-type(1) {
+        margin-right: 16px;
+    }
+
+    .app .card:nth-of-type(2) {
+        margin-right: 0;
+    }
+
+    .app .card:nth-of-type(3) {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (min-width: 600px) and (max-width: 799px) {
+
+    .app {
+        max-width: 700px;
+
+        padding: 28px;
+    }
+
+}
+
+
+/* =========================
+   PHONE
+   ========================= */
+
+@media (max-width: 599px) {
+
+    body {
+        padding: 0;
+
+        background:
+            linear-gradient(
+                180deg,
+                #9fd6ff 0%,
+                #dff4ff 100%
+            );
+    }
+
+    .app {
+        width: 100%;
+
+        max-width: none;
+
+        min-height: 100vh;
+
+        padding: 18px;
+
+        border-radius: 0;
+
+        box-shadow: none;
+
+        margin: 0;
+    }
+
+    .app-header {
+        gap: 12px;
+
+        margin-bottom: 20px;
+
+        padding-bottom: 16px;
+    }
+
+    .logo {
+        width: 58px;
+        height: 58px;
+
+        border-radius: 15px;
+
+        font-size: 30px;
+    }
+
+    .app-header h1 {
+        font-size: 24px;
+
+        line-height: 1.15;
+    }
+
+    .app-header p {
+        font-size: 14px;
+    }
+
+    .app > p {
+        font-size: 16px;
+    }
+
+    .card {
+        padding: 16px;
+
+        margin-top: 14px;
+
+        border-radius: 12px;
+    }
+
+    .card h2 {
+        font-size: 19px;
+    }
+
+    #conditions,
+    #recommendation {
+        font-size: 15px;
+
+        line-height: 1.6;
+    }
+
+    select {
+        font-size: 16px;
+
+        padding: 13px;
+    }
+
+    button {
+        font-size: 17px;
+
+        padding: 15px;
+
+        margin-top: 16px;
+    }
+}
+
+
+/* =========================
+   VERY SMALL PHONES
+   ========================= */
+
+@media (max-width: 380px) {
+
+    .app {
+        padding: 14px;
+    }
+
+    .logo {
+        width: 52px;
+        height: 52px;
+
+        font-size: 27px;
+    }
+
+    .app-header h1 {
+        font-size: 21px;
+    }
+
+    .app-header p {
+        font-size: 13px;
+    }
+
 }
 </style>
 
