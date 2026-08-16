@@ -346,7 +346,8 @@ if (selectedLocation.type !== "lake") {
     tideData = await tideResponse.json();
 
 }
-
+console.log("🌊 TIDE STATION USED:", selectedLocation.tideStation);
+    
 console.log(tideData);
 console.log(marineData);
 
