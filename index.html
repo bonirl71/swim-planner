@@ -1262,6 +1262,263 @@ document.getElementById("conditions").innerHTML =
 }
 
 }
+
+/* =========================
+   JOURNEY CALCULATOR
+   ========================= */
+
+async function calculateJourney() {
+
+    const journeyResult =
+        document.getElementById("journeyResult");
+
+    const selectedId =
+        document.getElementById("locationSelect").value;
+
+    const selectedLocation =
+        swimLocations.find(
+            location => location.id == selectedId
+        );
+
+    const selectedTide =
+        document.getElementById("highTideSelect").value;
+
+    if (!selectedTide) {
+
+        journeyResult.innerHTML =
+            "⚠️ Please choose a high tide first.";
+
+        return;
+    }
+
+    journeyResult.innerHTML =
+        "📍 Finding your current location...";
+
+    /* =========================
+       GET CURRENT LOCATION
+       ========================= */
+
+    if (!navigator.geolocation) {
+
+        journeyResult.innerHTML =
+            "⚠️ Your device does not support location services.";
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function(position) {
+
+            try {
+
+                const userLatitude =
+                    position.coords.latitude;
+
+                const userLongitude =
+                    position.coords.longitude;
+
+                journeyResult.innerHTML =
+                    "🛣️ Calculating driving distance and journey time...";
+
+                /* =========================
+                   ROUTE
+                   ========================= */
+
+                const routeUrl =
+                    `https://router.project-osrm.org/route/v1/driving/` +
+                    `${userLongitude},${userLatitude};` +
+                    `${selectedLocation.longitude},${selectedLocation.latitude}` +
+                    `?overview=false`;
+
+                const routeResponse =
+                    await fetch(routeUrl);
+
+                const routeData =
+                    await routeResponse.json();
+
+                if (
+                    routeData.code !== "Ok" ||
+                    !routeData.routes ||
+                    routeData.routes.length === 0
+                ) {
+
+                    journeyResult.innerHTML =
+                        "⚠️ Unable to calculate a driving route.";
+
+                    return;
+                }
+
+                const route =
+                    routeData.routes[0];
+
+                const distanceKm =
+                    route.distance / 1000;
+
+                const journeyMinutes =
+                    Math.ceil(route.duration / 60);
+
+                /* =========================
+                   TIDE TIMES
+                   ========================= */
+
+                const highTide =
+                    new Date(selectedTide);
+
+                /*
+                   We want to arrive TWO HOURS
+                   before high tide.
+                */
+
+                const arrivalTime =
+                    new Date(
+                        highTide.getTime() -
+                        (2 * 60 * 60 * 1000)
+                    );
+
+                /*
+                   Work backwards from arrival
+                   time using the driving time.
+                */
+
+                const leaveTime =
+                    new Date(
+                        arrivalTime.getTime() -
+                        (journeyMinutes * 60 * 1000)
+                    );
+
+                /* =========================
+                   FORMAT DATE / TIME
+                   ========================= */
+
+                function formatDateTime(date) {
+
+                    return date.toLocaleString(
+                        "en-IE",
+                        {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                            timeZone: "Europe/Dublin"
+                        }
+                    );
+
+                }
+
+                /* =========================
+                   DISPLAY RESULT
+                   ========================= */
+
+                journeyResult.innerHTML =
+                `
+                <hr>
+
+                <strong>📍 Journey to ${selectedLocation.name}</strong>
+
+                <br><br>
+
+                🌊 <strong>High Tide:</strong><br>
+                ${formatDateTime(highTide)}
+
+                <br><br>
+
+                🏊 <strong>Arrive at swim location:</strong><br>
+                ${formatDateTime(arrivalTime)}
+
+                <br><br>
+
+                🛣️ <strong>Driving distance:</strong><br>
+                ${distanceKm.toFixed(1)} km
+
+                <br><br>
+
+                ⏱️ <strong>Estimated driving time:</strong><br>
+                ${journeyMinutes} minutes
+
+                <br><br>
+
+                🚗 <strong>LEAVE BY:</strong><br>
+
+                <span style="
+                    font-size:20px;
+                    font-weight:bold;
+                    color:#006994;
+                ">
+                    ${formatDateTime(leaveTime)}
+                </span>
+
+                <br><br>
+
+                <small>
+                ⚠️ Journey time is an estimate and does not
+                include traffic, stops or delays.
+                </small>
+                `;
+
+            }
+
+            catch(error) {
+
+                console.error(
+                    "JOURNEY ERROR:",
+                    error
+                );
+
+                journeyResult.innerHTML =
+                    "⚠️ Unable to calculate the journey.";
+
+            }
+
+        },
+
+        function(error) {
+
+            console.error(
+                "LOCATION ERROR:",
+                error
+            );
+
+            if (error.code === 1) {
+
+                journeyResult.innerHTML =
+                    "⚠️ Location access was denied. " +
+                    "Please allow location access for this app.";
+
+            }
+            else if (error.code === 2) {
+
+                journeyResult.innerHTML =
+                    "⚠️ Your current location could not be determined.";
+
+            }
+            else if (error.code === 3) {
+
+                journeyResult.innerHTML =
+                    "⚠️ Location request timed out. Please try again.";
+
+            }
+            else {
+
+                journeyResult.innerHTML =
+                    "⚠️ Unable to get your current location.";
+
+            }
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+
+    );
+
+}
+   
 loadLocations();
 </script>
 </div>
