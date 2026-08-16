@@ -1566,6 +1566,21 @@ async function calculateJourney() {
 }
    
 loadLocations();
+document.getElementById("locationSelect").addEventListener("change", function () {
+
+    // Hide any previous journey planner
+    // whenever the swim location changes.
+    document.getElementById("travelPlannerCard").style.display = "none";
+
+    // Clear the previous journey information
+    document.getElementById("journeyResult").textContent =
+        "Waiting for location and tide information...";
+
+    // Reset the tide selection
+    document.getElementById("highTideSelect").innerHTML =
+        '<option value="">Check swim conditions first...</option>';
+
+});
 </script>
 </div>
 </body>
