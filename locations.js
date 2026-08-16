@@ -22,5 +22,21 @@ const swimLocations = [
         latitude: 53.053,
         longitude: -9.344,
         distance: "TBC"
+    },
+    {
+        id: 4,
+        name: "Kilkee Bay",
+        county: "Clare",
+        latitude: 52.679141,
+        longitude: -9.652973,
+        distance: "TBC"
+    },
+    {
+        id: 5,
+        name: "Whitestrand",
+        county: "Clare",
+        latitude: 52.747723,
+        longitude: -9.549059,
+        distance: "TBC"
     }
 ];
