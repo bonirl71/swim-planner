@@ -366,53 +366,120 @@ if (selectedLocation.type === "lake") {
     let locationImpact;
     let swimAdvice;
 
-    if (windDirection.includes("South")) {
+    /* =========================
+   LAKE WIND DIRECTION
+   ========================= */
 
-        lakeCondition = "🟢 CALM TO SLIGHT CHOP";
-        locationImpact =
-            "🟢 Youghal side: Calm<br>" +
-            "🟡 Tomona side: A little choppier";
-        swimAdvice =
-            "Youghal side is the better option in a southerly wind.";
+if (windDegrees >= 157.5 && windDegrees < 202.5) {
 
-    }
-    else if (windDirection.includes("North")) {
+    // SOUTH
+    lakeCondition = "🟢 CALM TO SLIGHT CHOP";
 
-        lakeCondition = "🟢 CALM TO SLIGHT CHOP";
-        locationImpact =
-            "🟡 Youghal side: A little choppier<br>" +
-            "🟢 Tomona side: Calm";
-        swimAdvice =
-            "Tomona side is the better option in a northerly wind.";
+    locationImpact =
+        "🟢 Youghal side: Calm<br>" +
+        "🟡 Tomona side: A little choppier";
 
-    }
-    else if (windDirection.includes("West")) {
+    swimAdvice =
+        "Youghal side is the better option in a southerly wind.";
 
-        lakeCondition = "🔴 CHOPPY";
-        locationImpact =
-            "🔴 Both sides exposed to chop";
-        swimAdvice =
-            "Westerly wind creates chop across the lake. Swimming towards Caddy's means swimming into the wind.";
+}
+else if (windDegrees >= 337.5 || windDegrees < 22.5) {
 
-    }
-    else if (windDirection.includes("East")) {
+    // NORTH
+    lakeCondition = "🟢 CALM TO SLIGHT CHOP";
 
-        lakeCondition = "🟡 SLIGHTLY CHOPPY";
-        locationImpact =
-            "🟡 Both sides somewhat sheltered";
-        swimAdvice =
-            "Easterly wind is generally better than westerly, but some chop is still expected.";
+    locationImpact =
+        "🟡 Youghal side: A little choppier<br>" +
+        "🟢 Tomona side: Calm";
 
-    }
-    else {
+    swimAdvice =
+        "Tomona side is the better option in a northerly wind.";
 
-        lakeCondition = "🟡 VARIABLE";
-        locationImpact =
-            "ℹ️ Conditions depend on the exact wind direction";
-        swimAdvice =
-            "Check the wind direction before swimming.";
+}
+else if (windDegrees >= 202.5 && windDegrees < 247.5) {
 
-    }
+    // SOUTH-WEST
+    lakeCondition = "🟠 INCREASING CHOP";
+
+    locationImpact =
+        "🟠 Both sides becoming more exposed";
+
+    swimAdvice =
+        "South-westerly wind creates increasing chop. Conditions are less sheltered than with a true southerly wind.";
+
+}
+else if (windDegrees >= 247.5 && windDegrees < 292.5) {
+
+    // WEST
+    lakeCondition = "🔴 CHOPPY";
+
+    locationImpact =
+        "🔴 Both sides exposed to chop";
+
+    swimAdvice =
+        "Westerly wind creates chop across the lake. Swimming towards Caddy's means swimming into the wind.";
+
+}
+else if (windDegrees >= 292.5 && windDegrees < 337.5) {
+
+    // NORTH-WEST
+    lakeCondition = "🟠 INCREASING CHOP";
+
+    locationImpact =
+        "🟠 Both sides becoming more exposed";
+
+    swimAdvice =
+        "North-westerly wind creates increasing chop, particularly on exposed sections.";
+
+}
+else if (windDegrees >= 67.5 && windDegrees < 112.5) {
+
+    // EAST
+    lakeCondition = "🟡 SLIGHTLY CHOPPY";
+
+    locationImpact =
+        "🟡 Both sides somewhat sheltered";
+
+    swimAdvice =
+        "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
+
+}
+else if (windDegrees >= 22.5 && windDegrees < 67.5) {
+
+    // NORTH-EAST
+    lakeCondition = "🟡 SLIGHTLY CHOPPY";
+
+    locationImpact =
+        "🟡 Generally sheltered with some chop";
+
+    swimAdvice =
+        "North-easterly wind should produce relatively modest chop.";
+
+}
+else if (windDegrees >= 112.5 && windDegrees < 157.5) {
+
+    // SOUTH-EAST
+    lakeCondition = "🟢 CALM TO SLIGHT CHOP";
+
+    locationImpact =
+        "🟢 Youghal side: Generally sheltered<br>" +
+        "🟡 Tomona side: Some exposure";
+
+    swimAdvice =
+        "South-easterly wind should leave the Youghal side relatively sheltered.";
+
+}
+else {
+
+    lakeCondition = "🟡 VARIABLE";
+
+    locationImpact =
+        "ℹ️ Conditions depend on the exact wind direction";
+
+    swimAdvice =
+        "Check the wind direction before swimming.";
+
+}
 
 
     /* Wind strength adjustment */
