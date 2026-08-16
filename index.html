@@ -138,7 +138,74 @@ body {
     margin: 0 0 20px 0;
 }
 
+/* =========================
+   USER GUIDE
+   ========================= */
 
+.user-guide {
+    margin-top: 18px;
+    background: #eef9ff;
+    border: 1px solid #d5ebf6;
+    border-radius: 14px;
+    padding: 0;
+}
+
+.user-guide summary {
+    padding: 16px 18px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: #006994;
+    list-style: none;
+}
+
+.user-guide summary::-webkit-details-marker {
+    display: none;
+}
+
+.user-guide summary::after {
+    content: "＋";
+    float: right;
+    font-size: 20px;
+}
+
+.user-guide[open] summary::after {
+    content: "−";
+}
+
+.user-guide-content {
+    padding: 0 18px 18px 18px;
+    color: #263f50;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.user-guide-content h3 {
+    color: #006994;
+    font-size: 17px;
+    margin-top: 18px;
+    margin-bottom: 6px;
+}
+
+.user-guide-content p {
+    margin: 6px 0;
+}
+
+.user-guide-content ul {
+    margin-top: 6px;
+    padding-left: 22px;
+}
+
+.user-guide-warning {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fff8e6;
+    border: 1px solid #f0d98c;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+   
 /* =========================
    CARDS
    ========================= */
@@ -468,6 +535,129 @@ button:active {
 Plan safe and enjoyable open water swims.
 </p>
 
+<details class="user-guide">
+
+    <summary>📖 How to use the Swim Planner</summary>
+
+    <div class="user-guide-content">
+
+        <h3>1. Choose your swim location</h3>
+
+        <p>
+            Select your preferred location from
+            <strong>Choose Swim Location</strong>.
+        </p>
+
+        <p>
+            The app supports both sea and lake swimming locations.
+        </p>
+
+
+        <h3>2. Check Swim Conditions</h3>
+
+        <p>
+            Tap <strong>Check Swim Conditions</strong> to see the
+            latest available conditions.
+        </p>
+
+        <ul>
+            <li>🌡️ Air temperature</li>
+            <li>🌊 Water temperature</li>
+            <li>💨 Wind speed and direction</li>
+            <li>☁️ Weather conditions</li>
+            <li>🌊 Wave height and period — sea locations</li>
+            <li>🌊 Upcoming tides — sea locations</li>
+            <li>🏊 Swim recommendation</li>
+        </ul>
+
+
+        <h3>3. Plan a future sea swim</h3>
+
+        <p>
+            Sea locations show high and low tides for the
+            <strong>next 7 days</strong>.
+        </p>
+
+        <p>
+            Select the high tide you want to swim around from
+            the high-tide dropdown.
+        </p>
+
+
+        <h3>4. Predict future swim conditions</h3>
+
+        <p>
+            Select a future high tide and tap
+            <strong>🔮 Predict Swim Conditions</strong>.
+        </p>
+
+        <p>
+            The app will provide the expected conditions around
+            that time, including wind, gusts, rain probability,
+            wave height, wave period, wave direction,
+            water temperature and a predicted Swim Score.
+        </p>
+
+        <div class="user-guide-warning">
+
+            ⚠️ <strong>Forecast guidance only</strong><br><br>
+
+            Future forecasts can change significantly,
+            particularly several days in advance.
+            Predictions are a guide only and should not be
+            relied upon as an assessment of swimming safety.
+
+            Always check the latest forecast and local conditions
+            before swimming.
+
+        </div>
+
+
+        <h3>5. Calculate your journey</h3>
+
+        <p>
+            For a sea swim, select your chosen high tide and tap
+            <strong>📍 Calculate Journey From My Location</strong>.
+        </p>
+
+        <p>
+            The app calculates the driving distance, estimated
+            journey time, recommended arrival time and
+            <strong>LEAVE BY</strong> time.
+        </p>
+
+        <p>
+            The planner currently works on the basis of arriving
+            <strong>2 hours before high tide</strong>.
+        </p>
+
+
+        <h3>6. Lake swimming</h3>
+
+        <p>
+            Lake locations don't use tidal information.
+            Instead, the app assesses wind, expected chop,
+            temperature and weather conditions.
+        </p>
+
+        <p>
+            It can also indicate which side of the lake may
+            be more sheltered depending on the wind direction.
+        </p>
+
+
+        <h3>🔄 Changing location</h3>
+
+        <p>
+            When you change the swim location, any previous
+            Journey Planner and future prediction are
+            automatically cleared.
+        </p>
+
+    </div>
+
+</details>   
+   
 <div class="card">
 <h2>Choose Swim Location</h2>
 
