@@ -532,7 +532,7 @@ else {
 }
 console.log("TIDE ROWS:", tideData.table.rows);
 console.log("TIDE COLUMNS:", tideData.table.columnNames);
-
+console.table(tideData.table.rows.slice(0, 20));
 
 /* =========================
    FIND HIGH & LOW TIDES
