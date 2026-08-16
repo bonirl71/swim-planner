@@ -490,6 +490,30 @@ Waiting for data...
 </p>
 </div>
 
+<div class="card" id="travelPlannerCard" style="display:none;">
+
+    <h2>🚗 Journey Planner</h2>
+
+    <p>
+        Choose the high tide you want to swim for:
+    </p>
+
+    <select id="highTideSelect">
+        <option value="">
+            Check swim conditions first...
+        </option>
+    </select>
+
+    <button type="button" onclick="calculateJourney()">
+        📍 Calculate Journey From My Location
+    </button>
+
+    <p id="journeyResult">
+        Waiting for location and tide information...
+    </p>
+
+</div>
+   
 <button onclick="checkConditions()">
 Check Swim Conditions
 </button>
