@@ -338,7 +338,8 @@ const tideData = await tideResponse.json();
 console.log(tideData);
 console.log(marineData);
 const current = data.current;
-
+console.log("TIDE ROWS:", tideData.rows);
+console.log("TIDE COLUMNS:", tideData.columnNames);
 document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
