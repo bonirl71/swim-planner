@@ -1,0 +1,82 @@
+name: Update Lake Water Temperature
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-temperature:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Get repository
+        uses: actions/checkout@v4
+
+      - name: Download OPW temperature data
+        run: |
+          curl -L \
+            "https://waterlevel.ie/data/day/25341_0002.csv" \
+            -o temperature.csv
+
+      - name: Create temperature JSON
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from datetime import datetime, timezone
+
+          filename = "temperature.csv"
+
+          with open(filename, "r", encoding="utf-8") as f:
+              rows = list(csv.reader(f))
+
+          temperature = None
+          timestamp = None
+
+          for row in reversed(rows):
+
+              if len(row) < 2:
+                  continue
+
+              try:
+                  value = float(row[-1])
+                  temperature = value
+                  timestamp = row[0]
+                  break
+              except ValueError:
+                  continue
+
+          if temperature is None:
+              raise SystemExit("No valid temperature found")
+
+          output = {
+              "temperature": temperature,
+              "timestamp": timestamp,
+              "source": "OPW Portumna Bridge",
+              "station": "25341",
+              "sensor": "0002"
+          }
+
+          with open("lake-temperature.json", "w", encoding="utf-8") as f:
+              json.dump(output, f, indent=2)
+
+          print(json.dumps(output, indent=2))
+          PY
+
+      - name: Save updated temperature
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add lake-temperature.json
+
+          git diff --cached --quiet || \
+            git commit -m "Update lake water temperature"
+
+          git push
