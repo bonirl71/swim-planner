@@ -908,7 +908,17 @@ for (const tide of tideEvents) {
    FORMAT TIDE DISPLAY
    ========================= */
 
-const tideDisplay = filteredTides
+const now = new Date();
+
+const upcomingTides = filteredTides.filter(
+    tide => tide.time >= now
+);
+
+const nextTide = upcomingTides.length > 0
+    ? upcomingTides[0]
+    : null;
+
+const tideDisplay = upcomingTides
     .slice(0, 6)
     .map(tide => {
 
@@ -917,7 +927,8 @@ const tideDisplay = filteredTides
             {
                 hour: "2-digit",
                 minute: "2-digit",
-                hour12: false
+                hour12: false,
+                timeZone: "Europe/Dublin"
             }
         );
 
@@ -925,14 +936,54 @@ const tideDisplay = filteredTides
             tide.type === "High Tide" ? "🔵" : "⚪";
 
         return `
-        <div style="margin:6px 0;">
-            ${icon} <strong>${tide.type}</strong>
+        <div style="margin:8px 0;">
+            ${icon}
+            <strong>${tide.type}</strong>
             — ${time}
             — ${tide.height.toFixed(2)} m
         </div>
         `;
     })
     .join("");
+
+
+/* =========================
+   NEXT TIDE
+   ========================= */
+
+let nextTideDisplay = "";
+
+if (nextTide) {
+
+    const nextTime = nextTide.time.toLocaleTimeString(
+        "en-IE",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            timeZone: "Europe/Dublin"
+        }
+    );
+
+    const nextIcon =
+        nextTide.type === "High Tide" ? "🔵" : "⚪";
+
+    nextTideDisplay = `
+        <div style="
+            margin-top:15px;
+            padding:12px;
+            background:#e8f6ff;
+            border-radius:10px;
+            font-weight:bold;
+        ">
+            ➡️ Next tide:
+            ${nextIcon}
+            ${nextTide.type}
+            at ${nextTime}
+            (${nextTide.height.toFixed(2)} m)
+        </div>
+    `;
+}
 
 
 /* =========================
