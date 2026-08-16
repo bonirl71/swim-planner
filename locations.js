@@ -57,5 +57,16 @@ const swimLocations = [
         longitude: -8.310286,
         distance: "TBC",
         type: "lake"
+    },
+    {
+        id: 7,
+        name: "Lambay Island",
+        county: "Dublin",
+        latitude: 53.49222995430973,
+        longitude: -6.015908380729172,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IEEABWC020_0000_0200_MODELLED"
     }
+];
 ];
