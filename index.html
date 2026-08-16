@@ -301,13 +301,14 @@ select.appendChild(option);
 }
 async function checkConditions() {
 console.log("checkConditions started");
+
 document.getElementById("conditions").innerHTML =
 "⏳ Getting live sea conditions...";
 
 const selectedId = document.getElementById("locationSelect").value;
 
 const selectedLocation = swimLocations.find(
-location => location.id == selectedId
+    location => location.id == selectedId
 );
 
 const latitude = selectedLocation.latitude;
@@ -315,8 +316,10 @@ const longitude = selectedLocation.longitude;
 
 const url =
 `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code&wind_speed_unit=ms`;
+
 const marineUrl =
 `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&current=wave_height,wave_period,wave_direction,sea_surface_temperature`;
+
 const today = new Date();
 const tomorrow = new Date(today);
 tomorrow.setDate(today.getDate() + 1);
@@ -326,20 +329,127 @@ const tomorrowString = tomorrow.toISOString().split("T")[0];
 
 const tideUrl =
 `https://erddap.marine.ie/erddap/tabledap/imiTidePrediction.json?&stationID%3D%22Lahinch_MODELLED%22&time%3E=${todayString}T00%3A00%3A00Z&time%3C=${tomorrowString}T00%3A00%3A00Z`;
+
 try {
 
 const response = await fetch(url);
-const data = await response.json();  
+const data = await response.json();
+
 const marineResponse = await fetch(marineUrl);
 const marineData = await marineResponse.json();
+
 const tideResponse = await fetch(tideUrl);
 const tideData = await tideResponse.json();
 
 console.log(tideData);
 console.log(marineData);
+
 const current = data.current;
+
 console.log("TIDE ROWS:", tideData.table.rows);
 console.log("TIDE COLUMNS:", tideData.table.columnNames);
+
+
+/* =========================
+   FIND HIGH & LOW TIDES
+   ========================= */
+
+const tideRows = tideData.table.rows;
+
+let tideEvents = [];
+
+for (let i = 1; i < tideRows.length - 1; i++) {
+
+    const previousHeight = Number(tideRows[i - 1][4]);
+    const currentHeight = Number(tideRows[i][4]);
+    const nextHeight = Number(tideRows[i + 1][4]);
+
+    // HIGH TIDE
+    if (
+        currentHeight > previousHeight &&
+        currentHeight >= nextHeight
+    ) {
+        tideEvents.push({
+            type: "High Tide",
+            time: new Date(tideRows[i][0]),
+            height: currentHeight
+        });
+    }
+
+    // LOW TIDE
+    if (
+        currentHeight < previousHeight &&
+        currentHeight <= nextHeight
+    ) {
+        tideEvents.push({
+            type: "Low Tide",
+            time: new Date(tideRows[i][0]),
+            height: currentHeight
+        });
+    }
+}
+
+
+/* Remove any duplicate events that are too close together */
+
+const filteredTides = [];
+
+for (const tide of tideEvents) {
+
+    if (filteredTides.length === 0) {
+        filteredTides.push(tide);
+        continue;
+    }
+
+    const previous =
+        filteredTides[filteredTides.length - 1];
+
+    const difference =
+        (tide.time - previous.time) / (1000 * 60);
+
+    // Real high/low tides are several hours apart.
+    // Ignore small fluctuations in the model.
+    if (difference >= 120) {
+        filteredTides.push(tide);
+    }
+}
+
+
+/* =========================
+   FORMAT TIDE DISPLAY
+   ========================= */
+
+const tideDisplay = filteredTides
+    .slice(0, 6)
+    .map(tide => {
+
+        const time = tide.time.toLocaleTimeString(
+            "en-IE",
+            {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }
+        );
+
+        const icon =
+            tide.type === "High Tide" ? "🔵" : "⚪";
+
+        return `
+        <div style="margin:6px 0;">
+            ${icon} <strong>${tide.type}</strong>
+            — ${time}
+            — ${tide.height.toFixed(2)} m
+        </div>
+        `;
+    })
+    .join("");
+
+
+/* =========================
+   DISPLAY SEA CONDITIONS
+   ========================= */
+
 document.getElementById("conditions").innerHTML =
 `
 🌡 Air temperature: ${current.temperature_2m}°C<br>
@@ -350,17 +460,33 @@ document.getElementById("conditions").innerHTML =
 
 🌊 Wave height: ${marineData.current.wave_height} m<br>
 ⏱ Wave period: ${marineData.current.wave_period} s<br>
-🌊 Swell direction: ${getCompassDirection(marineData.current.wave_direction)} (${marineData.current.wave_direction.toFixed(0)}°)
+🌊 Swell direction: ${getCompassDirection(marineData.current.wave_direction)}
+(${marineData.current.wave_direction.toFixed(0)}°)<br><br>
+
+<hr>
+
+<h3>🌊 TIDES</h3>
+
+${tideDisplay}
+
 `;
+
+
+/* =========================
+   SWIM SCORE
+   ========================= */
+
 let reasons = [];
-    
+
 const swimScore = calculateSwimScore(
     marineData.current.wave_height,
     marineData.current.wave_period,
     current.wind_speed_10m,
     getWindDirection(current.wind_direction_10m)
 );
-const windDirection = getWindDirection(current.wind_direction_10m);
+
+const windDirection =
+    getWindDirection(current.wind_direction_10m);
 
 if (windDirection === "West") {
     reasons.push("✅ Westerly wind - ideal direction");
@@ -373,33 +499,76 @@ else {
 }
 
 if (current.wind_speed_10m <= 3) {
-    reasons.push("✅ Light wind (" + current.wind_speed_10m + " m/s)");
+    reasons.push(
+        "✅ Light wind (" +
+        current.wind_speed_10m +
+        " m/s)"
+    );
 }
 else if (current.wind_speed_10m <= 5) {
-    reasons.push("🟡 Moderate wind (" + current.wind_speed_10m + " m/s)");
+    reasons.push(
+        "🟡 Moderate wind (" +
+        current.wind_speed_10m +
+        " m/s)"
+    );
 }
 else {
-    reasons.push("🔴 Strong wind (" + current.wind_speed_10m + " m/s)");
+    reasons.push(
+        "🔴 Strong wind (" +
+        current.wind_speed_10m +
+        " m/s)"
+    );
 }
 
 if (marineData.current.wave_height <= 0.5) {
-    reasons.push("✅ Small waves (" + marineData.current.wave_height + " m)");
+    reasons.push(
+        "✅ Small waves (" +
+        marineData.current.wave_height +
+        " m)"
+    );
 }
 else if (marineData.current.wave_height <= 1) {
-    reasons.push("🟡 Moderate waves (" + marineData.current.wave_height + " m)");
+    reasons.push(
+        "🟡 Moderate waves (" +
+        marineData.current.wave_height +
+        " m)"
+    );
 }
 else {
-    reasons.push("🔴 Large waves (" + marineData.current.wave_height + " m)");
+    reasons.push(
+        "🔴 Large waves (" +
+        marineData.current.wave_height +
+        " m)"
+    );
 }
+
 if (marineData.current.sea_surface_temperature >= 15) {
-    reasons.push("✅ Comfortable water temperature (" + marineData.current.sea_surface_temperature + "°C)");
+    reasons.push(
+        "✅ Comfortable water temperature (" +
+        marineData.current.sea_surface_temperature +
+        "°C)"
+    );
 }
 else if (marineData.current.sea_surface_temperature >= 12) {
-    reasons.push("🟡 Cold water (" + marineData.current.sea_surface_temperature + "°C)");
+    reasons.push(
+        "🟡 Cold water (" +
+        marineData.current.sea_surface_temperature +
+        "°C)"
+    );
 }
 else {
-    reasons.push("🔴 Very cold water (" + marineData.current.sea_surface_temperature + "°C)");
+    reasons.push(
+        "🔴 Very cold water (" +
+        marineData.current.sea_surface_temperature +
+        "°C)"
+    );
 }
+
+
+/* =========================
+   RATING
+   ========================= */
+
 let rating;
 
 if (swimScore >= 80) {
@@ -414,6 +583,7 @@ else if (swimScore >= 40) {
 else {
     rating = "🔴 POOR CONDITIONS";
 }
+
 let assessment;
 
 if (swimScore >= 85) {
@@ -426,8 +596,14 @@ else if (swimScore >= 50) {
     assessment = "🟡 Challenging conditions";
 }
 else {
-    assessment = "🔴 Poor swimming conditions";
+    assessment = "🔴 Poor conditions";
 }
+
+
+/* =========================
+   RECOMMENDATION
+   ========================= */
+
 document.getElementById("recommendation").innerHTML =
 `
 
@@ -436,9 +612,12 @@ ${rating}<br><br>
 
 ${reasons.join("<br>")}
 `;
+
 }
 
 catch(error) {
+
+console.error("ERROR:", error);
 
 document.getElementById("conditions").innerHTML =
 "⚠️ Unable to load weather data";
