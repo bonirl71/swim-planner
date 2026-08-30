@@ -1196,6 +1196,193 @@ body.dark-theme select { color:#f0f5f8; }
     .guide-modal-panel { padding:18px; }
 }
 
+
+/* =========================
+   SEA TIDE OUTLOOK
+   ========================= */
+
+.sea-tides-card { margin-top: 18px; }
+
+.tide-detail {
+    margin-top: 14px;
+    padding: 16px;
+    background: #f7fbfd;
+    border: 1px solid #d8e8f0;
+    border-radius: 12px;
+    line-height: 1.65;
+}
+
+.tide-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.tide-detail-item {
+    padding: 12px;
+    background: white;
+    border: 1px solid #e1edf3;
+    border-radius: 9px;
+}
+
+.tide-detail-label { display: block; font-size: 11px; color: #71818c; }
+.tide-detail-value { display: block; margin-top: 3px; font-weight: 700; }
+
+@media (min-width: 800px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        width: 100%;
+    }
+    .dashboard-grid > .card {
+        width: auto !important;
+        margin-right: 0 !important;
+        display: block !important;
+    }
+}
+
+body.dark-theme .tide-detail {
+    background: #263642;
+    border-color: #435764;
+    color: #d8e2e9;
+}
+body.dark-theme .tide-detail-item {
+    background: #202e39;
+    border-color: #40515e;
+}
+body.dark-theme .tide-detail-label { color: #aebdca; }
+
+@media (max-width: 599px) {
+    .tide-detail-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   FINAL RESPONSIVE LAYOUT
+   Desktop: use the available width properly.
+   Phone: stack cards so they remain readable.
+   ========================================================= */
+
+.menu-version {
+    cursor: default;
+}
+
+.menu-version:hover {
+    background: transparent !important;
+    color: inherit !important;
+}
+
+.menu-version strong {
+    margin-left: 4px;
+    font-weight: 800;
+}
+
+@media (min-width: 1000px) {
+
+    body {
+        padding: 24px;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 1400px;
+        padding: 32px;
+    }
+
+    .dashboard-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        gap: 20px !important;
+        width: 100% !important;
+    }
+
+    .dashboard-grid > .card {
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .conditions-content,
+    .recommendation-content {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .sea-tides-card,
+    .forecast-card,
+    .sea-planner-card {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .forecast-days {
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 800px) and (max-width: 999px) {
+
+    .app {
+        max-width: 1100px;
+        padding: 28px;
+    }
+
+    .dashboard-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        gap: 18px !important;
+        width: 100% !important;
+    }
+
+    .dashboard-grid > .card {
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .sea-tides-card,
+    .forecast-card,
+    .sea-planner-card {
+        width: 100% !important;
+    }
+
+    .forecast-days {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 799px) {
+
+    .dashboard-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: 100% !important;
+    }
+
+    .dashboard-grid > .card {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+}
+
+/* Keep headings and data from becoming cramped inside cards. */
+.card {
+    min-width: 0;
+}
+
+.card h2 {
+    overflow-wrap: break-word;
+}
+
+.conditions-content,
+.recommendation-content {
+    overflow-wrap: break-word;
+}
+
 </style>
 
 </head>
@@ -1219,9 +1406,9 @@ body.dark-theme select { color:#f0f5f8; }
             <button type="button" class="menu-item" onclick="openGuide()">
                 📖 <span>How to Use</span>
             </button>
-            <button type="button" class="menu-item" onclick="showVersion()">
-                ℹ️ <span>App Version</span>
-            </button>
+            <div class="menu-item menu-version">
+                ℹ️ <span>App Version <strong>2.2.0</strong></span>
+            </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
             </button>
@@ -1291,6 +1478,18 @@ body.dark-theme select { color:#f0f5f8; }
         <div class="section-heading"><h2>🏊 Swim Recommendation</h2></div>
         <div id="recommendation" class="recommendation-content">Waiting for data...</div>
     </div>
+</div>
+
+<div class="card sea-tides-card" id="seaTidesCard" style="display:none;">
+    <div class="section-heading">
+        <div>
+            <div class="eyebrow">7-DAY OUTLOOK</div>
+            <h2>🌊 Tide Outlook</h2>
+        </div>
+    </div>
+    <p class="forecast-intro">Select a high tide to see the surrounding tide times.</p>
+    <select id="seaTideSelect"></select>
+    <div id="seaTideDetail" class="tide-detail"></div>
 </div>
 
 <div class="card forecast-card" id="lakeForecastCard" style="display:none;">
@@ -1477,6 +1676,15 @@ function loadLocations() {
 
     });
 
+    // Make Youghal Quay the default location.
+    const youghalOption = Array.from(select.options).find(option =>
+        option.textContent.toLowerCase().includes("youghal quay")
+    );
+
+    if (youghalOption) {
+        select.value = youghalOption.value;
+    }
+
 }
 
 
@@ -1651,6 +1859,7 @@ async function checkConditions() {
                 ${assessment.impact}
             `;
 
+            document.getElementById("seaTidesCard").style.display = "none";
             loadLakeForecast(selectedLocation);
             return;
 
@@ -1977,6 +2186,31 @@ async function checkConditions() {
 
 
         /* =========================
+           SEA TIDE OUTLOOK
+           ========================= */
+
+        const seaTidesCard = document.getElementById("seaTidesCard");
+        const seaTideSelect = document.getElementById("seaTideSelect");
+
+        seaTideSelect.innerHTML = "";
+
+        highTides.forEach((tide, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            option.textContent = tide.time.toLocaleString("en-IE", {
+                weekday: "long", day: "numeric", month: "long",
+                hour: "2-digit", minute: "2-digit", hour12: false,
+                timeZone: "Europe/Dublin"
+            }) + " — High " + tide.height.toFixed(2) + " m";
+            seaTideSelect.appendChild(option);
+        });
+
+        window.currentSeaTides = { tides: filteredTides, highTides: highTides };
+        seaTidesCard.style.display = "block";
+        showSeaTide(0);
+        seaTideSelect.onchange = function() { showSeaTide(Number(this.value)); };
+
+        /* =========================
            DISPLAY SEA CONDITIONS
            ========================= */
 
@@ -2025,22 +2259,6 @@ async function checkConditions() {
         ${marineData.current.wave_direction.toFixed(0)}°
         )
 
-        <br><br>
-
-        <hr>
-
-        <h3>🌊 TIDES</h3>
-
-        ${tideDisplay}
-
-        ${nextTideDisplay}
-
-        <div class="station-info">
-
-            Marine Institute station:
-            ${selectedLocation.tideStation}
-
-        </div>
 
         `;
 
@@ -3258,11 +3476,6 @@ function closeGuide() {
     modal.setAttribute("aria-hidden", "true");
 }
 
-function showVersion() {
-    closeMenu();
-    alert("Open Water Swim Planner\nVersion 2.2.0");
-}
-
 function toggleTheme() {
     document.body.classList.toggle("dark-theme");
     const isDark = document.body.classList.contains("dark-theme");
@@ -3304,6 +3517,38 @@ document.addEventListener("click", function(event) {
    APP INITIALISATION
    ========================= */
 
+function showSeaTide(index) {
+    const state = window.currentSeaTides;
+    if (!state || !state.highTides[index]) return;
+
+    const selected = state.highTides[index];
+    const detail = document.getElementById("seaTideDetail");
+    if (!detail) return;
+
+    const surrounding = state.tides
+        .filter(tide => Math.abs(tide.time - selected.time) <= 8 * 60 * 60 * 1000)
+        .sort((a, b) => a.time - b.time);
+
+    const formatTide = tide => tide.time.toLocaleString("en-IE", {
+        weekday: "long", day: "numeric", month: "long",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+        timeZone: "Europe/Dublin"
+    });
+
+    detail.innerHTML = `
+        <strong>🌊 Selected high tide</strong><br>
+        ${formatTide(selected)} — ${selected.height.toFixed(2)} m
+        <div class="tide-detail-grid">
+            ${surrounding.map(tide => `
+                <div class="tide-detail-item">
+                    <span class="tide-detail-label">${tide.type}</span>
+                    <span class="tide-detail-value">${formatTide(tide)} — ${tide.height.toFixed(2)} m</span>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
+
 function initialiseApp() {
     loadLocations();
 
@@ -3339,6 +3584,7 @@ document.getElementById("locationSelect").addEventListener("change", function() 
     document.getElementById("conditions").innerHTML = "⏳ Loading conditions...";
     document.getElementById("recommendation").innerHTML = "⏳ Loading recommendation...";
     window.currentLakeForecast = null;
+    document.getElementById("seaTidesCard").style.display = "none";
 
     if (selectedLocation) {
         checkConditions();
