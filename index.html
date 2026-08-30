@@ -1760,10 +1760,9 @@ body.dark-theme .sea-forecast-summary {
     .desktop-sea-action {
         width: 100%;
         margin: 0;
-        padding: 14px 18px;
+        padding: 15px 18px;
         border-radius: 12px;
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 16px;
     }
 
     body.desktop-sea-tides-open #seaTidesCard,
@@ -1776,7 +1775,7 @@ body.dark-theme .sea-forecast-summary {
         width: min(540px, calc(100vw - 80px));
         max-height: min(720px, calc(100vh - 80px));
         overflow-y: auto;
-        z-index: 1001;
+        z-index: 1000;
         margin: 0 !important;
         box-shadow: 0 28px 80px rgba(0,0,0,.52);
         animation: seaPanelIn .22s cubic-bezier(.2,.8,.2,1) forwards;
@@ -1789,16 +1788,8 @@ body.dark-theme .sea-forecast-summary {
         inset: 0;
         background: rgba(4,12,20,.48);
         backdrop-filter: blur(3px);
-        z-index: 1000;
+        z-index: 999;
         animation: seaBackdropIn .18s ease-out forwards;
-    }
-
-    .desktop-only-close {
-        display: block;
-        width: auto;
-        margin: 0 0 12px auto;
-        padding: 7px 12px;
-        font-size: 12px;
     }
 
     @keyframes seaPanelIn {
@@ -1809,6 +1800,14 @@ body.dark-theme .sea-forecast-summary {
     @keyframes seaBackdropIn {
         from { opacity: 0; }
         to   { opacity: 1; }
+    }
+
+    .desktop-only-close {
+        display: block;
+        width: auto;
+        margin: 0 0 12px auto;
+        padding: 8px 14px;
+        font-size: 13px;
     }
 }
 
@@ -1881,13 +1880,9 @@ body.dark-theme .sea-forecast-summary {
         font-weight: 700;
     }
 
-    .mobile-no-tides {
-        margin-top: 12px;
-    }
-
     @keyframes mobileTideChoiceIn {
         from { opacity: 0; transform: translateY(-46%) scale(.96); }
-        to   { opacity: 1; transform: translateY(-50%) scale(1); }
+        to { opacity: 1; transform: translateY(-50%) scale(1); }
     }
 }
 
@@ -2249,13 +2244,10 @@ function getLocationDisplayName(location) {
    CHECK CONDITIONS
    ========================= */
 
-async 
 function updateDesktopSeaActions(location) {
     const actions = document.getElementById("desktopSeaActions");
     if (!actions) return;
-
-    const isSea = !!location && location.type !== "lake";
-    actions.style.display = isSea ? "" : "none";
+    actions.style.display = (location && location.type !== "lake") ? "grid" : "none";
 }
 
 async function checkConditions() {
@@ -3423,17 +3415,14 @@ function openMobileTravelPlanner(index) {
     const day = state.forecast[index];
     const date = day.date;
     const highTides = (window.currentSeaTides && window.currentSeaTides.highTides || [])
-        .filter(tide => {
-            const d = new Date(tide.time).toLocaleDateString("en-CA", {
-                timeZone: "Europe/Dublin"
-            });
-            return d === date;
-        });
+        .filter(tide => new Date(tide.time).toLocaleDateString("en-CA", {
+            timeZone: "Europe/Dublin"
+        }) === date);
 
     closeSeaForecastDetail();
 
-    const existing = document.getElementById("mobileTideChoiceModal");
-    if (existing) existing.remove();
+    const old = document.getElementById("mobileTideChoiceModal");
+    if (old) old.remove();
 
     const dateText = new Date(date + "T12:00:00").toLocaleDateString("en-IE", {
         weekday: "long", day: "numeric", month: "long"
@@ -3448,7 +3437,8 @@ function openMobileTravelPlanner(index) {
             <button type="button" class="mobile-forecast-close"
                     onclick="closeMobileTideChoice()" aria-label="Close">✕</button>
             <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
-            <h3>🚗 Plan your swim — ${dateText}</h3>
+            <h3>🚗 Plan your swim</h3>
+            <p><strong>${dateText}</strong></p>
             <p>Select the <strong>high tide</strong> you want to swim for:</p>
             <select id="mobileTravelTideSelect">
                 <option value="">Choose a high tide...</option>
@@ -3466,12 +3456,8 @@ function openMobileTravelPlanner(index) {
                         onclick="confirmMobileTravelTide()">
                     Continue to travel plan →
                 </button>
-            ` : `
-                <p class="mobile-no-tides">No high tide information is available for this day.</p>
-            `}
-        </div>
-    `;
-
+            ` : `<p>No high tide information is available for this day.</p>`}
+        </div>`;
     document.body.appendChild(modal);
 }
 
@@ -3479,22 +3465,12 @@ function confirmMobileTravelTide() {
     const choice = document.getElementById("mobileTravelTideSelect");
     const planner = document.getElementById("travelPlannerCard");
     const highTideSelect = document.getElementById("highTideSelect");
-
-    if (!choice || !choice.value || !planner || !highTideSelect) {
-        if (choice) choice.focus();
-        return;
-    }
+    if (!choice || !choice.value || !planner || !highTideSelect) return;
 
     highTideSelect.value = choice.value;
-
     closeMobileTideChoice();
-    closeSeaForecastDetail();
-
     document.body.classList.add("mobile-travel-open");
     planner.style.display = "block";
-
-    const close = document.getElementById("mobileTravelCloseButton");
-    if (close) close.focus();
 }
 
 function closeMobileTideChoice() {
@@ -4565,13 +4541,6 @@ function closeDesktopSeaPanels() {
     );
 }
 
-
-document.addEventListener("click", function(event) {
-    if (event.target === document.body && (document.body.classList.contains("desktop-sea-tides-open") || document.body.classList.contains("desktop-sea-travel-open"))) {
-        closeDesktopSeaPanels();
-    }
-});
-
 function toggleTheme() {
     document.body.classList.toggle("dark-theme");
     const isDark = document.body.classList.contains("dark-theme");
@@ -4587,7 +4556,7 @@ function updateThemeMenu() {
     button.innerHTML = isDark ? "☀️ <span>Light Theme</span>" : "🌙 <span>Dark Theme</span>";
 }
 
-if (localStorage.getItem("swimTheme") === "dark") {
+if (localStorage.getItem("swimTheme") !== "light") {
     document.body.classList.add("dark-theme");
 }
 updateThemeMenu();
