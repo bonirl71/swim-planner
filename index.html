@@ -1278,6 +1278,19 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 
 @media (min-width: 1000px) {
 
+    /* Keep every major section separated by the same 18px rhythm. */
+    .location-card { margin-bottom: 18px !important; }
+    .dashboard-grid { margin-bottom: 18px !important; }
+
+    .location-card,
+    .sea-tides-card,
+    .forecast-card,
+    .sea-planner-card {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
     body {
         padding: 24px;
     }
@@ -1326,6 +1339,9 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 
 @media (min-width: 800px) and (max-width: 999px) {
 
+    .location-card { margin-bottom: 18px !important; }
+    .dashboard-grid { margin-bottom: 18px !important; }
+
     .app {
         max-width: 1100px;
         padding: 28px;
@@ -1360,6 +1376,9 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 }
 
 @media (max-width: 799px) {
+
+    .location-card { margin-bottom: 14px !important; }
+    .dashboard-grid { margin-bottom: 14px !important; }
 
     .dashboard-grid {
         display: grid !important;
@@ -1436,6 +1455,32 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 
     #lakeForecastDetail.mobile-forecast-detail h3 {
         padding-right: 42px;
+    }
+}
+
+
+/* Sea forecast styling */
+.sea-forecast-summary {
+    padding: 14px;
+    border: 1px solid #cfe8dc;
+    background: #f1fbf6;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.sea-forecast-summary strong { font-size: 17px; }
+
+body.dark-theme .sea-forecast-summary {
+    background: #20392f;
+    border-color: #396c55;
+}
+
+@media (min-width: 800px) {
+    .location-card,
+    .sea-tides-card,
+    .forecast-card,
+    .sea-planner-card {
+        width: 100% !important;
     }
 }
 
@@ -1534,6 +1579,18 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
         <div class="section-heading"><h2>🏊 Swim Recommendation</h2></div>
         <div id="recommendation" class="recommendation-content">Waiting for data...</div>
     </div>
+</div>
+
+<div class="card forecast-card" id="seaForecastCard" style="display:none;">
+    <div class="section-heading">
+        <div>
+            <div class="eyebrow">7-DAY OUTLOOK</div>
+            <h2>🌊 Sea Forecast</h2>
+        </div>
+    </div>
+    <p class="forecast-intro">Select a day to see the expected weather, wind, waves and sea conditions.</p>
+    <div id="seaForecastDays" class="forecast-days"></div>
+    <div id="seaForecastDetail" class="forecast-detail" style="display:none;"></div>
 </div>
 
 <div class="card sea-tides-card" id="seaTidesCard" style="display:none;">
@@ -1916,6 +1973,8 @@ async function checkConditions() {
             `;
 
             document.getElementById("seaTidesCard").style.display = "none";
+            document.getElementById("seaForecastCard").style.display = "none";
+            closeSeaForecastDetail();
             loadLakeForecast(selectedLocation);
             return;
 
@@ -2266,6 +2325,9 @@ async function checkConditions() {
         showSeaTide(0);
         seaTideSelect.onchange = function() { showSeaTide(Number(this.value)); };
 
+        /* 7-day sea forecast/outlook */
+        loadSeaForecast(selectedLocation);
+
         /* =========================
            DISPLAY SEA CONDITIONS
            ========================= */
@@ -2564,6 +2626,245 @@ async function checkConditions() {
 
 }
 
+
+
+/* =========================
+   SEA FORECAST
+   ========================= */
+
+function getSeaForecastAssessment(waveHeight, wavePeriod, windSpeed, windDegrees, waterTemp) {
+    const score = calculateSwimScore(
+        Number(waveHeight),
+        Number(wavePeriod),
+        Number(windSpeed),
+        getWindDirection(Number(windDegrees))
+    );
+
+    let rating;
+    if (score >= 80) rating = "🟢 EXCELLENT CONDITIONS";
+    else if (score >= 60) rating = "🟡 GOOD CONDITIONS";
+    else if (score >= 40) rating = "🟠 CHALLENGING CONDITIONS";
+    else rating = "🔴 POOR CONDITIONS";
+
+    const reasons = [];
+    const windDirection = getWindDirection(Number(windDegrees));
+
+    if (windDirection === "West") reasons.push("✅ Westerly wind - ideal direction");
+    else if (windDirection.includes("North")) reasons.push("⚠️ Northerly wind - less favourable");
+    else reasons.push("ℹ️ Wind direction: " + windDirection);
+
+    if (Number(windSpeed) <= 3) reasons.push(`✅ Light wind (${Number(windSpeed).toFixed(1)} m/s)`);
+    else if (Number(windSpeed) <= 5) reasons.push(`🟡 Moderate wind (${Number(windSpeed).toFixed(1)} m/s)`);
+    else reasons.push(`🔴 Strong wind (${Number(windSpeed).toFixed(1)} m/s)`);
+
+    if (Number(waveHeight) <= 0.5) reasons.push(`✅ Small waves (${Number(waveHeight).toFixed(2)} m)`);
+    else if (Number(waveHeight) <= 1) reasons.push(`🟡 Moderate waves (${Number(waveHeight).toFixed(2)} m)`);
+    else reasons.push(`🔴 Large waves (${Number(waveHeight).toFixed(2)} m)`);
+
+    if (Number(waterTemp) >= 15) reasons.push(`✅ Comfortable water temperature (${Number(waterTemp).toFixed(1)}°C)`);
+    else if (Number(waterTemp) >= 12) reasons.push(`🟡 Cold water (${Number(waterTemp).toFixed(1)}°C)`);
+    else reasons.push(`🔴 Very cold water (${Number(waterTemp).toFixed(1)}°C)`);
+
+    return { score, rating, reasons };
+}
+
+async function loadSeaForecast(selectedLocation) {
+    const card = document.getElementById("seaForecastCard");
+    const daysContainer = document.getElementById("seaForecastDays");
+    const detail = document.getElementById("seaForecastDetail");
+
+    if (!selectedLocation || selectedLocation.type === "lake") {
+        card.style.display = "none";
+        daysContainer.innerHTML = "";
+        detail.style.display = "none";
+        return;
+    }
+
+    card.style.display = "block";
+    daysContainer.innerHTML = "<p>⏳ Loading sea forecast...</p>";
+    detail.style.display = "none";
+
+    try {
+        const latitude = selectedLocation.latitude;
+        const longitude = selectedLocation.longitude;
+
+        const weatherUrl =
+            `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${latitude}&longitude=${longitude}` +
+            `&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,precipitation_probability` +
+            `&forecast_days=7&wind_speed_unit=ms&timezone=Europe%2FDublin`;
+
+        const marineUrl =
+            `https://marine-api.open-meteo.com/v1/marine` +
+            `?latitude=${latitude}&longitude=${longitude}` +
+            `&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature` +
+            `&forecast_days=7&timezone=Europe%2FDublin`;
+
+        const [weatherResponse, marineResponse] = await Promise.all([
+            fetch(weatherUrl),
+            fetch(marineUrl)
+        ]);
+
+        if (!weatherResponse.ok || !marineResponse.ok) {
+            throw new Error("Sea forecast request failed");
+        }
+
+        const weather = await weatherResponse.json();
+        const marine = await marineResponse.json();
+
+        const byDate = {};
+        weather.hourly.time.forEach((time, i) => {
+            const date = time.slice(0, 10);
+            if (!byDate[date]) byDate[date] = { date, weather: [], marine: [] };
+            byDate[date].weather.push({
+                time,
+                temp: Number(weather.hourly.temperature_2m[i]),
+                wind: Number(weather.hourly.wind_speed_10m[i]),
+                direction: Number(weather.hourly.wind_direction_10m[i]),
+                gust: Number(weather.hourly.wind_gusts_10m[i]),
+                code: Number(weather.hourly.weather_code[i]),
+                rain: weather.hourly.precipitation_probability[i]
+            });
+        });
+
+        marine.hourly.time.forEach((time, i) => {
+            const date = time.slice(0, 10);
+            if (!byDate[date]) byDate[date] = { date, weather: [], marine: [] };
+            byDate[date].marine.push({
+                time,
+                wave: Number(marine.hourly.wave_height[i]),
+                period: Number(marine.hourly.wave_period[i]),
+                waveDirection: Number(marine.hourly.wave_direction[i]),
+                water: Number(marine.hourly.sea_surface_temperature[i])
+            });
+        });
+
+        const forecast = Object.values(byDate).slice(0, 7).map(day => {
+            const w = day.weather.filter(x => Number.isFinite(x.temp));
+            const m = day.marine.filter(x => Number.isFinite(x.wave) && Number.isFinite(x.period));
+            if (!w.length || !m.length) return null;
+
+            const maxTemp = Math.max(...w.map(x => x.temp));
+            const minTemp = Math.min(...w.map(x => x.temp));
+            const maxWind = Math.max(...w.map(x => x.wind));
+            const maxGust = Math.max(...w.map(x => x.gust));
+            const rain = Math.max(...w.map(x => Number(x.rain) || 0));
+            const representativeWeather = w.reduce((best, x) =>
+                Math.abs(Number(x.time.slice(11,13)) - 12) < Math.abs(Number(best.time.slice(11,13)) - 12) ? x : best
+            , w[0]);
+            const maxWave = Math.max(...m.map(x => x.wave));
+            const representativeMarine = m.reduce((best, x) =>
+                Math.abs(Number(x.time.slice(11,13)) - 12) < Math.abs(Number(best.time.slice(11,13)) - 12) ? x : best
+            , m[0]);
+            const maxPeriod = Math.max(...m.map(x => x.period));
+            const avgWater = m.reduce((sum, x) => sum + x.water, 0) / m.length;
+
+            const assessment = getSeaForecastAssessment(
+                maxWave,
+                representativeMarine.period,
+                maxWind,
+                representativeWeather.direction,
+                avgWater
+            );
+
+            return {
+                date: day.date,
+                weatherCode: representativeWeather.code,
+                maxTemp,
+                minTemp,
+                wind: maxWind,
+                gust: maxGust,
+                direction: representativeWeather.direction,
+                rain,
+                wave: maxWave,
+                period: representativeMarine.period,
+                maxPeriod,
+                waveDirection: representativeMarine.waveDirection,
+                water: avgWater,
+                assessment
+            };
+        }).filter(Boolean);
+
+        window.currentSeaForecast = { forecast };
+
+        daysContainer.innerHTML = forecast.map((day, index) => `
+            <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showSeaForecastDay(${index})">
+                <div class="forecast-day-name">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
+                <div class="forecast-day-date">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
+                <div class="forecast-icon">${getWeatherIcon(day.weatherCode)}</div>
+                <div class="forecast-temp">${Math.round(day.maxTemp)}°</div>
+                <div class="forecast-wind">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</div>
+                <div class="forecast-condition">${day.assessment.rating.replace(" CONDITIONS", "")}</div>
+            </button>
+        `).join("");
+
+        showSeaForecastDay(0);
+    } catch (error) {
+        console.error("SEA FORECAST ERROR:", error);
+        daysContainer.innerHTML = "⚠️ Unable to load the sea forecast. Please try again.";
+    }
+}
+
+function showSeaForecastDay(index) {
+    const state = window.currentSeaForecast;
+    if (!state || !state.forecast[index]) return;
+
+    const day = state.forecast[index];
+    const detail = document.getElementById("seaForecastDetail");
+    if (!detail) return;
+
+    document.querySelectorAll("#seaForecastDays .forecast-day").forEach((el, i) =>
+        el.classList.toggle("active", i === index)
+    );
+
+    const dateText = new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
+        weekday:"long", day:"numeric", month:"long"
+    });
+
+    const isMobile = window.matchMedia("(max-width: 599px)").matches;
+
+    detail.innerHTML = `
+        ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeSeaForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
+        <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
+        <div class="sea-forecast-summary">
+            <strong>${day.assessment.rating}</strong><br>
+            ${day.assessment.reasons.slice(0, 2).join(" · ")}<br><br>
+            ${day.assessment.reasons.slice(2).join("<br>")}
+        </div>
+        <div class="forecast-metrics">
+            <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
+        </div>
+        <div style="margin-top:14px;font-size:20px;font-weight:bold;color:#006994;">
+            🏊 Predicted Swim Score: ${day.assessment.score}/100
+        </div>
+    `;
+
+    detail.style.display = "block";
+
+    if (isMobile) {
+        detail.classList.add("mobile-forecast-detail");
+        document.body.style.overflow = "hidden";
+    } else {
+        detail.classList.remove("mobile-forecast-detail");
+        document.body.style.overflow = "";
+    }
+}
+
+function closeSeaForecastDetail() {
+    const detail = document.getElementById("seaForecastDetail");
+    if (!detail) return;
+    detail.style.display = "none";
+    detail.classList.remove("mobile-forecast-detail");
+    document.body.style.overflow = "";
+}
 
 
 /* =========================
@@ -3665,7 +3966,9 @@ document.getElementById("locationSelect").addEventListener("change", function() 
     document.getElementById("recommendation").innerHTML = "⏳ Loading recommendation...";
     window.currentLakeForecast = null;
     closeLakeForecastDetail();
+    closeSeaForecastDetail();
     document.getElementById("seaTidesCard").style.display = "none";
+    document.getElementById("seaForecastCard").style.display = "none";
 
     if (selectedLocation) {
         checkConditions();
