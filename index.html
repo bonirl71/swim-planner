@@ -1737,16 +1737,6 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
-
-@media (min-width: 600px) {
-    #seaForecastDetail {
-        display: none !important;
-    }
-    #seaForecastDetail.forecast-detail-open {
-        display: block !important;
-    }
-}
-
 </style>
 
 </head>
@@ -1891,7 +1881,7 @@ body.dark-theme .sea-forecast-summary {
     </select>
     <button type="button" onclick="predictSwimConditions()">🔮 Predict Swim Conditions</button>
     <div id="predictionResult"></div>
-    <button type="button" onclick="makeTravelPlansForSelectedForecast()">📍 Calculate Journey From My Location</button>
+    <button type="button" onclick="calculateJourney()">📍 Calculate Journey From My Location</button>
     <p id="journeyResult">Waiting for location and tide information...</p>
 </div>
 
@@ -3128,6 +3118,9 @@ function showSeaForecastDay(index) {
     const detail = document.getElementById("seaForecastDetail");
     if (!detail) return;
 
+    /* Show selected-day details on desktop as well. */
+    detail.classList.add("forecast-detail-open");
+
     document.querySelectorAll("#seaForecastDays .forecast-day").forEach((el, i) =>
         el.classList.toggle("active", i === index)
     );
@@ -3247,33 +3240,6 @@ function openMobileTravelPlanner(index) {
 
     closeSeaForecastDetail();
     planner.style.display = "block";
-    planner.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-
-function makeTravelPlansForSelectedForecast() {
-    const planner = document.getElementById("travelPlannerCard");
-    const tideSelect = document.getElementById("highTideSelect");
-
-    if (typeof closeSeaForecastDetail === "function") {
-        closeSeaForecastDetail();
-    }
-    if (typeof closeLakeForecastDetail === "function") {
-        closeLakeForecastDetail();
-    }
-
-    if (!planner) return;
-
-    planner.style.display = "block";
-
-    const state = window.seaForecastState || window.currentSeaForecast;
-    if (tideSelect && state && state.selectedTide) {
-        const option = Array.from(tideSelect.options).find(
-            option => option.value === state.selectedTide
-        );
-        if (option) tideSelect.value = state.selectedTide;
-    }
-
     planner.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -3497,6 +3463,12 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">Lake water</span><span class="forecast-metric-value">${state.waterTemp !== null ? state.waterTemp.toFixed(1) + "°C" : "Unavailable"}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
+
+        ${isMobile ? `
+            <div class="mobile-forecast-actions lake-mobile-actions">
+                <button type="button" class="secondary-action close-action" onclick="closeLakeForecastDetail()">Close</button>
+            </div>
+        ` : ""}
     `;
 
     detail.style.display = "block";
