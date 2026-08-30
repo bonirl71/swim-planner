@@ -1277,7 +1277,7 @@ body.dark-theme select { color:#f0f5f8; }
     </div>
     <div class="location-controls">
         <select id="locationSelect"></select>
-        <button type="button" class="primary-action" onclick="checkConditions()">Check Conditions</button>
+        
     </div>
 </div>
 
@@ -3306,6 +3306,13 @@ document.addEventListener("click", function(event) {
 
 function initialiseApp() {
     loadLocations();
+
+    const locationSelect =
+        document.getElementById("locationSelect");
+
+    if (locationSelect && locationSelect.value) {
+        checkConditions();
+    }
 }
 
 if (document.readyState === "loading") {
@@ -3329,10 +3336,13 @@ document.getElementById("locationSelect").addEventListener("change", function() 
     document.getElementById("journeyResult").textContent = "Waiting for location and tide information...";
     document.getElementById("predictionResult").innerHTML = "";
     document.getElementById("highTideSelect").innerHTML = '<option value="">Check swim conditions first...</option>';
-    document.getElementById("conditions").innerHTML = "Select a location and check conditions.";
-    document.getElementById("recommendation").innerHTML = "Waiting for data...";
+    document.getElementById("conditions").innerHTML = "⏳ Loading conditions...";
+    document.getElementById("recommendation").innerHTML = "⏳ Loading recommendation...";
     window.currentLakeForecast = null;
-    loadLakeForecast(selectedLocation);
+
+    if (selectedLocation) {
+        checkConditions();
+    }
 });
 
 </script>
