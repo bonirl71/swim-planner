@@ -2073,20 +2073,6 @@ body.dark-theme .sea-forecast-summary {
 }
 
 
-/* Updated How to Use guide */
-.user-guide .guide-section {
-    margin-bottom: 22px;
-}
-.user-guide .guide-section h3 {
-    margin-bottom: 10px;
-}
-.user-guide .guide-section ol {
-    padding-left: 22px;
-}
-.user-guide .guide-section li {
-    margin-bottom: 10px;
-    line-height: 1.5;
-}
 
 </style>
 
@@ -2112,7 +2098,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.4</strong></span>
+                ℹ️ <span>App Version <strong>2.4.5</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2123,145 +2109,48 @@ body.dark-theme .sea-forecast-summary {
 </header>
 
 
-<div class="user-guide" id="userGuide">
-    <h2>How to Use the App</h2>
 
-    <section class="guide-section">
-        <h3>📱 Phone</h3>
 
-        <ol>
-            <li>
-                <strong>Choose your swim location.</strong>
-                Youghal Quay is the default location when the app opens.
-                Select another sea or lake location from the location menu if required.
-            </li>
-            <li>
-                <strong>View the forecast.</strong>
-                The forecast loads automatically when you choose a location.
-                The 7-day forecast is the main view.
-            </li>
-            <li>
-                <strong>Select a day.</strong>
-                Tap a forecast day to open the information for that day.
-                You do not need to scroll through all the forecast information.
-                If the selected day is today, it is shown as <strong>Today</strong>.
-            </li>
-            <li>
-                <strong>View current conditions.</strong>
-                Current conditions and the Swim Recommendation are kept out of the
-                main phone view to reduce clutter. Use <strong>Show current conditions</strong>
-                when you want to see them.
-            </li>
-            <li>
-                <strong>Sea locations — Tide Info.</strong>
-                When viewing a sea forecast day, choose the tide option if you want
-                tide information for that date.
-            </li>
-            <li>
-                <strong>Sea locations — Make Travel Plans.</strong>
-                Select <strong>Make travel plans</strong> for the forecast day.
-                You will first be asked to choose the high tide you want to swim for.
-                After selecting the tide, continue to the Journey Planner to see the
-                travel plan for that swim.
-            </li>
-            <li>
-                <strong>Lake locations.</strong>
-                Lake forecasts do not use sea tide information. Select a forecast day
-                to see the lake information for that date.
-            </li>
-            <li>
-                <strong>Close a pop-up.</strong>
-                Use the <strong>Close</strong> button or X when available.
-            </li>
-        </ol>
-    </section>
-
-    <section class="guide-section">
-        <h3>🖥️ Desktop PC</h3>
-
-        <ol>
-            <li>
-                <strong>Choose your swim location.</strong>
-                Youghal Quay is the default location when the app opens.
-                Selecting a location automatically loads its current conditions,
-                Swim Recommendation and forecast.
-            </li>
-            <li>
-                <strong>View the forecast.</strong>
-                The 7-day forecast is displayed for the selected location.
-                Select a forecast day to view the detailed information for that day.
-                If the selected day is today, it is shown as <strong>Today</strong>.
-            </li>
-            <li>
-                <strong>Sea locations — Tide Info.</strong>
-                For sea locations, use <strong>Click for tide info</strong> when you
-                want to see the tide information. It opens in a separate window-style
-                panel so the main forecast screen stays uncluttered.
-            </li>
-            <li>
-                <strong>Sea locations — Journey Planner.</strong>
-                Use <strong>Click to plan your journey</strong> when you want to
-                open the Journey Planner. It appears in a separate panel rather than
-                taking up the main forecast screen.
-            </li>
-            <li>
-                <strong>Close information panels.</strong>
-                Use the X/Close control in the panel. You can also click outside the
-                panel to close it.
-            </li>
-            <li>
-                <strong>Lake locations.</strong>
-                Lake locations do not display the sea Tide Info or Journey Planner
-                buttons. The lake forecast is presented using the lake-specific
-                information.
-            </li>
-            <li>
-                <strong>Light / Dark theme.</strong>
-                Use the theme button in the header to switch between light and dark
-                themes. Dark theme is the default.
-            </li>
-            <li>
-                <strong>App information.</strong>
-                Open the menu to access the How to Use guide and see the current
-                App Version.
-            </li>
-        </ol>
-    </section>
-</div>
-
+    <div class="guide-modal" id="guideModal" aria-hidden="true">
+    <div class="guide-modal-backdrop" onclick="closeGuide()"></div>
     <div class="guide-modal-panel" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
         <div class="guide-modal-header">
             <h2 id="guideTitle">📖 How to Use the Swim Planner</h2>
             <button type="button" class="guide-close" onclick="closeGuide()" aria-label="Close guide">×</button>
         </div>
 
-        <button type="button" class="start-planning" onclick="closeGuide(); document.getElementById('locationCard').scrollIntoView({behavior:'smooth'});">
-            🏊 Let's Start Planning
-        </button>
+        <section class="guide-section">
+            <h3>📱 Phone</h3>
+            <ol>
+                <li><strong>Choose your swim location.</strong> Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.</li>
+                <li><strong>View the forecast.</strong> The forecast loads automatically when you choose a location. The 7-day forecast is the main view.</li>
+                <li><strong>Select a day.</strong> Tap a forecast day to open the information for that day. If the selected day is today, it is shown as <strong>Today</strong>.</li>
+                <li><strong>Current conditions.</strong> Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. Use <strong>Show current conditions</strong> when you want to see them.</li>
+                <li><strong>Sea locations — Tide Info.</strong> When viewing a sea forecast day, choose the tide option if you want tide information for that date.</li>
+                <li><strong>Sea locations — Make Travel Plans.</strong> Select <strong>Make travel plans</strong> for the forecast day. You will first be asked to choose the high tide you want to swim for. After selecting the tide, continue to the Journey Planner to see the travel plan.</li>
+                <li><strong>Lake locations.</strong> Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.</li>
+                <li><strong>Close a pop-up.</strong> Use the Close button or X when available.</li>
+            </ol>
+        </section>
 
-        <h3>🌊 Check current conditions</h3>
-        <p>Choose a swim location and select <strong>Check Swim Conditions</strong>. The app will show the latest available weather, wind, water and sea conditions.</p>
-
-        <h3>📅 Plan a future sea swim</h3>
-        <p>Sea locations show high and low tides for the next 7 days. Select the high tide you want to swim around.</p>
-
-        <h3>🔮 Predict future sea conditions</h3>
-        <p>Select a future high tide and choose <strong>Predict Swim Conditions</strong>. The app will show the expected conditions around that time.</p>
-
-        <h3>🚗 Plan your sea-swim journey</h3>
-        <p>Select your chosen high tide and use <strong>Calculate Journey From My Location</strong> to calculate your driving distance, journey time and recommended departure time.</p>
-
-        <h3>🏞️ Lake swimming</h3>
-        <p>Lake locations don't use tidal information. The app assesses wind, expected chop, temperature and weather conditions and indicates which side of the lake may be more sheltered.</p>
-        <p>Lake locations also have a <strong>7-day Lake Forecast</strong>. Select a day to see the expected wind, gusts, rain, temperature and lake conditions.</p>
+        <section class="guide-section">
+            <h3>🖥️ Desktop PC</h3>
+            <ol>
+                <li><strong>Choose your swim location.</strong> Youghal Quay is the default location when the app opens. Selecting a location automatically loads its current conditions, Swim Recommendation and forecast.</li>
+                <li><strong>View the forecast.</strong> The 7-day forecast is displayed for the selected location. Select a forecast day to view the detailed information for that day. If the selected day is today, it is shown as <strong>Today</strong>.</li>
+                <li><strong>Sea locations — Tide Info.</strong> For sea locations, use <strong>Click for tide info</strong> when you want to see the tide information. It opens in a separate panel so the main forecast screen stays uncluttered.</li>
+                <li><strong>Sea locations — Journey Planner.</strong> Use <strong>Click to plan your journey</strong> when you want to open the Journey Planner in a separate panel.</li>
+                <li><strong>Close information panels.</strong> Use the X/Close control in the panel. You can also click outside the panel to close it.</li>
+                <li><strong>Lake locations.</strong> Lake locations do not display the sea Tide Info or Journey Planner buttons. The lake forecast is presented using lake-specific information.</li>
+                <li><strong>Light / Dark theme.</strong> Use the theme option in the header to switch themes. Dark theme is the default.</li>
+                <li><strong>App information.</strong> Open the menu to access this guide and see the current App Version.</li>
+            </ol>
+        </section>
 
         <div class="user-guide-warning">
             ⚠️ <strong>Forecast guidance only</strong><br><br>
-            Forecast conditions, particularly several days in advance, can change significantly. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.
+            Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.
         </div>
-
-        <h3>🔄 Changing location</h3>
-        <p>When you change location, any previous Journey Planner, sea prediction and lake forecast are automatically cleared.</p>
     </div>
 </div>
 
