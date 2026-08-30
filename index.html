@@ -2085,7 +2085,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.9</strong></span>
+                ℹ️ <span>App Version <strong>2.5.0</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2594,7 +2594,7 @@ if (seaTidesCard) {
             const windSpeed = Number(current.wind_speed_10m);
             const windDegrees = Number(current.wind_direction_10m);
             const windDirection = getWindDirection(windDegrees);
-            const assessment = getLakeAssessment(windDegrees, windSpeed);
+            const assessment = getLakeAssessment(windDegrees, windSpeed, selectedLocation);
 
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
@@ -3693,7 +3693,66 @@ function closeSeaForecastDetail() {
    LAKE FORECAST
    ========================= */
 
-function getLakeAssessment(windDegrees, windSpeed) {
+function getLakeAssessment(windDegrees, windSpeed, location = null) {
+
+    // Portumna-specific local knowledge: northerly / north-westerly winds
+    // are offshore and normally keep the harbour very flat. Onshore winds
+    // are more problematic because waves are reinforced by the protective wall.
+    if (location && location.id === 8) {
+        if (windDegrees >= 292.5 || windDegrees < 22.5) {
+            if (windSpeed > 7) {
+                return {
+                    condition: "🟡 OFFSHORE — STRONG WIND",
+                    impact: "Northerly / north-westerly wind is offshore, but the stronger breeze may still affect swimming conditions.",
+                    advice: "The wind direction is favourable for Portumna and the water should remain relatively flat, although strong wind can still make conditions more demanding."
+                };
+            }
+            return {
+                condition: "🟢 CALM TO LIGHT CHOP",
+                impact: "Northerly / north-westerly wind is offshore and should keep the water relatively flat.",
+                advice: "This is a favourable wind direction for Portumna. Conditions should normally be very flat compared with an onshore breeze."
+            };
+        }
+
+        // Southerly, south-easterly and south-westerly winds are treated as
+        // particularly unfavourable because they are onshore at this spot.
+        if (windDegrees >= 112.5 && windDegrees < 247.5) {
+            if (windSpeed > 5) {
+                return {
+                    condition: "🔴 CHOPPY — ONSHORE WIND",
+                    impact: "Onshore wind is driving waves towards the protective wall, where they can bounce back and increase the chop.",
+                    advice: "Portumna can feel significantly rougher than the wind speed alone suggests in an onshore breeze. Even a moderate wind can make swimming conditions uncomfortable."
+                };
+            }
+            return {
+                condition: "🟠 INCREASING CHOP — ONSHORE WIND",
+                impact: "Onshore wind can create waves which are reinforced by bouncing off the protective wall.",
+                advice: "Conditions may feel worse than expected from the wind speed alone. Keep an eye on the water rather than relying solely on the forecast wind speed."
+            };
+        }
+
+        // Easterly / westerly winds are treated as intermediate conditions.
+        if (windSpeed > 7) {
+            return {
+                condition: "🔴 CHOPPY / STRONG WIND",
+                impact: "Strong wind may create significant chop around Portumna Harbour.",
+                advice: "Wind direction is neither the preferred offshore northerly / north-westerly direction nor the most problematic onshore sector, but the strength of the wind may still make conditions rough."
+            };
+        }
+        if (windSpeed > 4) {
+            return {
+                condition: "🟡 SLIGHTLY CHOPPY",
+                impact: "Some exposure to chop is possible.",
+                advice: "Conditions are likely to be more variable than with a northerly or north-westerly offshore breeze."
+            };
+        }
+        return {
+            condition: "🟢 CALM TO LIGHT CHOP",
+            impact: "Light winds should keep conditions reasonably settled.",
+            advice: "Light wind should produce relatively calm conditions, although the northerly / north-westerly offshore direction is the most favourable pattern here."
+        };
+    }
+
     let condition;
     let impact;
     let advice;
@@ -3824,7 +3883,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             gust: d.wind_gusts_10m_max[i],
             direction: d.wind_direction_10m_dominant[i],
             rain: d.precipitation_probability_max[i],
-            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
+            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i], selectedLocation)
         }));
 
         /*
@@ -3842,7 +3901,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
                 today.wind = currentWind;
                 today.direction = currentDirection;
-                today.assessment = getLakeAssessment(currentDirection, currentWind);
+                today.assessment = getLakeAssessment(currentDirection, currentWind, selectedLocation);
             }
             if (Number.isFinite(currentTemp)) {
                 today.maxTemp = currentTemp;
