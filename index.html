@@ -1737,6 +1737,71 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+/* =========================================================
+   DESKTOP SEA ACTIONS
+   Phone layout remains unchanged.
+   ========================================================= */
+.desktop-sea-actions { display: none; }
+
+@media (min-width: 600px) {
+    #seaTidesCard,
+    #travelPlannerCard {
+        display: none !important;
+    }
+
+    .desktop-sea-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .desktop-sea-action {
+        width: 100%;
+        margin: 0;
+        padding: 15px 18px;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    body.desktop-sea-tides-open #seaTidesCard,
+    body.desktop-sea-travel-open #travelPlannerCard {
+        display: block !important;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(720px, calc(100vw - 48px));
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+        z-index: 1000;
+        margin: 0 !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+
+    body.desktop-sea-tides-open::after,
+    body.desktop-sea-travel-open::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.35);
+        z-index: 999;
+    }
+
+    .desktop-only-close {
+        display: block;
+        width: auto;
+        margin: 0 0 12px auto;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 599px) {
+    .desktop-only-close { display: none; }
+}
+
 </style>
 
 </head>
@@ -1761,7 +1826,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.5</strong></span>
+                ℹ️ <span>App Version <strong>2.3.6</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1849,11 +1914,25 @@ body.dark-theme .sea-forecast-summary {
     <div id="seaForecastDetail" class="forecast-detail" style="display:none;"></div>
 </div>
 
+
+<div class="desktop-sea-actions" id="desktopSeaActions">
+    <button type="button" class="desktop-sea-action"
+            onclick="openDesktopSeaTides()">
+        🌊 Click for tide info
+    </button>
+    <button type="button" class="desktop-sea-action"
+            onclick="openDesktopSeaTravel()">
+        🚗 Click to plan your journey
+    </button>
+</div>
+
 <div class="card sea-tides-card" id="seaTidesCard" style="display:none;">
     <div class="section-heading">
         <div>
             <div class="eyebrow">7-DAY OUTLOOK</div>
             <h2>🌊 Tide Outlook</h2>
+    <button type="button" class="desktop-only-close" onclick="closeDesktopSeaPanels()">✕ Close</button>
+
         </div>
     </div>
     <p class="forecast-intro">Select a high tide to see the surrounding tide times.</p>
@@ -1874,7 +1953,9 @@ body.dark-theme .sea-forecast-summary {
 </div>
 
 <div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
-    <div class="section-heading"><h2>🚗 Journey Planner</h2></div>
+    <div class="section-heading"><h2>🚗 Journey Planner</h2>
+    <button type="button" class="desktop-only-close" onclick="closeDesktopSeaPanels()">✕ Close</button>
+</div>
     <p>Choose the high tide you want to swim for:</p>
     <select id="highTideSelect">
         <option value="">Check swim conditions first...</option>
@@ -4280,6 +4361,24 @@ function closeGuide() {
     const modal = document.getElementById("guideModal");
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden", "true");
+}
+
+
+function openDesktopSeaTides() {
+    document.body.classList.remove("desktop-sea-travel-open");
+    document.body.classList.add("desktop-sea-tides-open");
+}
+
+function openDesktopSeaTravel() {
+    document.body.classList.remove("desktop-sea-tides-open");
+    document.body.classList.add("desktop-sea-travel-open");
+}
+
+function closeDesktopSeaPanels() {
+    document.body.classList.remove(
+        "desktop-sea-tides-open",
+        "desktop-sea-travel-open"
+    );
 }
 
 function toggleTheme() {
