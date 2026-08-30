@@ -1571,6 +1571,16 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+@media (max-width: 599px) {
+    #seaForecastLocation,
+    #lakeForecastLocation {
+        display: block;
+        font-size: 0.78em;
+        margin-top: 2px;
+    }
+}
+
 </style>
 
 </head>
@@ -1595,7 +1605,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.7</strong></span>
+                ℹ️ <span>App Version <strong>2.2.8</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1672,7 +1682,7 @@ body.dark-theme .sea-forecast-summary {
     <div class="section-heading">
         <div>
             <div class="eyebrow">7-DAY OUTLOOK</div>
-            <h2>🌊 Sea Forecast</h2>
+            <h2>🌊 Sea Forecast <span id="seaForecastLocation"></span></h2>
         </div>
     </div>
     <p class="forecast-intro">Select a day to see the expected weather, wind, waves and sea conditions.</p>
@@ -1696,7 +1706,7 @@ body.dark-theme .sea-forecast-summary {
     <div class="section-heading">
         <div>
             <div class="eyebrow">7-DAY OUTLOOK</div>
-            <h2>🏞️ Lake Forecast</h2>
+            <h2>🏞️ Lake Forecast <span id="lakeForecastLocation"></span></h2>
         </div>
     </div>
     <p class="forecast-intro">Select a day to see the expected weather, wind and lake conditions.</p>
@@ -2060,7 +2070,7 @@ if (seaTidesCard) {
             const assessment = getLakeAssessment(windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
-                <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ Air temperature: <strong>${current.temperature_2m}°C</strong><br>
                     🏞️ Lake water temperature: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong><br>
@@ -2070,7 +2080,7 @@ if (seaTidesCard) {
             `;
 
             document.getElementById("recommendation").innerHTML = `
-                <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="lake-summary">
                     <strong>${assessment.condition}</strong>
                 </div>
@@ -2454,7 +2464,7 @@ if (lakeForecastCard) {
             "conditions"
         ).innerHTML =
         `
-        <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
         🌡 Air temperature:
         ${current.temperature_2m}°C
         <br>
@@ -2804,6 +2814,8 @@ async function loadSeaForecast(selectedLocation) {
     }
 
     card.style.display = "block";
+    const seaLocationLabel = document.getElementById("seaForecastLocation");
+    if (seaLocationLabel) seaLocationLabel.textContent = ` — ${getLocationDisplayName(selectedLocation)}`;
     daysContainer.innerHTML = "<p>⏳ Loading sea forecast...</p>";
     detail.style.display = "none";
 
@@ -3078,6 +3090,8 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
     }
 
     card.style.display = "block";
+    const lakeLocationLabel = document.getElementById("lakeForecastLocation");
+    if (lakeLocationLabel) lakeLocationLabel.textContent = ` — ${getLocationDisplayName(selectedLocation)}`;
     daysContainer.innerHTML = "<p>⏳ Loading lake forecast...</p>";
     detail.style.display = "none";
 
