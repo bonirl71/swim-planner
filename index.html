@@ -1656,22 +1656,11 @@ body.dark-theme .sea-forecast-summary {
         display: none !important;
     }
 
-    .mobile-current-button {
-        display: block !important;
-        width: 100%;
-        min-height: 44px;
-        margin-top: 10px;
-        padding: 10px 14px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-    }
-
-    /* Only reveal current conditions when the swimmer asks for them. */
-    body.mobile-show-current .dashboard-grid {
-        display: grid !important;
-        order: 3;
+    /* Phone view: keep current conditions and sea actions out of the main view.
+       They become available from the selected forecast-day pop-out instead. */
+    .mobile-current-button,
+    .desktop-sea-actions {
+        display: none !important;
     }
 
     #lakeForecastDetail.mobile-forecast-detail,
@@ -2096,7 +2085,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.8</strong></span>
+                ℹ️ <span>App Version <strong>2.4.9</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2123,7 +2112,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><strong>Choose your swim location.</strong> Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.</li>
                 <li><strong>View the forecast.</strong> The forecast loads automatically when you choose a location. The 7-day forecast is the main view.</li>
                 <li><strong>Select a day.</strong> Tap a forecast day to open the information for that day. If the selected day is today, it is shown as <strong>Today</strong>.</li>
-                <li><strong>Current conditions.</strong> Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. Use <strong>Show current conditions</strong> when you want to see them.</li>
+                <li><strong>Current conditions.</strong> Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.</li>
                 <li><strong>Sea locations — Tide Info.</strong> When viewing a sea forecast day, choose the tide option if you want tide information for that date.</li>
                 <li><strong>Sea locations — Make Travel Plans.</strong> Select <strong>Make travel plans</strong> for the forecast day. You will first be asked to choose the high tide you want to swim for. After selecting the tide, continue to the Journey Planner to see the travel plan.</li>
                 <li><strong>Lake locations.</strong> Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.</li>
@@ -2161,10 +2150,6 @@ body.dark-theme .sea-forecast-summary {
     </div>
     <div class="location-controls">
         <select id="locationSelect"></select>
-        <button type="button" id="mobileCurrentButton" class="mobile-current-button" onclick="toggleMobileCurrentConditions()">
-            🌤️ Show current conditions
-        </button>
-        
     </div>
 </div>
 
@@ -2265,16 +2250,6 @@ document.addEventListener("click", function(event) {
 <script>
 
 
-
-function toggleMobileCurrentConditions() {
-    const shown = document.body.classList.toggle("mobile-show-current");
-    const button = document.getElementById("mobileCurrentButton");
-    if (button) {
-        button.textContent = shown
-            ? "✕ Hide current conditions"
-            : "🌤️ Show current conditions";
-    }
-}
 
 /* =========================
    WEATHER DESCRIPTION
@@ -4881,12 +4856,6 @@ if (document.readyState === "loading") {
 // Populate the swim location dropdown when the app loads.
 
 document.getElementById("locationSelect").addEventListener("change", function() {
-    if (window.matchMedia("(max-width: 599px)").matches) {
-        document.body.classList.remove("mobile-show-current");
-        const button = document.getElementById("mobileCurrentButton");
-        if (button) button.textContent = "🌤️ Show current conditions";
-    }
-
     const selectedId = this.value;
     const selectedLocation = swimLocations.find(location => location.id == selectedId);
 
