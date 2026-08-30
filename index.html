@@ -1760,9 +1760,10 @@ body.dark-theme .sea-forecast-summary {
     .desktop-sea-action {
         width: 100%;
         margin: 0;
-        padding: 15px 18px;
+        padding: 14px 18px;
         border-radius: 12px;
-        font-size: 16px;
+        font-size: 15px;
+        font-weight: 700;
     }
 
     body.desktop-sea-tides-open #seaTidesCard,
@@ -1771,13 +1772,14 @@ body.dark-theme .sea-forecast-summary {
         position: fixed;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%);
-        width: min(720px, calc(100vw - 48px));
-        max-height: calc(100vh - 48px);
+        transform: translate(-50%, -50%) scale(.96);
+        width: min(540px, calc(100vw - 80px));
+        max-height: min(720px, calc(100vh - 80px));
         overflow-y: auto;
-        z-index: 1000;
+        z-index: 1001;
         margin: 0 !important;
-        box-shadow: 0 20px 60px rgba(0,0,0,.4);
+        box-shadow: 0 28px 80px rgba(0,0,0,.52);
+        animation: seaPanelIn .22s cubic-bezier(.2,.8,.2,1) forwards;
     }
 
     body.desktop-sea-tides-open::after,
@@ -1785,21 +1787,108 @@ body.dark-theme .sea-forecast-summary {
         content: "";
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.35);
-        z-index: 999;
+        background: rgba(4,12,20,.48);
+        backdrop-filter: blur(3px);
+        z-index: 1000;
+        animation: seaBackdropIn .18s ease-out forwards;
     }
 
     .desktop-only-close {
         display: block;
         width: auto;
         margin: 0 0 12px auto;
-        padding: 8px 14px;
-        font-size: 13px;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    @keyframes seaPanelIn {
+        from { opacity: 0; transform: translate(-50%, -47%) scale(.94); }
+        to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @keyframes seaBackdropIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
     }
 }
 
 @media (max-width: 599px) {
     .desktop-only-close { display: none; }
+}
+
+
+@media (max-width: 599px) {
+    body.mobile-travel-open #travelPlannerCard {
+        display: block !important;
+        position: fixed !important;
+        left: 12px !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 1001 !important;
+        max-height: calc(100vh - 24px) !important;
+        overflow-y: auto !important;
+        margin: 0 !important;
+        box-shadow: 0 22px 60px rgba(0,0,0,.5);
+        border-radius: 16px;
+    }
+
+    body.mobile-travel-open::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(4,12,20,.52);
+        backdrop-filter: blur(2px);
+        z-index: 1000;
+    }
+
+    .mobile-tide-choice-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+    }
+
+    .mobile-tide-choice-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(4,12,20,.52);
+        backdrop-filter: blur(2px);
+    }
+
+    .mobile-tide-choice-panel {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 20px;
+        border-radius: 16px;
+        background: var(--card-bg, #1d2b36);
+        border: 1px solid rgba(130,190,235,.35);
+        box-shadow: 0 22px 60px rgba(0,0,0,.5);
+        animation: mobileTideChoiceIn .2s ease-out;
+    }
+
+    .mobile-tide-choice-panel select {
+        width: 100%;
+        min-height: 46px;
+        margin: 8px 0 14px;
+    }
+
+    .mobile-travel-continue {
+        width: 100%;
+        min-height: 46px;
+        font-weight: 700;
+    }
+
+    .mobile-no-tides {
+        margin-top: 12px;
+    }
+
+    @keyframes mobileTideChoiceIn {
+        from { opacity: 0; transform: translateY(-46%) scale(.96); }
+        to   { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
 }
 
 </style>
@@ -1826,7 +1915,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.6</strong></span>
+                ℹ️ <span>App Version <strong>2.3.7</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1954,6 +2043,8 @@ body.dark-theme .sea-forecast-summary {
 
 <div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
     <div class="section-heading"><h2>🚗 Journey Planner</h2>
+    <button type="button" id="mobileTravelCloseButton" class="mobile-only-close"
+            onclick="closeMobileTravelPlanner()">✕ Close</button>
     <button type="button" class="desktop-only-close" onclick="closeDesktopSeaPanels()">✕ Close</button>
 </div>
     <p>Choose the high tide you want to swim for:</p>
@@ -2158,7 +2249,16 @@ function getLocationDisplayName(location) {
    CHECK CONDITIONS
    ========================= */
 
-async function checkConditions() {
+async 
+function updateDesktopSeaActions(location) {
+    const actions = document.getElementById("desktopSeaActions");
+    if (!actions) return;
+
+    const isSea = !!location && location.type !== "lake";
+    actions.style.display = isSea ? "" : "none";
+}
+
+function checkConditions() {
 
     console.log("checkConditions started");
 
@@ -2172,6 +2272,8 @@ async function checkConditions() {
         swimLocations.find(
             location => location.id == selectedId
         );
+
+    updateDesktopSeaActions(selectedLocation);
 
 /* Keep lake and sea forecast sections mutually exclusive. */
 const lakeForecastCard = document.getElementById("lakeForecastCard");
@@ -3316,12 +3418,94 @@ function showMobileSeaForecastDetails(index) {
 
 function openMobileTravelPlanner(index) {
     const state = window.currentSeaForecast;
-    const planner = document.getElementById("travelPlannerCard");
-    if (!state || !state.forecast[index] || !planner) return;
+    if (!state || !state.forecast[index]) return;
+
+    const day = state.forecast[index];
+    const date = day.date;
+    const highTides = (window.currentSeaTides && window.currentSeaTides.highTides || [])
+        .filter(tide => {
+            const d = new Date(tide.time).toLocaleDateString("en-CA", {
+                timeZone: "Europe/Dublin"
+            });
+            return d === date;
+        });
 
     closeSeaForecastDetail();
+
+    const existing = document.getElementById("mobileTideChoiceModal");
+    if (existing) existing.remove();
+
+    const dateText = new Date(date + "T12:00:00").toLocaleDateString("en-IE", {
+        weekday: "long", day: "numeric", month: "long"
+    });
+
+    const modal = document.createElement("div");
+    modal.id = "mobileTideChoiceModal";
+    modal.className = "mobile-tide-choice-modal";
+    modal.innerHTML = `
+        <div class="mobile-tide-choice-backdrop" onclick="closeMobileTideChoice()"></div>
+        <div class="mobile-tide-choice-panel" role="dialog" aria-modal="true">
+            <button type="button" class="mobile-forecast-close"
+                    onclick="closeMobileTideChoice()" aria-label="Close">✕</button>
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+            <h3>🚗 Plan your swim — ${dateText}</h3>
+            <p>Select the <strong>high tide</strong> you want to swim for:</p>
+            <select id="mobileTravelTideSelect">
+                <option value="">Choose a high tide...</option>
+                ${highTides.map(tide => `
+                    <option value="${tide.time.toISOString()}">
+                        ${tide.time.toLocaleTimeString("en-IE", {
+                            hour:"2-digit", minute:"2-digit", hour12:false,
+                            timeZone:"Europe/Dublin"
+                        })} — ${Number(tide.height).toFixed(2)} m
+                    </option>
+                `).join("")}
+            </select>
+            ${highTides.length ? `
+                <button type="button" class="mobile-travel-continue"
+                        onclick="confirmMobileTravelTide()">
+                    Continue to travel plan →
+                </button>
+            ` : `
+                <p class="mobile-no-tides">No high tide information is available for this day.</p>
+            `}
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function confirmMobileTravelTide() {
+    const choice = document.getElementById("mobileTravelTideSelect");
+    const planner = document.getElementById("travelPlannerCard");
+    const highTideSelect = document.getElementById("highTideSelect");
+
+    if (!choice || !choice.value || !planner || !highTideSelect) {
+        if (choice) choice.focus();
+        return;
+    }
+
+    highTideSelect.value = choice.value;
+
+    closeMobileTideChoice();
+    closeSeaForecastDetail();
+
+    document.body.classList.add("mobile-travel-open");
     planner.style.display = "block";
-    planner.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const close = document.getElementById("mobileTravelCloseButton");
+    if (close) close.focus();
+}
+
+function closeMobileTideChoice() {
+    const modal = document.getElementById("mobileTideChoiceModal");
+    if (modal) modal.remove();
+}
+
+function closeMobileTravelPlanner() {
+    document.body.classList.remove("mobile-travel-open");
+    const planner = document.getElementById("travelPlannerCard");
+    if (planner) planner.style.display = "none";
 }
 
 function closeSeaForecastDetail() {
@@ -4381,6 +4565,13 @@ function closeDesktopSeaPanels() {
     );
 }
 
+
+document.addEventListener("click", function(event) {
+    if (event.target === document.body && (document.body.classList.contains("desktop-sea-tides-open") || document.body.classList.contains("desktop-sea-travel-open"))) {
+        closeDesktopSeaPanels();
+    }
+});
+
 function toggleTheme() {
     document.body.classList.toggle("dark-theme");
     const isDark = document.body.classList.contains("dark-theme");
@@ -4487,6 +4678,8 @@ document.getElementById("locationSelect").addEventListener("change", function() 
 
     const selectedId = this.value;
     const selectedLocation = swimLocations.find(location => location.id == selectedId);
+
+    updateDesktopSeaActions(selectedLocation);
 
     document.getElementById("travelPlannerCard").style.display = "none";
     document.getElementById("journeyResult").textContent = "Waiting for location and tide information...";
