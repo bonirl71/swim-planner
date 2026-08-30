@@ -1915,7 +1915,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.7</strong></span>
+                ℹ️ <span>App Version <strong>2.3.8</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2258,7 +2258,7 @@ function updateDesktopSeaActions(location) {
     actions.style.display = isSea ? "" : "none";
 }
 
-function checkConditions() {
+async function checkConditions() {
 
     console.log("checkConditions started");
 
