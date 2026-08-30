@@ -1886,6 +1886,67 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+@media (min-width: 600px) {
+    body.desktop-sea-tides-open #seaTidesCard,
+    body.desktop-sea-travel-open #travelPlannerCard {
+        width: min(620px, calc(100vw - 80px)) !important;
+        max-width: 620px !important;
+        left: 50% !important;
+        right: auto !important;
+    }
+}
+
+
+@media (min-width: 600px) {
+    #travelPlannerCard .desktop-only-close {
+        display: none !important;
+    }
+
+    #travelPlannerCard > .mobile-only-close,
+    #travelPlannerCard .mobile-only-close {
+        display: none !important;
+    }
+}
+
+
+@media (max-width: 599px) {
+    body.mobile-travel-open #travelPlannerCard {
+        padding-top: 0 !important;
+        overflow-y: auto !important;
+    }
+
+    body.mobile-travel-open #travelPlannerCard > .planner-mobile-header,
+    body.mobile-travel-open #travelPlannerCard .planner-mobile-header {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 46px;
+        padding: 6px 10px;
+        margin: 0 0 10px 0;
+        background: var(--card-bg, #1d2b36);
+        border-bottom: 1px solid rgba(130,190,235,.25);
+    }
+
+    body.mobile-travel-open #mobileTravelCloseButton {
+        position: static !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: auto !important;
+        min-width: 72px;
+        min-height: 34px;
+        margin: 0 !important;
+        padding: 7px 12px !important;
+        border-radius: 9px;
+        font-size: 13px;
+        line-height: 1;
+    }
+}
+
 </style>
 
 </head>
@@ -1910,7 +1971,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.8</strong></span>
+                ℹ️ <span>App Version <strong>2.3.9</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2038,8 +2099,8 @@ body.dark-theme .sea-forecast-summary {
 
 <div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
     <div class="section-heading"><h2>🚗 Journey Planner</h2>
-    <button type="button" id="mobileTravelCloseButton" class="mobile-only-close"
-            onclick="closeMobileTravelPlanner()">✕ Close</button>
+    <div class="planner-mobile-header"><button type="button" id="mobileTravelCloseButton" class="mobile-only-close"
+            onclick="closeDesktopSeaPanels()">✕ Close</button></div>
     <button type="button" class="desktop-only-close" onclick="closeDesktopSeaPanels()">✕ Close</button>
 </div>
     <p>Choose the high tide you want to swim for:</p>
