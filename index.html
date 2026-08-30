@@ -3,1292 +3,563 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Sea Swim Planner</title>
-
-<link rel="icon" href="data:image/svg+xml,
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-<rect width='100' height='100' rx='20' fill='%230077b6'/>
-<text x='50' y='68' font-size='55' text-anchor='middle'>🌊</text>
-</svg>">
-
+<title>Open Water Swim Planner</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230077b6'/><text x='50' y='68' font-size='55' text-anchor='middle'>🌊</text></svg>">
 <style>
 
 /* =========================
-   GLOBAL
+   CLEAN DASHBOARD DESIGN
    ========================= */
 
-* {
-    box-sizing: border-box;
+:root {
+    --navy: #0b1f33;
+    --navy-2: #132d46;
+    --blue: #0879c9;
+    --blue-light: #eaf6ff;
+    --text: #203647;
+    --muted: #6c7d8b;
+    --border: #dce8f0;
+    --card: #ffffff;
+    --page: #eef5f9;
+    --green: #1f9d61;
+    --amber: #d79a19;
+    --red: #d9534f;
 }
+
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-    padding: 20px;
+    padding: 24px;
     font-family: Arial, Helvetica, sans-serif;
-
-    background: linear-gradient(
-        180deg,
-        #9fd6ff 0%,
-        #dff4ff 40%,
-        #f4fbff 100%
-    );
-
+    background: var(--page);
+    color: var(--text);
     min-height: 100vh;
-
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-
-    transition: background 0.25s ease;
+    transition: background .25s ease, color .25s ease;
 }
-
-
-/* =========================
-   MAIN APP
-   ========================= */
 
 .app {
     width: 100%;
-    max-width: 900px;
-
-    background: white;
-
-    border-radius: 22px;
-
-    padding: 30px;
-
-    box-shadow:
-        0 12px 30px rgba(0,0,0,0.15);
-
-    margin-bottom: 40px;
-
-    transition:
-        background 0.25s ease,
-        color 0.25s ease,
-        box-shadow 0.25s ease;
+    max-width: 1500px;
+    margin: 0 auto;
 }
 
-
-/* =========================
-   HEADER
-   ========================= */
+/* HEADER */
 
 .app-header {
+    background: var(--navy);
+    color: white;
+    border-radius: 20px;
+    padding: 20px 24px;
     display: flex;
-
     align-items: center;
-
-    gap: 18px;
-
-    margin-bottom: 28px;
-
-    padding-bottom: 20px;
-
-    border-bottom: 1px solid #e7eef5;
+    gap: 16px;
+    box-shadow: 0 10px 28px rgba(8,31,51,.16);
+    margin-bottom: 18px;
 }
-.app-title {
-    flex: 1;
+
+.logo {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    background: linear-gradient(135deg,#00b4ff,#0077cc);
+}
+
+.app-title { min-width: 0; flex: 1; }
+.app-header h1 { margin: 0; font-size: 30px; }
+.app-header .subtitle {
+    margin-top: 5px;
+    color: #b9d4e7;
+    font-size: 14px;
+}
+
+.menu { position: relative; }
+
+.menu summary {
+    list-style: none;
+    cursor: pointer;
+    width: 52px;
+    height: 52px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    border: 1px solid rgba(255,255,255,.16);
+}
+
+.menu summary::-webkit-details-marker { display:none; }
+
+.menu-content {
+    position: absolute;
+    right: 0;
+    top: 62px;
+    width: 270px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.18);
+    padding: 8px;
+    z-index: 200;
+}
+
+.menu-content button,
+.menu-item {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    padding: 12px 13px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.menu-content button:hover,
+.menu-item:hover { background: var(--blue-light); }
+
+.menu-content details > summary { list-style: none; }
+.menu-content details > summary::-webkit-details-marker { display: none; }
+
+.menu-section {
+    padding: 11px 13px 5px;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.guide-panel {
+    padding: 10px 13px 14px;
+    font-size: 14px;
+    line-height: 1.55;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+.guide-panel h3 { color: var(--blue); margin: 14px 0 5px; }
+.guide-panel p { margin: 5px 0 10px; }
+
+.version-panel {
+    padding: 10px 13px 14px;
+    font-size: 14px;
+}
+
+/* DASHBOARD */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.45fr);
+    gap: 18px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 5px 18px rgba(25,55,75,.06);
     min-width: 0;
 }
 
-.user-guide {
-    margin-left: 0;
-}
-.logo {
-    width: 70px;
-    height: 70px;
-
-    flex-shrink: 0;
-
-    border-radius: 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 36px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #00b4ff,
-            #0077cc
-        );
-
-    color: white;
-
-    box-shadow:
-        0 8px 18px rgba(0,119,204,.25);
-}
-
-.app-header h1 {
-    margin: 0;
-
-    font-size: 34px;
-
-    color: #0d5f92;
-}
-
-.app-header p {
-    margin-top: 6px;
-    margin-bottom: 0;
-
-    color: #6b7b88;
-
-    font-size: 16px;
-}
-
-
-/* =========================
-   INTRODUCTION
-   ========================= */
-
-.app > p {
-    font-size: 17px;
-
-    color: #4f6472;
-
-    margin: 0 0 20px 0;
-}
-
-
-/* =========================
-   USER GUIDE
-   ========================= */
-
-.user-guide {
-    position: relative;
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-.user-guide summary {
-    width: 56px;
-    height: 56px;
-
-    border-radius: 14px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-
-    background:
-        linear-gradient(
-            135deg,
-            #00b4ff,
-            #0077cc
-        );
-
-    color: white;
-
-    box-shadow:
-        0 8px 18px rgba(0,119,204,.25);
-
-    list-style: none;
-
-    font-size: 23px;
-}
-
-.user-guide summary::-webkit-details-marker {
-    display: none;
-}
-
-.user-guide summary span {
-    font-size: 11px;
-    font-weight: bold;
-    margin-top: 2px;
-}
-
-.user-guide-content {
-    position: absolute;
-    right: 0;
-    top: 82px;
-
-    width: min(600px, 80vw);
-
-    background: white;
-
-    padding: 22px;
-
-    border-radius: 14px;
-
-    border: 1px solid #d7e8f1;
-
-    box-shadow:
-        0 12px 30px rgba(0,0,0,0.18);
-
-    color: #263f50;
-
-    font-size: 15px;
-
-    line-height: 1.6;
-
-    z-index: 100;
-}
-
-.user-guide-content h2 {
-    margin-top: 0;
-    color: #006994;
-}
-
-.user-guide-content h3 {
-    color: #006994;
-    font-size: 17px;
-    margin-top: 18px;
-    margin-bottom: 6px;
-}
-
-.user-guide-content p {
-    margin: 6px 0;
-}
-
-.start-planning {
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.user-guide-warning {
-    margin-top: 16px;
-    padding: 12px;
-
-    background: #fff8e6;
-
-    border: 1px solid #f0d98c;
-
-    border-radius: 10px;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-}
-
-.user-guide-example {
-    margin-top: 20px;
-    padding: 16px;
-
-    background: #f4fbff;
-
-    border: 1px solid #cfe8f5;
-
-    border-radius: 12px;
-
-    line-height: 1.6;
-}
-
-.user-guide-example h3 {
-    margin-top: 0;
-}
-
-.user-guide-example .step {
-    margin: 12px 0;
-}
-
-
-/* =========================
-   CARDS
-   ========================= */
-
-.card {
-    background: #f4fbff;
-
-    padding: 20px;
-
-    margin-top: 18px;
-
-    border-radius: 14px;
-
-    border: 1px solid #e1f0f8;
-
-    transition:
-        background 0.25s ease,
-        border-color 0.25s ease,
-        color 0.25s ease;
-}
-
 .card h2 {
-    margin-top: 0;
-
-    color: #006994;
-
-    font-size: 21px;
+    margin: 0 0 15px;
+    color: var(--navy);
+    font-size: 19px;
 }
 
+.card-wide { grid-column: 1 / -1; }
 
-/* =========================
-   LOCATION SELECT
-   ========================= */
+.location-controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
 
 select {
     width: 100%;
-
-    padding: 14px;
-
+    padding: 13px 14px;
     border-radius: 10px;
-
-    border: 1px solid #b8d7e8;
-
+    border: 1px solid #b9d2e1;
     background: white;
-
-    color: #123;
-
-    font-size: 17px;
-
-    cursor: pointer;
-}
-
-
-/* =========================
-   CONDITIONS / RECOMMENDATION
-   ========================= */
-
-#conditions,
-#recommendation {
-    line-height: 1.65;
-
+    color: var(--text);
     font-size: 16px;
-
-    color: #263f50;
 }
 
-#conditions hr {
-    border: 0;
-
-    border-top: 1px solid #d7e8f1;
-
-    margin: 20px 0;
-}
-
-#conditions h3 {
-    color: #006994;
-
-    margin-top: 0;
-}
-
-
-/* =========================
-   BUTTON
-   ========================= */
-
-button {
-    display: block;
-
-    width: 100%;
-
-    margin-top: 20px;
-
-    background: #0077b6;
-
-    color: white;
-
-    border: none;
-
-    padding: 15px 20px;
-
-    border-radius: 10px;
-
-    font-size: 17px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s,
-        transform 0.1s;
-}
-
-button:hover {
-    background: #005f8a;
-}
-
-button:active {
-    transform: scale(0.99);
-}
-
-
-/* =========================
-   LIGHT / DARK THEME TOGGLE
-   ========================= */
-
-.theme-toggle {
-    width: 56px;
-    height: 56px;
-
+button.primary {
+    width: auto;
     margin: 0;
-    padding: 0;
+    white-space: nowrap;
+    background: var(--blue);
+    color: white;
+    border: 0;
+    padding: 13px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
 
-    flex-shrink: 0;
+button.primary:hover { background: #0668ad; }
 
-    border-radius: 14px;
+#conditions, #recommendation, #lakeForecastResult, #predictionResult, #journeyResult {
+    line-height: 1.55;
+    font-size: 15px;
+    color: var(--text);
+    margin: 0;
+}
 
+.condition-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+}
+
+.metric {
+    background: var(--blue-light);
+    border-radius: 11px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #00b4ff,
-            #0077cc
-        );
-
-    color: white;
-
-    box-shadow:
-        0 8px 18px rgba(0,119,204,.25);
-
-    font-size: 23px;
+    gap: 5px;
 }
 
-.theme-toggle span {
+.metric span { color: var(--muted); font-size: 12px; }
+.metric strong { font-size: 15px; }
+
+.lake-status, .recommendation-score {
+    margin-top: 14px;
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+}
+
+.status-label { font-size: 12px; color: var(--muted); }
+.status-title { font-size: 18px; font-weight: 800; margin: 4px 0 6px; }
+.status-text { font-size: 14px; }
+
+.shelter-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f6fafc;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.good { border-color: #bfe6d0; background: #effaf4; }
+.fair { border-color: #ead9a8; background: #fff9e8; }
+.challenging { border-color: #efc79f; background: #fff4e9; }
+.poor { border-color: #efb8b5; background: #fff0ef; }
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(145px,1fr));
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.forecast-day {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px;
+    background: #fbfdfe;
+    min-width: 145px;
+}
+
+.forecast-day-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.forecast-day-header span {
+    font-size: 12px;
+    color: var(--muted);
+    min-height: 32px;
+}
+
+.forecast-temp {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.forecast-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.forecast-lake-status {
+    margin-top: 11px;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.forecast-advice {
+    margin-top: 8px;
     font-size: 11px;
-    font-weight: bold;
-    margin-top: 2px;
+    line-height: 1.4;
 }
 
-
-/* =========================
-   DARK MODE - WHOLE APP
-   ========================= */
-
-body.dark-theme {
-    background: #101820;
-    color: #e6edf3;
+.forecast-note {
+    margin-top: 12px;
+    padding: 11px 13px;
+    background: #fff8e6;
+    border: 1px solid #f0d98c;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.45;
 }
 
-body.dark-theme .app {
-    background: #18232d;
-    color: #e6edf3;
+.loading { color: var(--muted); }
 
-    box-shadow:
-        0 12px 30px rgba(0,0,0,0.40);
+.prediction-card {
+    margin-top: 15px;
+    padding: 16px;
+    background: #f7fbfd;
+    border: 1px solid var(--border);
+    border-radius: 12px;
 }
 
-body.dark-theme .app-header {
-    border-bottom-color: #344653;
+.prediction-title { margin: 0 0 10px; color: var(--blue); }
+.prediction-divider { border:0; border-top:1px solid var(--border); margin:14px 0; }
+.prediction-score { font-size: 20px; font-weight:800; color:var(--blue); }
+.prediction-warning {
+    margin-top:15px;
+    padding:11px;
+    background:#fff8e6;
+    border:1px solid #f0d98c;
+    border-radius:9px;
+    font-size:12px;
 }
-
-body.dark-theme .app-header h1 {
-    color: #66c7ff;
-}
-
-body.dark-theme .app-header p {
-    color: #aebdca;
-}
-
-body.dark-theme .app > p {
-    color: #c3d0da;
-}
-
-
-/* =========================
-   DARK MODE - CARDS
-   ========================= */
-
-body.dark-theme .card {
-    background: #202e39;
-    border-color: #3a4c59;
-}
-
-body.dark-theme .card h2 {
-    color: #66c7ff;
-}
-
-
-/* =========================
-   DARK MODE - CONDITIONS
-   ========================= */
-
-body.dark-theme #conditions,
-body.dark-theme #recommendation {
-    color: #d8e2e9;
-}
-
-body.dark-theme #conditions hr {
-    border-top-color: #40515e;
-}
-
-body.dark-theme #conditions h3 {
-    color: #66c7ff;
-}
-
-
-/* =========================
-   DARK MODE - SELECT BOXES
-   ========================= */
-
-body.dark-theme select {
-    background: #263642;
-    color: #f0f5f8;
-    border-color: #526875;
-}
-
-body.dark-theme select option {
-    background: #263642;
-    color: #f0f5f8;
-}
-
-
-/* =========================
-   DARK MODE - USER GUIDE
-   ========================= */
-
-body.dark-theme .user-guide-content {
-    background: #202e39;
-    border-color: #435764;
-    color: #d8e2e9;
-}
-
-body.dark-theme .user-guide-content h2,
-body.dark-theme .user-guide-content h3 {
-    color: #66c7ff;
-}
-
-body.dark-theme .user-guide-content strong {
-    color: #f0f5f8;
-}
-
-body.dark-theme .user-guide-warning {
-    background: #3a3320;
-    border-color: #665a32;
-    color: #e6edf3;
-}
-
-body.dark-theme .user-guide-example {
-    background: #263642;
-    border-color: #405664;
-    color: #d8e2e9;
-}
-
-
-/* =========================
-   DARK MODE - BUTTONS
-   ========================= */
-
-body.dark-theme button {
-    background: #0077b6;
-    color: white;
-}
-
-body.dark-theme button:hover {
-    background: #0096d6;
-}
-
-
-/*
-   Keep the theme button blue in dark mode.
-*/
-body.dark-theme .theme-toggle {
-    background:
-        linear-gradient(
-            135deg,
-            #00b4ff,
-            #0077cc
-        );
-
-    color: white;
-}
-
-
-/* =========================
-   DARK MODE - GENERATED TIDE ITEMS
-   ========================= */
 
 .tide-item {
-    margin: 10px 0;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e1eef5;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .next-tide {
-    margin-top: 18px;
-    padding: 14px;
-
-    background: #e8f6ff;
-
-    border-radius: 10px;
-
-    font-weight: bold;
-
-    color: #006994;
-}
-
-.station-info {
-    margin-top: 12px;
-
-    font-size: 13px;
-
-    color: #6b7b88;
-}
-
-body.dark-theme .tide-item {
-    border-bottom-color: #40515e;
-}
-
-body.dark-theme .next-tide {
-    background: #263f50;
-    color: #66c7ff;
-}
-
-body.dark-theme .station-info {
-    color: #9eacb7;
-}
-
-
-/* =========================
-   DARK MODE - PREDICTION
-   ========================= */
-
-.prediction-card {
-    margin-top: 18px;
-    padding: 18px;
-
-    background: #ffffff;
-
-    border: 1px solid #d7e8f1;
-
-    border-radius: 12px;
-
-    color: #263f50;
-}
-
-.prediction-title {
-    margin-top: 0;
-    color: #006994;
-}
-
-.prediction-divider {
-    border: 0;
-    border-top: 1px solid #d7e8f1;
-    margin: 15px 0;
-}
-
-.prediction-score {
-    font-size: 20px;
-    font-weight: bold;
-    color: #006994;
-}
-
-.prediction-warning {
-    margin-top: 18px;
+    margin-top: 14px;
     padding: 12px;
-
-    background: #fff8e6;
-
-    border: 1px solid #f0d98c;
-
+    background: var(--blue-light);
     border-radius: 10px;
-
-    font-size: 13px;
-
-    line-height: 1.5;
+    font-weight: 700;
+    color: var(--blue);
 }
 
-body.dark-theme .prediction-card {
-    background: #263642;
-    border-color: #435764;
-    color: #d8e2e9;
+.station-info { margin-top: 10px; color: var(--muted); font-size: 12px; }
+
+.journey-leave { font-size: 19px; font-weight:800; color:var(--blue); }
+
+/* DARK */
+
+body.dark-theme {
+    --page: #0d1720;
+    --card: #172530;
+    --navy: #0a1621;
+    --navy-2: #122433;
+    --text: #dbe7ee;
+    --muted: #9db0bd;
+    --border: #304552;
+    --blue-light: #1c3545;
 }
 
-body.dark-theme .prediction-title {
-    color: #66c7ff;
+body.dark-theme .card,
+body.dark-theme .forecast-day { background: var(--card); }
+
+body.dark-theme .metric,
+body.dark-theme .shelter-box { background: #1c3545; }
+
+body.dark-theme select {
+    background: #1b303d;
+    color: #eef5f8;
+    border-color: #486170;
 }
 
-body.dark-theme .prediction-divider {
-    border-top-color: #40515e;
-}
+body.dark-theme .menu-content { background: #172530; color: var(--text); }
+body.dark-theme .menu-content button:hover { background: #223c4d; }
+body.dark-theme .prediction-card { background:#1c303d; }
+body.dark-theme .prediction-warning,
+body.dark-theme .forecast-note { background:#3a3320; }
+body.dark-theme .app-header h1 { color:white; }
 
-body.dark-theme .prediction-score {
-    color: #66c7ff;
-}
+/* RESPONSIVE */
 
-body.dark-theme .prediction-warning {
-    background: #3a3320;
-    border-color: #665a32;
-    color: #e6edf3;
-}
-
-
-/* =========================
-   DARK MODE - JOURNEY RESULT
-   ========================= */
-
-body.dark-theme #journeyResult {
-    color: #d8e2e9;
-}
-
-body.dark-theme #journeyResult hr {
-    border-top-color: #40515e;
-}
-
-.journey-leave {
-    font-size: 20px;
-    font-weight: bold;
-    color: #006994;
-}
-
-body.dark-theme .journey-leave {
-    color: #66c7ff;
-}
-
-
-/* =========================
-   DESKTOP LAYOUT
-   ========================= */
-
-@media (min-width: 800px) {
-
-    .app {
-        max-width: 1200px;
-        padding: 35px;
+@media (max-width: 1050px) {
+    .forecast-grid {
+        grid-template-columns: repeat(4, minmax(145px,1fr));
     }
-
-    /*
-       Wider desktop layout.
-       Location gets 45%.
-       Conditions gets 55%.
-    */
-
-    .app .card:nth-of-type(1),
-    .app .card:nth-of-type(2) {
-        display: inline-block;
-        vertical-align: top;
-    }
-
-    /* Swim location */
-    .app .card:nth-of-type(1) {
-        width: calc(45% - 10px);
-        margin-right: 16px;
-    }
-
-    /* Current conditions + tides */
-    .app .card:nth-of-type(2) {
-        width: calc(55% - 10px);
-    }
-
-    /* Swim recommendation */
-    .app .card:nth-of-type(3) {
-        width: 100%;
-    }
-
 }
 
-
-/* =========================
-   TABLET
-   ========================= */
-
-@media (min-width: 600px) and (max-width: 799px) {
-
-    .app {
-        max-width: 700px;
-
-        padding: 28px;
-    }
-
+@media (max-width: 799px) {
+    body { padding: 12px; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .card-wide { grid-column: auto; }
+    .condition-grid { grid-template-columns: repeat(2,1fr); }
+    .forecast-grid { grid-template-columns: repeat(2, minmax(145px,1fr)); }
 }
-
-
-/* =========================
-   PHONE
-   ========================= */
 
 @media (max-width: 599px) {
-
-    body {
-        padding: 0;
-
-        background:
-            linear-gradient(
-                180deg,
-                #9fd6ff 0%,
-                #dff4ff 100%
-            );
-    }
-
-    body.dark-theme {
-        background: #101820;
-    }
-
-    .app {
-        width: 100%;
-
-        max-width: none;
-
-        min-height: 100vh;
-
-        padding: 18px;
-
-        border-radius: 0;
-
-        box-shadow: none;
-
-        margin: 0;
-    }
-
+    body { padding: 0; }
+    .app { width:100%; }
     .app-header {
-        gap: 12px;
-
-        margin-bottom: 20px;
-
-        padding-bottom: 16px;
+        border-radius: 0 0 18px 18px;
+        padding: 15px;
+        margin-bottom: 12px;
     }
-
-    .logo {
-        width: 58px;
-        height: 58px;
-
-        border-radius: 15px;
-
-        font-size: 30px;
-    }
-
-    .app-header h1 {
-        font-size: 24px;
-
-        line-height: 1.15;
-    }
-
-    .app-header p {
-        font-size: 14px;
-    }
-
-    .user-guide summary {
-        width: 50px;
-        height: 50px;
-
-        border-radius: 13px;
-
-        font-size: 21px;
-    }
-
-    .theme-toggle {
-        width: 50px;
-        height: 50px;
-
-        border-radius: 13px;
-
-        font-size: 21px;
-    }
-
-    .user-guide-content {
+    .logo { width:50px; height:50px; flex-basis:50px; font-size:27px; }
+    .app-header h1 { font-size:22px; }
+    .app-header .subtitle { font-size:12px; }
+    .menu summary { width:48px; height:48px; }
+    .menu-content {
         position: fixed;
-
-        top: 12px;
+        top: 68px;
         left: 12px;
         right: 12px;
-
         width: auto;
-
-        max-height: calc(100vh - 24px);
-
+        max-height: calc(100vh - 80px);
         overflow-y: auto;
     }
-
-    .app > p {
-        font-size: 16px;
-    }
-
-    .card {
-        padding: 16px;
-
-        margin-top: 14px;
-
-        border-radius: 12px;
-    }
-
-    .card h2 {
-        font-size: 19px;
-    }
-
-    #conditions,
-    #recommendation {
-        font-size: 15px;
-
-        line-height: 1.6;
-    }
-
-    select {
-        font-size: 16px;
-
-        padding: 13px;
-    }
-
-    button {
-        font-size: 17px;
-
-        padding: 15px;
-
-        margin-top: 16px;
-    }
-
-}
-
-
-/* =========================
-   VERY SMALL PHONES
-   ========================= */
-
-@media (max-width: 380px) {
-
-    .app {
-        padding: 14px;
-    }
-
-    .logo {
-        width: 52px;
-        height: 52px;
-
-        font-size: 27px;
-    }
-
-    .app-header h1 {
-        font-size: 21px;
-    }
-
-    .app-header p {
-        font-size: 13px;
-    }
-
+    .card { padding:15px; border-radius:13px; }
+    .location-controls { grid-template-columns:1fr; }
+    button.primary { width:100%; }
+    .condition-grid { grid-template-columns:1fr 1fr; }
+    .forecast-grid { grid-template-columns:1fr 1fr; }
 }
 
 </style>
-
 </head>
-
 <body>
 
 <div class="app">
 
 <header class="app-header">
-
-    <div class="logo">
-        🌊
-    </div>
-
+    <div class="logo">🌊</div>
     <div class="app-title">
-
         <h1>Open Water Swim Planner</h1>
-
+        <div class="subtitle">Sea & lake conditions, forecasts and swim planning</div>
     </div>
 
-    <button
-        type="button"
-        id="themeToggle"
-        class="theme-toggle"
-        onclick="toggleTheme()"
-    >
-        🌙
-        <span>Dark</span>
-    </button>
+    <details class="menu">
+        <summary aria-label="Open menu">☰</summary>
+        <div class="menu-content">
 
-    <details class="user-guide" id="userGuide">
+            <div class="menu-section">App</div>
 
-        <summary>
-            📖
-            <span>Guide</span>
-        </summary>
+            <details>
+                <summary class="menu-item">📖 How to use</summary>
+                <div class="guide-panel">
+                    <p><strong>Start by choosing your swim location.</strong></p>
 
-        <div class="user-guide-content">
+                    <h3>🌊 Sea swims</h3>
+                    <p>Check the current weather, wind, waves, water temperature and tides. Select a future high tide to predict conditions, then use the Journey Planner if you are travelling to the swim.</p>
 
-            <button
-                type="button"
-                class="start-planning"
-                onclick="
-                    document.getElementById('userGuide').removeAttribute('open');
-                    document.getElementById('locationCard').scrollIntoView({behavior:'smooth'});
-                "
-            >
-                🏊 Let's Start Planning
-            </button>
+                    <h3>🏞️ Lake swimming</h3>
+                    <p>Lake locations use weather, wind and the lake's existing shelter guidance. The Lake Forecast shows the expected conditions for the next 7 days.</p>
 
-            <h2>How to use the Swim Planner</h2>
+                    <h3>🔮 Forecasts</h3>
+                    <p>Forecasts are guidance only and can change, especially several days ahead. Always check the latest forecast and local conditions before swimming.</p>
 
-            <h3>🌊 Check current conditions</h3>
-
-            <p>
-                Choose a swim location and select
-                <strong>Check Swim Conditions</strong>.
-                The app will show the latest available
-                weather, wind, water and sea conditions.
-            </p>
-
-            <h3>📅 Plan a future sea swim</h3>
-
-            <p>
-                Sea locations show high and low tides for
-                the next 7 days. Select the high tide you
-                want to swim around.
-            </p>
-
-            <h3>🔮 Predict future conditions</h3>
-
-            <p>
-                Select a future high tide and choose
-                <strong>Predict Swim Conditions</strong>.
-                The app will show the expected conditions
-                around that time.
-            </p>
-
-            <div class="user-guide-warning">
-
-                ⚠️ <strong>Forecast guidance only</strong><br><br>
-
-                Forecast conditions, particularly several
-                days in advance, can change significantly.
-                Predictions are a guide only and should not
-                be relied upon as an assessment of swimming
-                safety. Always check the latest forecast and
-                local conditions before swimming.
-
-            </div>
-
-            <h3>🚗 Plan your journey</h3>
-
-            <p>
-                Select your chosen high tide and use
-                <strong>Calculate Journey From My Location</strong>
-                to calculate your driving distance, journey
-                time and recommended departure time.
-            </p>
-
-            <p>
-                The journey planner currently works on the
-                basis of arriving 2 hours before high tide.
-            </p>
-
-            <h3>🏞️ Lake swimming</h3>
-
-            <p>
-                Lake locations don't use tidal information.
-                Instead, the app assesses wind, expected
-                chop, temperature and weather conditions.
-            </p>
-
-            <p>
-                It can also indicate which side of the lake may
-                be more sheltered depending on the wind direction.
-            </p>
-
-            <h3>🔄 Changing location</h3>
-
-            <p>
-                When you change location, any previous
-                Journey Planner and future prediction are
-                automatically cleared.
-            </p>
-
-            <div class="user-guide-example">
-
-                <h3>🏊 Worked Example — Planning a Sea Swim</h3>
-
-                <p>
-                    Here's an example of how you can use the app to plan
-                    a future swim at Whitestrand.
-                </p>
-
-                <div class="step">
-
-                    <strong>1️⃣ Select Whitestrand</strong>
-
-                    <p>
-                        From <strong>Choose Swim Location</strong>,
-                        select <strong>Whitestrand (Clare)</strong>.
-                    </p>
-
+                    <h3>🔄 Changing location</h3>
+                    <p>Changing location clears the previous forecast, prediction and journey information.</p>
                 </div>
+            </details>
 
-                <div class="step">
-
-                    <strong>2️⃣ Check the conditions</strong>
-
-                    <p>
-                        Tap <strong>Check Swim Conditions</strong>.
-                        The app will show the current weather, wind,
-                        waves, water temperature and upcoming tides.
-                    </p>
-
+            <details>
+                <summary class="menu-item">ℹ️ App version</summary>
+                <div class="version-panel">
+                    <strong>Open Water Swim Planner</strong><br>
+                    Version 2.0.0
                 </div>
+            </details>
 
-                <div class="step">
-
-                    <strong>3️⃣ Choose your future high tide</strong>
-
-                    <p>
-                        In the <strong>Journey Planner</strong>, look at
-                        the high tides available for the next 7 days.
-                        Select the future date and time you want to swim.
-                    </p>
-
-                    <p>
-                        For example, you might choose a
-                        <strong>Saturday morning high tide</strong>
-                        if you're planning your weekend swim.
-                    </p>
-
-                </div>
-
-                <div class="step">
-
-                    <strong>4️⃣ Predict the swimming conditions</strong>
-
-                    <p>
-                        With your future high tide selected, tap
-                        <strong>🔮 Predict Swim Conditions</strong>.
-                    </p>
-
-                    <p>
-                        The app will estimate what the conditions could
-                        be like at that time, including wind, waves,
-                        water temperature, rain and the predicted
-                        <strong>Swim Score</strong>.
-                    </p>
-
-                    <p>
-                        This gives you an early indication of whether
-                        the swim looks promising.
-                    </p>
-
-                </div>
-
-                <div class="step">
-
-                    <strong>5️⃣ Plan your journey</strong>
-
-                    <p>
-                        If the predicted conditions look suitable,
-                        tap <strong>📍 Calculate Journey From My Location</strong>.
-                    </p>
-
-                    <p>
-                        The app will calculate the driving distance and
-                        estimated journey time, then work backwards from
-                        the selected high tide to tell you when you should
-                        leave home.
-                    </p>
-
-                    <p>
-                        The planner allows <strong>2 hours before high tide</strong>
-                        for your arrival at the swim location.
-                    </p>
-
-                </div>
-
-                <div class="step">
-
-                    <strong>6️⃣ Check again before you swim</strong>
-
-                    <p>
-                        A forecast several days ahead is only a guide.
-                        Check the latest conditions again on the day of
-                        your swim before deciding whether to enter the water.
-                    </p>
-
-                </div>
-
-            </div>
+            <div class="menu-section">Appearance</div>
+            <button type="button" id="themeToggle" onclick="toggleTheme()">🌙 Dark mode</button>
 
         </div>
-
     </details>
-
 </header>
 
-<p>
-    Plan safe and enjoyable open water swims.
-</p>
+<div class="dashboard-grid">
 
+    <div class="card card-wide" id="locationCard">
+        <h2>📍 Choose Swim Location</h2>
+        <div class="location-controls">
+            <select id="locationSelect"></select>
+            <button type="button" class="primary" onclick="checkConditions()">
+                Check Conditions
+            </button>
+        </div>
+    </div>
 
-<div class="card" id="locationCard">
+    <div class="card">
+        <h2>🌤️ Current Conditions</h2>
+        <div id="conditions">
+            Checking conditions...
+        </div>
+    </div>
 
-    <h2>Choose Swim Location</h2>
+    <div class="card">
+        <h2>🏊 Swim Recommendation</h2>
+        <div id="recommendation">
+            Waiting for data...
+        </div>
+    </div>
 
-    <div class="location-controls">
+    <div class="card card-wide" id="lakeForecastCard" style="display:none;">
+        <h2>📅 Lake Forecast — Next 7 Days</h2>
+        <div id="lakeForecastResult">
+            Choose a lake location to load the forecast.
+        </div>
+    </div>
 
-        <select id="locationSelect">
+    <div class="card card-wide" id="seaPredictionCard" style="display:none;">
+
+        <h2>🌊 Sea Swim Planner</h2>
+
+        <p>Choose the high tide you want to swim for:</p>
+
+        <select id="highTideSelect">
+            <option value="">Check swim conditions first...</option>
         </select>
 
-        <button type="button" onclick="checkConditions()">
-            Check Swim Conditions
+        <button type="button" class="primary" style="margin-top:12px;" onclick="predictSwimConditions()">
+            🔮 Predict Swim Conditions
         </button>
+
+        <div id="predictionResult"></div>
+
+        <button type="button" class="primary" style="margin-top:12px;" onclick="calculateJourney()">
+            📍 Calculate Journey From My Location
+        </button>
+
+        <p id="journeyResult">
+            Waiting for location and tide information...
+        </p>
 
     </div>
 
 </div>
-
-
-<div class="card">
-
-    <h2>Current Conditions</h2>
-
-    <p id="conditions">
-        Checking conditions...
-    </p>
-
 </div>
-
-
-<div class="card">
-
-    <h2>Swim Recommendation</h2>
-
-    <p id="recommendation">
-        Waiting for data...
-    </p>
-
-</div>
-
-
-<div class="card" id="travelPlannerCard" style="display:none;">
-
-    <h2>🚗 Journey Planner</h2>
-
-    <p>
-        Choose the high tide you want to swim for:
-    </p>
-
-    <select id="highTideSelect">
-
-        <option value="">
-            Check swim conditions first...
-        </option>
-
-    </select>
-
-    <button
-        type="button"
-        onclick="predictSwimConditions()"
-    >
-        🔮 Predict Swim Conditions
-    </button>
-
-    <div id="predictionResult"></div>
-
-    <button
-        type="button"
-        onclick="calculateJourney()"
-    >
-        📍 Calculate Journey From My Location
-    </button>
-
-    <p id="journeyResult">
-        Waiting for location and tide information...
-    </p>
-
-</div>
-
-
-</div>
-
 
 <script src="locations.js?v=3"></script>
-
 <script>
+
 
 
 /* =========================
@@ -1419,6 +690,212 @@ function calculateSwimScore(
 }
 
 
+
+/* =========================
+   LAKE WIND ASSESSMENT
+   ========================= */
+
+function getLakeWindAssessment(windDegrees, windSpeed) {
+
+    let condition;
+    let locationImpact;
+    let advice;
+    let className;
+
+    if (windDegrees >= 157.5 && windDegrees < 202.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        locationImpact =
+            "🟢 Youghal side: Calm<br>🟡 Tomona side: A little choppier";
+        advice = "Youghal side is the better option in a southerly wind.";
+        className = "good";
+    }
+    else if (windDegrees >= 337.5 || windDegrees < 22.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        locationImpact =
+            "🟡 Youghal side: A little choppier<br>🟢 Tomona side: Calm";
+        advice = "Tomona side is the better option in a northerly wind.";
+        className = "good";
+    }
+    else if (windDegrees >= 202.5 && windDegrees < 247.5) {
+        condition = "🟠 INCREASING CHOP";
+        locationImpact = "🟠 Both sides becoming more exposed";
+        advice =
+            "South-westerly wind creates increasing chop. Conditions are less sheltered than with a true southerly wind.";
+        className = "challenging";
+    }
+    else if (windDegrees >= 247.5 && windDegrees < 292.5) {
+        condition = "🔴 CHOPPY";
+        locationImpact = "🔴 Both sides exposed to chop";
+        advice =
+            "Westerly wind creates chop across the lake. Swimming from Youghalarra quay towards Caddy's Point and Garrykennedy means swimming into the wind.";
+        className = "poor";
+    }
+    else if (windDegrees >= 292.5 && windDegrees < 337.5) {
+        condition = "🟠 INCREASING CHOP";
+        locationImpact = "🟠 Both sides becoming more exposed";
+        advice =
+            "North-westerly wind creates increasing chop, particularly on exposed sections.";
+        className = "challenging";
+    }
+    else if (windDegrees >= 67.5 && windDegrees < 112.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        locationImpact = "🟡 Both sides somewhat sheltered";
+        advice =
+            "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
+        className = "fair";
+    }
+    else if (windDegrees >= 22.5 && windDegrees < 67.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        locationImpact = "🟡 Generally sheltered with some chop";
+        advice = "North-easterly wind should produce relatively modest chop.";
+        className = "fair";
+    }
+    else if (windDegrees >= 112.5 && windDegrees < 157.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        locationImpact =
+            "🟢 Youghal side: Generally sheltered<br>🟡 Tomona side: Some exposure";
+        advice =
+            "South-easterly wind should leave the Youghal side relatively sheltered.";
+        className = "good";
+    }
+    else {
+        condition = "🟡 VARIABLE";
+        locationImpact = "ℹ️ Conditions depend on the exact wind direction";
+        advice = "Check the wind direction before swimming.";
+        className = "fair";
+    }
+
+    if (windSpeed > 7) {
+        condition = "🔴 CHOPPY / STRONG WIND";
+        className = "poor";
+        advice +=
+            "<br>⚠️ Strong wind — conditions may be significantly rougher than normal.";
+    }
+    else if (windSpeed > 5) {
+        if (className === "good") className = "fair";
+        advice += "<br>🟡 Moderate wind — expect increased chop.";
+    }
+
+    return { condition, locationImpact, advice, className };
+}
+
+
+/* =========================
+   LAKE FORECAST
+   ========================= */
+
+async function loadLakeForecast(selectedLocation) {
+
+    const forecastResult =
+        document.getElementById("lakeForecastResult");
+
+    forecastResult.innerHTML =
+        '<div class="loading">⏳ Loading the 7-day lake forecast...</div>';
+
+    try {
+
+        const weatherUrl =
+            `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${selectedLocation.latitude}` +
+            `&longitude=${selectedLocation.longitude}` +
+            `&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,precipitation_probability_max,precipitation_sum` +
+            `&forecast_days=7` +
+            `&wind_speed_unit=ms` +
+            `&timezone=Europe%2FDublin`;
+
+        const response = await fetch(weatherUrl);
+
+        if (!response.ok) {
+            throw new Error("Lake forecast request failed");
+        }
+
+        const data = await response.json();
+        const daily = data.daily;
+
+        let cards = "";
+
+        for (let i = 0; i < daily.time.length; i++) {
+
+            const date = new Date(daily.time[i] + "T12:00:00");
+
+            const dayName =
+                i === 0
+                    ? "Today"
+                    : i === 1
+                        ? "Tomorrow"
+                        : date.toLocaleDateString(
+                            "en-IE",
+                            {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "short"
+                            }
+                        );
+
+            const windDegrees =
+                Number(daily.wind_direction_10m_dominant[i]);
+
+            const windSpeed =
+                Number(daily.wind_speed_10m_max[i]);
+
+            const assessment =
+                getLakeWindAssessment(
+                    windDegrees,
+                    windSpeed
+                );
+
+            const rain =
+                daily.precipitation_probability_max[i] ?? 0;
+
+            const rainAmount =
+                daily.precipitation_sum[i] ?? 0;
+
+            cards += `
+                <div class="forecast-day">
+                    <div class="forecast-day-header">
+                        <strong>${dayName}</strong>
+                        <span>${getWeatherDescription(daily.weather_code[i])}</span>
+                    </div>
+
+                    <div class="forecast-temp">
+                        ${daily.temperature_2m_min[i]}° / ${daily.temperature_2m_max[i]}°C
+                    </div>
+
+                    <div class="forecast-details">
+                        <span>💨 ${windSpeed} m/s ${getCompassDirection(windDegrees)}</span>
+                        <span>💨 Gusts ${daily.wind_gusts_10m_max[i]} m/s</span>
+                        <span>🌧️ Rain ${rain}%</span>
+                    </div>
+
+                    <div class="forecast-lake-status ${assessment.className}">
+                        ${assessment.condition}
+                    </div>
+
+                    <div class="forecast-advice">
+                        ${assessment.locationImpact}
+                    </div>
+                </div>
+            `;
+        }
+
+        forecastResult.innerHTML =
+            `<div class="forecast-grid">${cards}</div>
+             <div class="forecast-note">
+                ⚠️ Forecast guidance only. Conditions can change, particularly several days ahead.
+                Check the latest forecast and local lake conditions before swimming.
+             </div>`;
+
+    }
+    catch (error) {
+
+        console.error("LAKE FORECAST ERROR:", error);
+
+        forecastResult.innerHTML =
+            "⚠️ Unable to load the lake forecast. Please try again.";
+    }
+}
+
+
 /* =========================
    LOAD LOCATIONS
    ========================= */
@@ -1457,7 +934,7 @@ async function checkConditions() {
     console.log("checkConditions started");
 
     document.getElementById("conditions").innerHTML =
-        "⏳ Getting live sea conditions...";
+        "⏳ Getting current conditions...";
 
     const selectedId =
         document.getElementById("locationSelect").value;
@@ -1544,309 +1021,91 @@ async function checkConditions() {
             data.current;
 
 
+
         /* =========================
            LAKE CONDITIONS
            ========================= */
 
         if (selectedLocation.type === "lake") {
 
-
-            /* =========================
-               LAKE WATER TEMPERATURE
-               ========================= */
+            let lakeWaterTemperature = null;
 
             try {
-
                 const waterTempResponse =
-                    await fetch(
-                        "lake-temperature.json?t=" +
-                        Date.now()
-                    );
+                    await fetch("lake-temperature.json?t=" + Date.now());
 
-                const waterTempData =
-                    await waterTempResponse.json();
+                if (waterTempResponse.ok) {
+                    const waterTempData =
+                        await waterTempResponse.json();
 
-                lakeWaterTemperature =
-                    Number(
-                        waterTempData.temperature
-                    );
-
-                console.log(
-                    "🌡️ LAKE WATER TEMPERATURE:",
-                    lakeWaterTemperature,
-                    "°C"
-                );
-
+                    lakeWaterTemperature =
+                        Number(waterTempData.temperature);
+                }
             }
             catch (error) {
-
-                console.error(
-                    "LAKE WATER TEMPERATURE ERROR:",
-                    error
-                );
-
-                lakeWaterTemperature = null;
-
+                console.error("LAKE WATER TEMPERATURE ERROR:", error);
             }
 
-
-            const windSpeed =
-                current.wind_speed_10m;
-
-            const windDegrees =
-                current.wind_direction_10m;
-
-            const windDirection =
-                getWindDirection(windDegrees);
-
-            let lakeCondition;
-
-            let locationImpact;
-
-            let swimAdvice;
-
-
-            /* =========================
-               LAKE WIND DIRECTION
-               ========================= */
-
-            if (
-                windDegrees >= 157.5 &&
-                windDegrees < 202.5
-            ) {
-
-                // SOUTH
-
-                lakeCondition =
-                    "🟢 CALM TO SLIGHT CHOP";
-
-                locationImpact =
-                    "🟢 Youghal side: Calm<br>" +
-                    "🟡 Tomona side: A little choppier";
-
-                swimAdvice =
-                    "Youghal side is the better option in a southerly wind.";
-
-            }
-
-            else if (
-                windDegrees >= 337.5 ||
-                windDegrees < 22.5
-            ) {
-
-                // NORTH
-
-                lakeCondition =
-                    "🟢 CALM TO SLIGHT CHOP";
-
-                locationImpact =
-                    "🟡 Youghal side: A little choppier<br>" +
-                    "🟢 Tomona side: Calm";
-
-                swimAdvice =
-                    "Tomona side is the better option in a northerly wind.";
-
-            }
-
-            else if (
-                windDegrees >= 202.5 &&
-                windDegrees < 247.5
-            ) {
-
-                // SOUTH-WEST
-
-                lakeCondition =
-                    "🟠 INCREASING CHOP";
-
-                locationImpact =
-                    "🟠 Both sides becoming more exposed";
-
-                swimAdvice =
-                    "South-westerly wind creates increasing chop. Conditions are less sheltered than with a true southerly wind.";
-
-            }
-
-            else if (
-                windDegrees >= 247.5 &&
-                windDegrees < 292.5
-            ) {
-
-                // WEST
-
-                lakeCondition =
-                    "🔴 CHOPPY";
-
-                locationImpact =
-                    "🔴 Both sides exposed to chop";
-
-                swimAdvice =
-                    "Westerly wind creates chop across the lake. Swimming from Youghalarra quay towards Caddy's Point and Garrykennedy means swimming into the wind.";
-
-            }
-
-            else if (
-                windDegrees >= 292.5 &&
-                windDegrees < 337.5
-            ) {
-
-                // NORTH-WEST
-
-                lakeCondition =
-                    "🟠 INCREASING CHOP";
-
-                locationImpact =
-                    "🟠 Both sides becoming more exposed";
-
-                swimAdvice =
-                    "North-westerly wind creates increasing chop, particularly on exposed sections.";
-
-            }
-
-            else if (
-                windDegrees >= 67.5 &&
-                windDegrees < 112.5
-            ) {
-
-                // EAST
-
-                lakeCondition =
-                    "🟡 SLIGHTLY CHOPPY";
-
-                locationImpact =
-                    "🟡 Both sides somewhat sheltered";
-
-                swimAdvice =
-                    "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
-
-            }
-
-            else if (
-                windDegrees >= 22.5 &&
-                windDegrees < 67.5
-            ) {
-
-                // NORTH-EAST
-
-                lakeCondition =
-                    "🟡 SLIGHTLY CHOPPY";
-
-                locationImpact =
-                    "🟡 Generally sheltered with some chop";
-
-                swimAdvice =
-                    "North-easterly wind should produce relatively modest chop.";
-
-            }
-
-            else if (
-                windDegrees >= 112.5 &&
-                windDegrees < 157.5
-            ) {
-
-                // SOUTH-EAST
-
-                lakeCondition =
-                    "🟢 CALM TO SLIGHT CHOP";
-
-                locationImpact =
-                    "🟢 Youghal side: Generally sheltered<br>" +
-                    "🟡 Tomona side: Some exposure";
-
-                swimAdvice =
-                    "South-easterly wind should leave the Youghal side relatively sheltered.";
-
-            }
-
-            else {
-
-                lakeCondition =
-                    "🟡 VARIABLE";
-
-                locationImpact =
-                    "ℹ️ Conditions depend on the exact wind direction";
-
-                swimAdvice =
-                    "Check the wind direction before swimming.";
-
-            }
-
-
-            /* Wind strength adjustment */
-
-            if (windSpeed > 7) {
-
-                lakeCondition =
-                    "🔴 CHOPPY / STRONG WIND";
-
-                swimAdvice +=
-                    "<br>⚠️ Strong wind — conditions may be significantly rougher than normal.";
-
-            }
-
-            else if (windSpeed > 5) {
-
-                swimAdvice +=
-                    "<br>🟡 Moderate wind — expect increased chop.";
-
-            }
-
-
-            document.getElementById(
-                "conditions"
-            ).innerHTML =
-            `
-            🌡 Air temperature:
-            ${current.temperature_2m}°C<br>
-
-            🌊 Lake water temperature:
-            ${
-                lakeWaterTemperature !== null
-                    ? lakeWaterTemperature.toFixed(1)
-                    : "Unavailable"
-            }°C<br>
-
-            💨 Wind speed:
-            ${windSpeed} m/s<br>
-
-            🧭 Wind direction:
-            ${windDirection}
-            (${windDegrees.toFixed(0)}°)<br>
-
-            ☁ Conditions:
-            ${getWeatherDescription(current.weather_code)}
-            <br><br>
-
-            <hr>
-
-            <h3>🏊 LAKE CONDITIONS</h3>
-
-            <strong>${lakeCondition}</strong>
-            <br><br>
-
-            ${locationImpact}
-            <br><br>
-
-            ${swimAdvice}
+            const windSpeed = current.wind_speed_10m;
+            const windDegrees = current.wind_direction_10m;
+            const windDirection = getWindDirection(windDegrees);
+
+            const lakeAssessment =
+                getLakeWindAssessment(windDegrees, windSpeed);
+
+            document.getElementById("conditions").innerHTML = `
+                <div class="condition-grid">
+                    <div class="metric">
+                        <span>🌡️ Air</span>
+                        <strong>${current.temperature_2m}°C</strong>
+                    </div>
+                    <div class="metric">
+                        <span>🌊 Water</span>
+                        <strong>${lakeWaterTemperature !== null ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong>
+                    </div>
+                    <div class="metric">
+                        <span>💨 Wind</span>
+                        <strong>${windSpeed} m/s</strong>
+                    </div>
+                    <div class="metric">
+                        <span>🧭 Direction</span>
+                        <strong>${windDirection} (${windDegrees.toFixed(0)}°)</strong>
+                    </div>
+                    <div class="metric">
+                        <span>☁️ Weather</span>
+                        <strong>${getWeatherDescription(current.weather_code)}</strong>
+                    </div>
+                </div>
+
+                <div class="lake-status ${lakeAssessment.className}">
+                    <div class="status-label">🏊 Lake conditions</div>
+                    <div class="status-title">${lakeAssessment.condition}</div>
+                    <div class="status-text">${lakeAssessment.advice}</div>
+                </div>
             `;
 
-
-            document.getElementById(
-                "recommendation"
-            ).innerHTML =
-            `
-            🏊 <strong>LAKE SWIM RECOMMENDATION</strong>
-            <br><br>
-
-            ${lakeCondition}
-            <br><br>
-
-            ${swimAdvice}
+            document.getElementById("recommendation").innerHTML = `
+                <div class="recommendation-score ${lakeAssessment.className}">
+                    ${lakeAssessment.condition}
+                </div>
+                <p>${lakeAssessment.advice}</p>
+                <div class="shelter-box">
+                    <strong>📍 Sheltered side</strong><br>
+                    ${lakeAssessment.locationImpact}
+                </div>
             `;
+
+            document.getElementById("travelPlannerCard").style.display = "none";
+            document.getElementById("lakeForecastCard").style.display = "block";
+            document.getElementById("seaPredictionCard").style.display = "none";
+
+            await loadLakeForecast(selectedLocation);
 
             return;
-
         }
 
+        document.getElementById("lakeForecastCard").style.display = "none";
+        document.getElementById("seaPredictionCard").style.display = "block";
 
         console.log(
             "TIDE ROWS:",
@@ -2108,7 +1367,7 @@ async function checkConditions() {
 
         const travelPlannerCard =
             document.getElementById(
-                "travelPlannerCard"
+                "seaPredictionCard"
             );
 
 
@@ -3349,9 +2608,9 @@ document.getElementById(
          * whenever the swim location changes.
          */
 
-        document.getElementById(
-            "travelPlannerCard"
-        ).style.display = "none";
+        document.getElementById("seaPredictionCard").style.display = "none";
+
+        document.getElementById("lakeForecastCard").style.display = "none";
 
 
         /*
@@ -3384,6 +2643,7 @@ document.getElementById(
 
     }
 );
+
 
 </script>
 
