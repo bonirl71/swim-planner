@@ -1293,13 +1293,16 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
         gap: 20px !important;
         width: 100% !important;
+        align-items: stretch !important;
     }
 
     .dashboard-grid > .card {
         width: auto !important;
         min-width: 0 !important;
         margin: 0 !important;
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
     }
 
     .conditions-content,
@@ -1333,13 +1336,16 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
         gap: 18px !important;
         width: 100% !important;
+        align-items: stretch !important;
     }
 
     .dashboard-grid > .card {
         width: auto !important;
         min-width: 0 !important;
         margin: 0 !important;
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
     }
 
     .sea-tides-card,
@@ -1381,6 +1387,56 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 .conditions-content,
 .recommendation-content {
     overflow-wrap: break-word;
+}
+
+
+/* =========================================================
+   MOBILE LAKE FORECAST DETAIL
+   Selecting a day opens its detail in the current viewport,
+   rather than making the user scroll down to find it.
+   ========================================================= */
+
+@media (max-width: 599px) {
+    #lakeForecastDetail.mobile-forecast-detail {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 900;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        margin: 0 !important;
+        padding: 18px !important;
+        box-shadow: 0 18px 50px rgba(0,0,0,.38);
+        border-radius: 16px;
+    }
+
+    #lakeForecastDetail.mobile-forecast-detail::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: rgba(4,18,29,.58);
+        pointer-events: none;
+    }
+
+    #lakeForecastDetail .mobile-forecast-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 38px !important;
+        height: 38px;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 9px !important;
+        font-size: 20px !important;
+        line-height: 1 !important;
+    }
+
+    #lakeForecastDetail.mobile-forecast-detail h3 {
+        padding-right: 42px;
+    }
 }
 
 </style>
@@ -2660,14 +2716,20 @@ function showLakeForecastDay(index) {
 
     const day = state.forecast[index];
     const detail = document.getElementById("lakeForecastDetail");
+    if (!detail) return;
 
-    document.querySelectorAll(".forecast-day").forEach((el, i) => el.classList.toggle("active", i === index));
+    document.querySelectorAll(".forecast-day").forEach((el, i) =>
+        el.classList.toggle("active", i === index)
+    );
 
     const dateText = new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
         weekday:"long", day:"numeric", month:"long"
     });
 
+    const isMobile = window.matchMedia("(max-width: 599px)").matches;
+
     detail.innerHTML = `
+        ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeLakeForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
         <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
         <div class="lake-summary">
             <strong>${day.assessment.condition}</strong><br>
@@ -2683,7 +2745,25 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
     `;
+
     detail.style.display = "block";
+
+    if (isMobile) {
+        detail.classList.add("mobile-forecast-detail");
+        document.body.style.overflow = "hidden";
+    } else {
+        detail.classList.remove("mobile-forecast-detail");
+        document.body.style.overflow = "";
+    }
+}
+
+function closeLakeForecastDetail() {
+    const detail = document.getElementById("lakeForecastDetail");
+    if (!detail) return;
+
+    detail.style.display = "none";
+    detail.classList.remove("mobile-forecast-detail");
+    document.body.style.overflow = "";
 }
 
 
@@ -3584,6 +3664,7 @@ document.getElementById("locationSelect").addEventListener("change", function() 
     document.getElementById("conditions").innerHTML = "⏳ Loading conditions...";
     document.getElementById("recommendation").innerHTML = "⏳ Loading recommendation...";
     window.currentLakeForecast = null;
+    closeLakeForecastDetail();
     document.getElementById("seaTidesCard").style.display = "none";
 
     if (selectedLocation) {
