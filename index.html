@@ -1973,12 +1973,23 @@ async function checkConditions() {
             `;
 
             document.getElementById("seaTidesCard").style.display = "none";
+    const lakeForecastCardOnChange = document.getElementById("lakeForecastCard");
+    if (lakeForecastCardOnChange) {
+        lakeForecastCardOnChange.style.display = "none";
+    }
             document.getElementById("seaForecastCard").style.display = "none";
             closeSeaForecastDetail();
             loadLakeForecast(selectedLocation);
             return;
 
         }
+
+/* Ensure lake-only forecast is never shown for a sea location */
+const lakeForecastCard = document.getElementById("lakeForecastCard");
+if (lakeForecastCard) {
+    lakeForecastCard.style.display = "none";
+}
+
 
 
         console.log(
