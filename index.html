@@ -1502,6 +1502,19 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
 }
 
 
+/* Location label shown inside mobile contextual pop-outs/cards. */
+.mobile-context-location {
+    display: none;
+    margin: -2px 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #006994;
+}
+body.dark-theme .mobile-context-location { color: #79d1ff; }
+@media (max-width: 599px) {
+    .mobile-context-location { display: block; }
+}
+
 /* Sea forecast styling */
 .sea-forecast-summary {
     padding: 14px;
@@ -1551,7 +1564,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.3</strong></span>
+                ℹ️ <span>App Version <strong>2.2.4</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1844,6 +1857,11 @@ function loadLocations() {
 }
 
 
+function getLocationDisplayName(location) {
+    if (!location) return "";
+    return `${location.name}${location.county ? ` (${location.county})` : ""}`;
+}
+
 /* =========================
    CHECK CONDITIONS
    ========================= */
@@ -1992,6 +2010,7 @@ async function checkConditions() {
             const assessment = getLakeAssessment(windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ Air temperature: <strong>${current.temperature_2m}°C</strong><br>
                     🏞️ Lake water temperature: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong><br>
@@ -2001,6 +2020,7 @@ async function checkConditions() {
             `;
 
             document.getElementById("recommendation").innerHTML = `
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="lake-summary">
                     <strong>${assessment.condition}</strong>
                 </div>
@@ -2384,6 +2404,7 @@ if (lakeForecastCard) {
             "conditions"
         ).innerHTML =
         `
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
         🌡 Air temperature:
         ${current.temperature_2m}°C
         <br>
@@ -2873,6 +2894,7 @@ function showSeaForecastDay(index) {
 
     detail.innerHTML = `
         ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeSeaForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
         <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
         <div class="sea-forecast-summary">
             <strong>${day.assessment.rating}</strong><br>
@@ -3084,7 +3106,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             </button>
         `).join("");
 
-        window.currentLakeForecast = { forecast, waterTemp };
+        window.currentLakeForecast = { forecast, waterTemp, location: selectedLocation };
         showLakeForecastDay(0);
 
     } catch (error) {
@@ -3113,6 +3135,7 @@ function showLakeForecastDay(index) {
 
     detail.innerHTML = `
         ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeLakeForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
         <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
         <div class="lake-summary">
             <strong>${day.assessment.condition}</strong><br>
