@@ -1512,7 +1512,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.1</strong></span>
+                ℹ️ <span>App Version <strong>2.2.2</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1977,7 +1977,7 @@ async function checkConditions() {
     }
             document.getElementById("seaForecastCard").style.display = "none";
             closeSeaForecastDetail();
-            loadLakeForecast(selectedLocation);
+            loadLakeForecast(selectedLocation, current);
             return;
 
         }
@@ -2860,7 +2860,11 @@ function showSeaForecastDay(index) {
 
     if (isMobile) {
         detail.classList.add("mobile-forecast-detail");
-        document.body.style.overflow = "hidden";
+        /* Keep the main page scrollable on phones. The forecast detail is
+           already a fixed, internally scrollable panel, so locking body
+           scrolling here prevents sea-location pages from being scrolled. */
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
     } else {
         detail.classList.remove("mobile-forecast-detail");
         document.body.style.overflow = "";
@@ -2946,7 +2950,7 @@ function getForecastDateLabel(dateString) {
     return d.toLocaleDateString("en-IE", { weekday:"short", day:"numeric", month:"short" });
 }
 
-async function loadLakeForecast(selectedLocation) {
+async function loadLakeForecast(selectedLocation, currentConditions = null) {
     const card = document.getElementById("lakeForecastCard");
     const daysContainer = document.getElementById("lakeForecastDays");
     const detail = document.getElementById("lakeForecastDetail");
@@ -3000,6 +3004,35 @@ async function loadLakeForecast(selectedLocation) {
             rain: d.precipitation_probability_max[i],
             assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
         }));
+
+        /*
+           Today is shown as the current lake situation, rather than a
+           separate daily-average/dominant-wind calculation. This prevents
+           the first forecast tile from contradicting the Current Conditions
+           and Swim Recommendation cards. Days 2-7 remain true daily forecasts.
+        */
+        if (currentConditions && forecast.length) {
+            const today = forecast[0];
+            const currentWind = Number(currentConditions.wind_speed_10m);
+            const currentDirection = Number(currentConditions.wind_direction_10m);
+            const currentTemp = Number(currentConditions.temperature_2m);
+
+            if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
+                today.wind = currentWind;
+                today.direction = currentDirection;
+                today.assessment = getLakeAssessment(currentDirection, currentWind);
+            }
+            if (Number.isFinite(currentTemp)) {
+                today.maxTemp = currentTemp;
+                today.minTemp = currentTemp;
+            }
+            if (Number.isFinite(Number(currentConditions.wind_gusts_10m))) {
+                today.gust = Number(currentConditions.wind_gusts_10m);
+            }
+            if (Number.isFinite(Number(currentConditions.weather_code))) {
+                today.weatherCode = Number(currentConditions.weather_code);
+            }
+        }
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showLakeForecastDay(${index})">
