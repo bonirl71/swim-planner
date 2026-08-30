@@ -2102,7 +2102,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.1</strong></span>
+                ℹ️ <span>App Version <strong>2.4.2</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -3474,8 +3474,8 @@ async function loadSeaForecast(selectedLocation) {
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showSeaForecastDay(${index})">
-                <div class="forecast-day-name">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
-                <div class="forecast-day-date">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
+                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
+                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
                 <div class="forecast-icon">${getWeatherIcon(day.weatherCode)}</div>
                 <div class="forecast-temp">${Math.round(day.maxTemp)}°</div>
                 <div class="forecast-wind">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</div>
@@ -3505,9 +3505,11 @@ function showSeaForecastDay(index) {
         el.classList.toggle("active", i === index)
     );
 
-    const dateText = new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
-        weekday:"long", day:"numeric", month:"long"
-    });
+    const dateText = isForecastToday(day.date)
+        ? "Today"
+        : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
+            weekday:"long", day:"numeric", month:"long"
+        });
 
     const isMobile = window.matchMedia("(max-width: 599px)").matches;
 
@@ -3767,7 +3769,19 @@ function getWeatherIcon(code) {
     return "🌤️";
 }
 
+function getIrelandTodayString() {
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Dublin",
+        year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(new Date());
+}
+
+function isForecastToday(dateString) {
+    return dateString === getIrelandTodayString();
+}
+
 function getForecastDateLabel(dateString) {
+    if (isForecastToday(dateString)) return "Today";
     const d = new Date(dateString + "T12:00:00");
     return d.toLocaleDateString("en-IE", { weekday:"short", day:"numeric", month:"short" });
 }
@@ -3860,8 +3874,8 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showLakeForecastDay(${index})">
-                <div class="forecast-day-name">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
-                <div class="forecast-day-date">${new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
+                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
+                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
                 <div class="forecast-icon">${getWeatherIcon(day.weatherCode)}</div>
                 <div class="forecast-temp">${Math.round(day.maxTemp)}°</div>
                 <div class="forecast-wind">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</div>
@@ -3870,7 +3884,14 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         `).join("");
 
         window.currentLakeForecast = { forecast, waterTemp, location: selectedLocation };
-        showLakeForecastDay(0);
+        // Keep the mobile landing view clean. Lake details appear only after
+        // the user selects a forecast day. Desktop retains the selected day.
+        if (window.matchMedia("(max-width: 599px)").matches) {
+            detail.style.display = "none";
+            detail.classList.remove("mobile-forecast-detail", "forecast-detail-open");
+        } else {
+            showLakeForecastDay(0);
+        }
 
     } catch (error) {
         console.error("LAKE FORECAST ERROR:", error);
@@ -3890,9 +3911,11 @@ function showLakeForecastDay(index) {
         el.classList.toggle("active", i === index)
     );
 
-    const dateText = new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
-        weekday:"long", day:"numeric", month:"long"
-    });
+    const dateText = isForecastToday(day.date)
+        ? "Today"
+        : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
+            weekday:"long", day:"numeric", month:"long"
+        });
 
     const isMobile = window.matchMedia("(max-width: 599px)").matches;
 
