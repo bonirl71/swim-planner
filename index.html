@@ -1701,6 +1701,31 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+/* =========================================================
+   DESKTOP CLEAN SEA FORECAST
+   Keep the 7-day tiles visible, but show detailed information
+   only for the selected day. Lake behaviour is unchanged.
+   ========================================================= */
+@media (min-width: 600px) {
+    #seaForecastDetail {
+        display: none;
+    }
+
+    #seaForecastDetail.forecast-detail-open {
+        display: block;
+        margin-top: 18px;
+    }
+
+    #seaForecastCard .forecast-days {
+        margin-bottom: 0;
+    }
+
+    #seaForecastCard .forecast-day {
+        cursor: pointer;
+    }
+}
+
 </style>
 
 </head>
@@ -1725,7 +1750,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.1</strong></span>
+                ℹ️ <span>App Version <strong>2.3.3</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
