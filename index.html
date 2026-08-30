@@ -1737,6 +1737,16 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+@media (min-width: 600px) {
+    #seaForecastDetail {
+        display: none !important;
+    }
+    #seaForecastDetail.forecast-detail-open {
+        display: block !important;
+    }
+}
+
 </style>
 
 </head>
@@ -1761,7 +1771,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.4</strong></span>
+                ℹ️ <span>App Version <strong>2.3.5</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1881,7 +1891,7 @@ body.dark-theme .sea-forecast-summary {
     </select>
     <button type="button" onclick="predictSwimConditions()">🔮 Predict Swim Conditions</button>
     <div id="predictionResult"></div>
-    <button type="button" onclick="calculateJourney()">📍 Calculate Journey From My Location</button>
+    <button type="button" onclick="makeTravelPlansForSelectedForecast()">📍 Calculate Journey From My Location</button>
     <p id="journeyResult">Waiting for location and tide information...</p>
 </div>
 
@@ -3237,6 +3247,33 @@ function openMobileTravelPlanner(index) {
 
     closeSeaForecastDetail();
     planner.style.display = "block";
+    planner.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+function makeTravelPlansForSelectedForecast() {
+    const planner = document.getElementById("travelPlannerCard");
+    const tideSelect = document.getElementById("highTideSelect");
+
+    if (typeof closeSeaForecastDetail === "function") {
+        closeSeaForecastDetail();
+    }
+    if (typeof closeLakeForecastDetail === "function") {
+        closeLakeForecastDetail();
+    }
+
+    if (!planner) return;
+
+    planner.style.display = "block";
+
+    const state = window.seaForecastState || window.currentSeaForecast;
+    if (tideSelect && state && state.selectedTide) {
+        const option = Array.from(tideSelect.options).find(
+            option => option.value === state.selectedTide
+        );
+        if (option) tideSelect.value = state.selectedTide;
+    }
+
     planner.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
