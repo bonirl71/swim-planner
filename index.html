@@ -1581,6 +1581,126 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+/* =========================================================
+   MOBILE FORECAST ACTIONS
+   Keep the phone view deliberately uncluttered. A selected day
+   opens a compact panel first; tides/travel are optional next steps.
+   ========================================================= */
+@media (max-width: 599px) {
+    .mobile-forecast-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .mobile-forecast-actions button {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .mobile-forecast-actions .secondary-action {
+        background: transparent;
+        border: 1px solid #4d6475;
+    }
+
+    .mobile-day-summary {
+        margin-top: 12px;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,.035);
+        border: 1px solid #405463;
+    }
+
+    .mobile-day-summary strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 17px;
+    }
+
+    .mobile-extra-panel {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #405463;
+        background: rgba(255,255,255,.025);
+    }
+
+    .mobile-extra-panel h4 {
+        margin: 0 0 10px;
+        font-size: 16px;
+    }
+
+    .mobile-tide-row {
+        padding: 9px 0;
+        border-bottom: 1px solid #405463;
+    }
+
+    .mobile-tide-row:last-child { border-bottom: 0; }
+
+    .mobile-forecast-actions .close-action {
+        margin-top: 2px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE CLEAN VIEW
+   Forecast first; supporting information on demand.
+   ========================================================= */
+.mobile-current-button { display: none; }
+
+@media (max-width: 599px) {
+    #locationCard { order: 1; }
+    #lakeForecastCard,
+    #seaForecastCard { order: 2; }
+
+    /* Hide secondary information on phones by default. */
+    .dashboard-grid,
+    #seaTidesCard,
+    #travelPlannerCard {
+        display: none !important;
+    }
+
+    .mobile-current-button {
+        display: block !important;
+        width: 100%;
+        min-height: 44px;
+        margin-top: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* Only reveal current conditions when the swimmer asks for them. */
+    body.mobile-show-current .dashboard-grid {
+        display: grid !important;
+        order: 3;
+    }
+
+    #lakeForecastDetail.mobile-forecast-detail,
+    #seaForecastDetail.mobile-forecast-detail {
+        position: fixed !important;
+        left: 12px !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 900 !important;
+        max-height: calc(100vh - 28px) !important;
+        overflow-y: auto !important;
+        margin: 0 !important;
+        padding: 18px !important;
+        box-shadow: 0 18px 50px rgba(0,0,0,.42);
+        border-radius: 16px;
+    }
+}
+
 </style>
 
 </head>
@@ -1605,7 +1725,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.8</strong></span>
+                ℹ️ <span>App Version <strong>2.3.1</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1662,6 +1782,9 @@ body.dark-theme .sea-forecast-summary {
     </div>
     <div class="location-controls">
         <select id="locationSelect"></select>
+        <button type="button" id="mobileCurrentButton" class="mobile-current-button" onclick="toggleMobileCurrentConditions()">
+            🌤️ Show current conditions
+        </button>
         
     </div>
 </div>
@@ -1731,6 +1854,17 @@ body.dark-theme .sea-forecast-summary {
 
 <script>
 
+
+
+function toggleMobileCurrentConditions() {
+    const shown = document.body.classList.toggle("mobile-show-current");
+    const button = document.getElementById("mobileCurrentButton");
+    if (button) {
+        button.textContent = shown
+            ? "✕ Hide current conditions"
+            : "🌤️ Show current conditions";
+    }
+}
 
 /* =========================
    WEATHER DESCRIPTION
@@ -2958,30 +3092,49 @@ function showSeaForecastDay(index) {
 
     const isMobile = window.matchMedia("(max-width: 599px)").matches;
 
-    detail.innerHTML = `
-        ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeSeaForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
-        <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
-        <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
-        <div class="sea-forecast-summary">
-            <strong>${day.assessment.rating}</strong><br>
-            ${day.assessment.reasons.slice(0, 2).join(" · ")}<br><br>
-            ${day.assessment.reasons.slice(2).join("<br>")}
-        </div>
-        <div class="forecast-metrics">
-            <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
-        </div>
-        <div style="margin-top:14px;font-size:20px;font-weight:bold;color:#006994;">
-            🏊 Predicted Swim Score: ${day.assessment.score}/100
-        </div>
-    `;
+    if (isMobile) {
+        detail.innerHTML = `
+            <button type="button" class="mobile-forecast-close" onclick="closeSeaForecastDetail()" aria-label="Close forecast details">✕</button>
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+            <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
+            <div class="mobile-day-summary">
+                <strong>${day.assessment.rating}</strong>
+                ${day.assessment.reasons.slice(0, 2).join(" · ")}<br>
+                🏊 Swim score: <strong style="display:inline;font-size:17px;">${day.assessment.score}/100</strong>
+            </div>
+            <div class="mobile-forecast-actions">
+                <button type="button" onclick="showMobileSeaTides(${index})">🌊 Show tides for this day</button>
+                <button type="button" onclick="openMobileTravelPlanner(${index})">🚗 Make travel plans</button>
+                <button type="button" class="secondary-action" onclick="showMobileSeaForecastDetails(${index})">ℹ️ Show full forecast details</button>
+                <button type="button" class="secondary-action close-action" onclick="closeSeaForecastDetail()">Close</button>
+            </div>
+            <div id="mobileSeaExtraPanel"></div>
+        `;
+    } else {
+        detail.innerHTML = `
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
+            <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
+            <div class="sea-forecast-summary">
+                <strong>${day.assessment.rating}</strong><br>
+                ${day.assessment.reasons.slice(0, 2).join(" · ")}<br><br>
+                ${day.assessment.reasons.slice(2).join("<br>")}
+            </div>
+            <div class="forecast-metrics">
+                <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
+            </div>
+            <div style="margin-top:14px;font-size:20px;font-weight:bold;color:#006994;">
+                🏊 Predicted Swim Score: ${day.assessment.score}/100
+            </div>
+        `;
+    }
 
     detail.style.display = "block";
 
@@ -2996,6 +3149,59 @@ function showSeaForecastDay(index) {
         detail.classList.remove("mobile-forecast-detail");
         document.body.style.overflow = "";
     }
+}
+
+
+function showMobileSeaTides(index) {
+    const state = window.currentSeaForecast;
+    const panel = document.getElementById("mobileSeaExtraPanel");
+    if (!state || !state.forecast[index] || !panel) return;
+
+    const date = state.forecast[index].date;
+    const tides = (window.currentSeaTides && window.currentSeaTides.tides || [])
+        .filter(tide => {
+            const d = new Date(tide.time).toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" });
+            return d === date;
+        });
+
+    panel.innerHTML = `
+        <div class="mobile-extra-panel">
+            <h4>🌊 Tides for ${new Date(date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"long", day:"numeric", month:"long"})}</h4>
+            ${tides.length ? tides.map(tide => `
+                <div class="mobile-tide-row"><strong>${tide.type}</strong><br>${new Date(tide.time).toLocaleTimeString("en-IE", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Dublin"})} — ${Number(tide.height).toFixed(2)} m</div>
+            `).join("") : "<p>No tide information is available for this day.</p>"}
+        </div>`;
+}
+
+function showMobileSeaForecastDetails(index) {
+    const state = window.currentSeaForecast;
+    const panel = document.getElementById("mobileSeaExtraPanel");
+    if (!state || !state.forecast[index] || !panel) return;
+    const day = state.forecast[index];
+    panel.innerHTML = `
+        <div class="mobile-extra-panel">
+            <h4>📋 Full forecast</h4>
+            <div class="forecast-metrics">
+                <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
+            </div>
+        </div>`;
+}
+
+function openMobileTravelPlanner(index) {
+    const state = window.currentSeaForecast;
+    const planner = document.getElementById("travelPlannerCard");
+    if (!state || !state.forecast[index] || !planner) return;
+
+    closeSeaForecastDetail();
+    planner.style.display = "block";
+    planner.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function closeSeaForecastDetail() {
@@ -4129,6 +4335,12 @@ if (document.readyState === "loading") {
 // Populate the swim location dropdown when the app loads.
 
 document.getElementById("locationSelect").addEventListener("change", function() {
+    if (window.matchMedia("(max-width: 599px)").matches) {
+        document.body.classList.remove("mobile-show-current");
+        const button = document.getElementById("mobileCurrentButton");
+        if (button) button.textContent = "🌤️ Show current conditions";
+    }
+
     const selectedId = this.value;
     const selectedLocation = swimLocations.find(location => location.id == selectedId);
 
