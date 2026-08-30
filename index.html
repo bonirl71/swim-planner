@@ -1947,6 +1947,54 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+.journey-planner-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.planner-close-button {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 78px;
+    padding: 8px 13px !important;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1;
+}
+
+@media (min-width: 600px) {
+    #travelPlannerCard .planner-close-button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #travelPlannerCard .desktop-only-close,
+    #travelPlannerCard .mobile-only-close {
+        display: none !important;
+    }
+}
+
+@media (max-width: 599px) {
+    #travelPlannerCard .planner-close-button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+    }
+}
+
+
+@media (max-width: 599px) {
+    body.mobile-travel-open #journeyPlannerCloseButton {
+        position: static !important;
+        margin: 0 !important;
+    }
+}
+
 </style>
 
 </head>
@@ -1971,7 +2019,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.9</strong></span>
+                ℹ️ <span>App Version <strong>2.4.0</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2098,10 +2146,10 @@ body.dark-theme .sea-forecast-summary {
 </div>
 
 <div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
-    <div class="section-heading"><h2>🚗 Journey Planner</h2>
-    <div class="planner-mobile-header"><button type="button" id="mobileTravelCloseButton" class="mobile-only-close"
-            onclick="closeDesktopSeaPanels()">✕ Close</button></div>
-    <button type="button" class="desktop-only-close" onclick="closeDesktopSeaPanels()">✕ Close</button>
+    <div class="section-heading journey-planner-heading">
+    <h2>🚗 Journey Planner</h2>
+    <button type="button" id="journeyPlannerCloseButton" class="planner-close-button"
+            onclick="closeJourneyPlanner()" aria-label="Close Journey Planner">✕ Close</button>
 </div>
     <p>Choose the high tide you want to swim for:</p>
     <select id="highTideSelect">
@@ -2114,7 +2162,18 @@ body.dark-theme .sea-forecast-summary {
 </div>
 
 </div>
-<script src="locations.js?v=4"></script>
+<script src="locations.js?v=4">
+document.addEventListener("click", function(event) {
+    if (!document.body.classList.contains("desktop-sea-travel-open")) return;
+    const planner = document.getElementById("travelPlannerCard");
+    const button = document.getElementById("journeyPlannerCloseButton");
+    if (!planner) return;
+    if (!planner.contains(event.target) && event.target !== button) {
+        closeJourneyPlanner();
+    }
+});
+
+</script>
 
 <script>
 
@@ -3539,10 +3598,14 @@ function closeMobileTideChoice() {
     if (modal) modal.remove();
 }
 
-function closeMobileTravelPlanner() {
-    document.body.classList.remove("mobile-travel-open");
+function closeJourneyPlanner() {
+    document.body.classList.remove("mobile-travel-open", "desktop-sea-travel-open");
     const planner = document.getElementById("travelPlannerCard");
     if (planner) planner.style.display = "none";
+}
+
+function closeMobileTravelPlanner() {
+    closeJourneyPlanner();
 }
 
 function closeSeaForecastDetail() {
@@ -4596,10 +4659,11 @@ function openDesktopSeaTravel() {
 }
 
 function closeDesktopSeaPanels() {
-    document.body.classList.remove(
-        "desktop-sea-tides-open",
-        "desktop-sea-travel-open"
-    );
+    document.body.classList.remove("desktop-sea-tides-open", "desktop-sea-travel-open");
+    const tides = document.getElementById("seaTidesCard");
+    const planner = document.getElementById("travelPlannerCard");
+    if (tides) tides.style.display = "none";
+    if (planner) planner.style.display = "none";
 }
 
 function toggleTheme() {
