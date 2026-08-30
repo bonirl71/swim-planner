@@ -1196,145 +1196,6 @@ body.dark-theme select { color:#f0f5f8; }
     .guide-modal-panel { padding:18px; }
 }
 
-/* =========================
-   FINAL DESKTOP LAYOUT
-   ========================= */
-
-/* The older nth-of-type desktop rules above are intentionally
-   overridden here. The dashboard now controls its own layout. */
-@media (min-width: 800px) {
-    .app {
-        max-width: 1280px;
-        padding: 28px 32px 32px;
-    }
-
-    .app-header {
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-    }
-
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(300px, .9fr);
-        gap: 16px;
-        align-items: stretch;
-    }
-
-    .dashboard-grid > .card {
-        width: auto !important;
-        margin: 0 !important;
-        min-width: 0;
-    }
-
-    .conditions-card,
-    .recommendation-card,
-    .sea-planner-card {
-        min-height: 285px;
-    }
-
-    .sea-planner-card {
-        display: block;
-    }
-
-    .sea-planner-card[style*="display: none"] {
-        display: none !important;
-    }
-
-    .forecast-card {
-        width: 100% !important;
-        margin-top: 16px;
-    }
-
-    .forecast-days {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-    }
-
-    .forecast-day {
-        min-width: 0;
-    }
-}
-
-/* Keep the desktop planning panel compact enough to sit in the
-   first viewport, while still allowing results to grow naturally. */
-.planner-intro {
-    margin: 0 0 12px;
-    color: #5c6f7d;
-    line-height: 1.45;
-}
-
-.sea-planner-card select {
-    margin-bottom: 2px;
-}
-
-.sea-planner-card button {
-    width: 100%;
-}
-
-#predictionResult,
-#journeyResult {
-    margin-top: 12px;
-}
-
-/* Stronger light/dark readability for all headings and body text. */
-.conditions-content,
-.recommendation-content,
-.forecast-detail,
-.sea-planner-card {
-    color: #17344a;
-}
-
-.conditions-content strong,
-.recommendation-content strong,
-.forecast-detail strong,
-.sea-planner-card strong {
-    color: #0d527d;
-}
-
-body.dark-theme .conditions-content,
-body.dark-theme .recommendation-content,
-body.dark-theme .forecast-detail,
-body.dark-theme .sea-planner-card {
-    color: #e8f1f6;
-}
-
-body.dark-theme .conditions-content strong,
-body.dark-theme .recommendation-content strong,
-body.dark-theme .forecast-detail strong,
-body.dark-theme .sea-planner-card strong {
-    color: #9edcff;
-}
-
-body.dark-theme .planner-intro {
-    color: #c7d6df;
-}
-
-/* Menu is deliberately compact and easy to read. */
-.app-menu-content {
-    padding: 7px;
-}
-
-.app-menu-content .menu-item {
-    min-height: 40px;
-    padding: 10px 12px;
-}
-
-/* On smaller screens, return to a simple one-column flow. */
-@media (max-width: 799px) {
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-grid > .card {
-        width: 100% !important;
-        margin: 0 !important;
-    }
-
-    .sea-planner-card {
-        min-height: 0;
-    }
-}
-
 </style>
 
 </head>
@@ -1421,26 +1282,14 @@ body.dark-theme .planner-intro {
 </div>
 
 <div class="dashboard-grid">
-    <div class="card conditions-card">
+    <div class="card">
         <div class="section-heading"><h2>🌤️ Current Conditions</h2></div>
         <div id="conditions" class="conditions-content">Select a location and check conditions.</div>
     </div>
 
-    <div class="card recommendation-card">
+    <div class="card">
         <div class="section-heading"><h2>🏊 Swim Recommendation</h2></div>
         <div id="recommendation" class="recommendation-content">Waiting for data...</div>
-    </div>
-
-    <div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
-        <div class="section-heading"><h2>🔮 Future Swim Planner</h2></div>
-        <p class="planner-intro">Choose a future high tide to predict conditions and plan your journey.</p>
-        <select id="highTideSelect">
-            <option value="">Check swim conditions first...</option>
-        </select>
-        <button type="button" onclick="predictSwimConditions()">🔮 Predict Swim Conditions</button>
-        <div id="predictionResult"></div>
-        <button type="button" onclick="calculateJourney()">📍 Calculate Journey From My Location</button>
-        <p id="journeyResult">Waiting for location and tide information...</p>
     </div>
 </div>
 
@@ -1456,8 +1305,20 @@ body.dark-theme .planner-intro {
     <div id="lakeForecastDetail" class="forecast-detail" style="display:none;"></div>
 </div>
 
+<div class="card sea-planner-card" id="travelPlannerCard" style="display:none;">
+    <div class="section-heading"><h2>🚗 Journey Planner</h2></div>
+    <p>Choose the high tide you want to swim for:</p>
+    <select id="highTideSelect">
+        <option value="">Check swim conditions first...</option>
+    </select>
+    <button type="button" onclick="predictSwimConditions()">🔮 Predict Swim Conditions</button>
+    <div id="predictionResult"></div>
+    <button type="button" onclick="calculateJourney()">📍 Calculate Journey From My Location</button>
+    <p id="journeyResult">Waiting for location and tide information...</p>
 </div>
-<script src="locations.js?v=5"></script>
+
+</div>
+<script src="locations.js?v=4"></script>
 
 <script>
 
@@ -1637,14 +1498,6 @@ async function checkConditions() {
         swimLocations.find(
             location => location.id == selectedId
         );
-
-    if (!selectedLocation) {
-        document.getElementById("conditions").innerHTML =
-            "⚠️ Please choose a swim location.";
-        document.getElementById("recommendation").innerHTML =
-            "Waiting for a location...";
-        return;
-    }
 
     const latitude =
         selectedLocation.latitude;
@@ -2640,17 +2493,6 @@ async function predictSwimConditions() {
                 location.id == selectedId
         );
 
-    if (!selectedLocation) {
-        journeyResult.innerHTML = "⚠️ Please choose a swim location.";
-        return;
-    }
-
-    if (selectedLocation.type === "lake") {
-        journeyResult.innerHTML =
-            "🏞️ Journey planning is available for sea swims only.";
-        return;
-    }
-
 
     const selectedTide =
         document.getElementById(
@@ -2658,22 +2500,20 @@ async function predictSwimConditions() {
         ).value;
 
 
-    if (!selectedLocation) {
-        predictionResult.innerHTML =
-            "⚠️ Please choose a swim location.";
-        return;
-    }
-
-    if (selectedLocation.type === "lake") {
-        predictionResult.innerHTML =
-            "🏞️ Lake locations use the Lake Forecast above instead of tide prediction.";
-        return;
-    }
-
     if (!selectedTide) {
 
         predictionResult.innerHTML =
             "⚠️ Please choose a high tide first.";
+
+        return;
+
+    }
+
+
+    if (!selectedLocation) {
+
+        predictionResult.innerHTML =
+            "⚠️ Please choose a swim location.";
 
         return;
 
@@ -3461,25 +3301,36 @@ document.addEventListener("click", function(event) {
 
 
 /* =========================
+   APP INITIALISATION
+   ========================= */
+
+function initialiseApp() {
+    loadLocations();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialiseApp);
+} else {
+    initialiseApp();
+}
+
+
+/* =========================
    LOCATION CHANGE
    ========================= */
+
+// Populate the swim location dropdown when the app loads.
 
 document.getElementById("locationSelect").addEventListener("change", function() {
     const selectedId = this.value;
     const selectedLocation = swimLocations.find(location => location.id == selectedId);
 
-    document.getElementById("travelPlannerCard").style.display =
-        selectedLocation && selectedLocation.type !== "lake" ? "block" : "none";
-
-    document.getElementById("journeyResult").textContent =
-        "Waiting for location and tide information...";
+    document.getElementById("travelPlannerCard").style.display = "none";
+    document.getElementById("journeyResult").textContent = "Waiting for location and tide information...";
     document.getElementById("predictionResult").innerHTML = "";
-    document.getElementById("highTideSelect").innerHTML =
-        '<option value="">Check swim conditions first...</option>';
-    document.getElementById("conditions").innerHTML =
-        "Select a location and check conditions.";
-    document.getElementById("recommendation").innerHTML =
-        "Waiting for data...";
+    document.getElementById("highTideSelect").innerHTML = '<option value="">Check swim conditions first...</option>';
+    document.getElementById("conditions").innerHTML = "Select a location and check conditions.";
+    document.getElementById("recommendation").innerHTML = "Waiting for data...";
     window.currentLakeForecast = null;
     loadLakeForecast(selectedLocation);
 });
