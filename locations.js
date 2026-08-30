@@ -67,5 +67,14 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         tideStation: "IEEABWC020_0000_0200_MODELLED"
+    },
+    {
+        id: 8,
+        name: "Portumna Harbour",
+        county: "Galway",
+        latitude: 53.083405,
+        longitude: -8.220102,
+        distance: "TBC",
+        type: "lake"
     }
 ];
