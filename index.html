@@ -1995,6 +1995,89 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+/* Journey Planner close control */
+.journey-planner-heading {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 8px 0 10px;
+    background: var(--card-bg, #1d2b36);
+}
+
+@media (min-width: 600px) {
+    body.desktop-sea-travel-open #travelPlannerCard .journey-planner-heading {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 46px;
+        margin: 0 0 8px;
+        padding: 6px 4px 8px;
+        background: var(--card-bg, #1d2b36);
+        border-bottom: 1px solid rgba(130,190,235,.25);
+    }
+
+    body.desktop-sea-travel-open #travelPlannerCard .planner-close-button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        min-width: 42px;
+        width: 42px !important;
+        height: 42px;
+        padding: 0 !important;
+        border-radius: 50%;
+        font-size: 0;
+        line-height: 1;
+    }
+
+    body.desktop-sea-travel-open #travelPlannerCard .planner-close-button::before {
+        content: "×";
+        font-size: 26px;
+        font-weight: 400;
+        line-height: 1;
+    }
+}
+
+@media (max-width: 599px) {
+    body.mobile-travel-open #travelPlannerCard .journey-planner-heading {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 46px;
+        margin: 0 0 8px;
+        padding: 6px 4px 8px;
+        background: var(--card-bg, #1d2b36);
+        border-bottom: 1px solid rgba(130,190,235,.25);
+    }
+
+    body.mobile-travel-open #travelPlannerCard .planner-close-button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        min-width: 42px;
+        width: 42px !important;
+        height: 42px;
+        padding: 0 !important;
+        border-radius: 50%;
+        font-size: 0;
+    }
+
+    body.mobile-travel-open #travelPlannerCard .planner-close-button::before {
+        content: "×";
+        font-size: 25px;
+        font-weight: 400;
+        line-height: 1;
+    }
+}
+
 </style>
 
 </head>
@@ -2019,7 +2102,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.0</strong></span>
+                ℹ️ <span>App Version <strong>2.4.1</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2165,10 +2248,12 @@ body.dark-theme .sea-forecast-summary {
 <script src="locations.js?v=4">
 document.addEventListener("click", function(event) {
     if (!document.body.classList.contains("desktop-sea-travel-open")) return;
+
     const planner = document.getElementById("travelPlannerCard");
-    const button = document.getElementById("journeyPlannerCloseButton");
     if (!planner) return;
-    if (!planner.contains(event.target) && event.target !== button) {
+
+    // Anything outside the Journey Planner closes it.
+    if (!planner.contains(event.target)) {
         closeJourneyPlanner();
     }
 });
