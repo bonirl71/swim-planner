@@ -2098,7 +2098,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.4.5</strong></span>
+                ℹ️ <span>App Version <strong>2.4.6</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -3487,7 +3487,14 @@ async function loadSeaForecast(selectedLocation) {
             </button>
         `).join("");
 
-        showSeaForecastDay(0);
+        // Do not automatically open today's detail on mobile (or desktop).
+        // The forecast detail opens only when the user selects a forecast day.
+        const initialDetail = document.getElementById("seaForecastDetail");
+        if (initialDetail) {
+            initialDetail.style.display = "none";
+            initialDetail.classList.remove("forecast-detail-open", "mobile-forecast-detail");
+            initialDetail.innerHTML = "";
+        }
     } catch (error) {
         console.error("SEA FORECAST ERROR:", error);
         daysContainer.innerHTML = "⚠️ Unable to load the sea forecast. Please try again.";
