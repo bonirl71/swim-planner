@@ -1595,7 +1595,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.6</strong></span>
+                ℹ️ <span>App Version <strong>2.2.7</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2060,7 +2060,7 @@ if (seaTidesCard) {
             const assessment = getLakeAssessment(windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
-                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
                 <div class="conditions-metrics">
                     🌡️ Air temperature: <strong>${current.temperature_2m}°C</strong><br>
                     🏞️ Lake water temperature: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong><br>
@@ -2070,7 +2070,7 @@ if (seaTidesCard) {
             `;
 
             document.getElementById("recommendation").innerHTML = `
-                <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+                <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
                 <div class="lake-summary">
                     <strong>${assessment.condition}</strong>
                 </div>
@@ -2454,7 +2454,7 @@ if (lakeForecastCard) {
             "conditions"
         ).innerHTML =
         `
-        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
         🌡 Air temperature:
         ${current.temperature_2m}°C
         <br>
@@ -2948,7 +2948,7 @@ function showSeaForecastDay(index) {
 
     detail.innerHTML = `
         ${isMobile ? '<button type="button" class="mobile-forecast-close" onclick="closeSeaForecastDetail()" aria-label="Close forecast details">✕</button>' : ""}
-        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
         <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
         <div class="sea-forecast-summary">
             <strong>${day.assessment.rating}</strong><br>
