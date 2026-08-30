@@ -1457,8 +1457,47 @@ body.dark-theme .tide-detail-label { color: #aebdca; }
         line-height: 1 !important;
     }
 
-    #lakeForecastDetail.mobile-forecast-detail h3 {
+    #lakeForecastDetail.mobile-forecast-detail h3,
+    #seaForecastDetail.mobile-forecast-detail h3 {
         padding-right: 42px;
+    }
+
+    /* Use the same on-screen forecast panel for sea locations as for lakes. */
+    #seaForecastDetail.mobile-forecast-detail {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 900;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        margin: 0 !important;
+        padding: 18px !important;
+        box-shadow: 0 18px 50px rgba(0,0,0,.38);
+        border-radius: 16px;
+    }
+
+    #seaForecastDetail.mobile-forecast-detail::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: rgba(4,18,29,.58);
+        pointer-events: none;
+    }
+
+    #seaForecastDetail .mobile-forecast-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 38px !important;
+        height: 38px;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 9px !important;
+        font-size: 20px !important;
+        line-height: 1 !important;
     }
 }
 
@@ -1512,7 +1551,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.2</strong></span>
+                ℹ️ <span>App Version <strong>2.2.3</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
