@@ -1540,6 +1540,37 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+/* =========================================================
+   MOBILE FORECAST-FIRST LAYOUT
+   ========================================================= */
+@media (max-width: 599px) {
+    .app {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #locationCard { order: 1; }
+    #lakeForecastCard,
+    #seaForecastCard,
+    #seaTidesCard { order: 2; }
+    .dashboard-grid { order: 3; }
+    #travelPlannerCard { order: 4; }
+
+    #seaForecastDetail.mobile-forecast-detail {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 900;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        margin: 0 !important;
+        box-shadow: 0 18px 50px rgba(0,0,0,.38);
+    }
+}
+
 </style>
 
 </head>
@@ -1564,7 +1595,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.4</strong></span>
+                ℹ️ <span>App Version <strong>2.2.6</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1880,6 +1911,25 @@ async function checkConditions() {
         swimLocations.find(
             location => location.id == selectedId
         );
+
+/* Keep lake and sea forecast sections mutually exclusive. */
+const lakeForecastCard = document.getElementById("lakeForecastCard");
+const seaForecastCard = document.getElementById("seaForecastCard");
+const seaTidesCard = document.getElementById("seaTidesCard");
+
+if (lakeForecastCard) {
+    lakeForecastCard.style.display =
+        selectedLocation && selectedLocation.type === "lake" ? "block" : "none";
+}
+if (seaForecastCard) {
+    seaForecastCard.style.display =
+        selectedLocation && selectedLocation.type !== "lake" ? "block" : "none";
+}
+if (seaTidesCard) {
+    seaTidesCard.style.display =
+        selectedLocation && selectedLocation.type !== "lake" ? "block" : "none";
+}
+
 
     const latitude =
         selectedLocation.latitude;
@@ -2738,6 +2788,10 @@ function getSeaForecastAssessment(waveHeight, wavePeriod, windSpeed, windDegrees
 }
 
 async function loadSeaForecast(selectedLocation) {
+    if (!selectedLocation || selectedLocation.type === "lake") {
+        return;
+    }
+
     const card = document.getElementById("seaForecastCard");
     const daysContainer = document.getElementById("seaForecastDays");
     const detail = document.getElementById("seaForecastDetail");
@@ -2854,7 +2908,7 @@ async function loadSeaForecast(selectedLocation) {
             };
         }).filter(Boolean);
 
-        window.currentSeaForecast = { forecast };
+        window.currentSeaForecast = { forecast, location: selectedLocation };
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showSeaForecastDay(${index})">
