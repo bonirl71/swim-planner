@@ -1726,6 +1726,17 @@ body.dark-theme .sea-forecast-summary {
     }
 }
 
+
+@media (min-width: 600px) {
+    #seaForecastDetail {
+        display: none !important;
+    }
+
+    #seaForecastDetail.forecast-detail-open {
+        display: block !important;
+    }
+}
+
 </style>
 
 </head>
@@ -1750,7 +1761,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.3.3</strong></span>
+                ℹ️ <span>App Version <strong>2.3.4</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -3164,7 +3175,7 @@ function showSeaForecastDay(index) {
     detail.style.display = "block";
 
     if (isMobile) {
-        detail.classList.add("mobile-forecast-detail");
+        detail.classList.add("mobile-forecast-detail", "forecast-detail-open");
         /* Keep the main page scrollable on phones. The forecast detail is
            already a fixed, internally scrollable panel, so locking body
            scrolling here prevents sea-location pages from being scrolled. */
@@ -3233,7 +3244,7 @@ function closeSeaForecastDetail() {
     const detail = document.getElementById("seaForecastDetail");
     if (!detail) return;
     detail.style.display = "none";
-    detail.classList.remove("mobile-forecast-detail");
+    detail.classList.remove("mobile-forecast-detail", "forecast-detail-open");
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
 }
