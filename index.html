@@ -1233,11 +1233,15 @@ body.dark-theme select { color:#f0f5f8; }
     .dashboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         width: 100%;
+        align-items: stretch !important;
     }
     .dashboard-grid > .card {
         width: auto !important;
         margin-right: 0 !important;
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-width: 0 !important;
     }
 }
 
@@ -1508,7 +1512,7 @@ body.dark-theme .sea-forecast-summary {
                 📖 <span>How to Use</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.2.0</strong></span>
+                ℹ️ <span>App Version <strong>2.2.1</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -1954,12 +1958,6 @@ async function checkConditions() {
                     🏞️ Lake water temperature: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong><br>
                     💨 Wind: <strong>${windSpeed} m/s ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ Conditions: <strong>${getWeatherDescription(current.weather_code)}</strong>
-                </div>
-                <hr>
-                <div class="lake-summary">
-                    <strong>${assessment.condition}</strong><br><br>
-                    ${assessment.impact}<br><br>
-                    ${assessment.advice}
                 </div>
             `;
 
@@ -2875,6 +2873,7 @@ function closeSeaForecastDetail() {
     detail.style.display = "none";
     detail.classList.remove("mobile-forecast-detail");
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
 }
 
 
@@ -3076,6 +3075,7 @@ function closeLakeForecastDetail() {
     detail.style.display = "none";
     detail.classList.remove("mobile-forecast-detail");
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
 }
 
 
@@ -3978,6 +3978,11 @@ document.getElementById("locationSelect").addEventListener("change", function() 
     window.currentLakeForecast = null;
     closeLakeForecastDetail();
     closeSeaForecastDetail();
+
+    /* Always restore page scrolling when changing location */
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+
     document.getElementById("seaTidesCard").style.display = "none";
     document.getElementById("seaForecastCard").style.display = "none";
 
