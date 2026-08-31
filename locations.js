@@ -1,5 +1,32 @@
 const swimLocations = [
     {
+        id: 6,
+        name: "Youghal Quay",
+        county: "Tipperary",
+        latitude: 52.898509,
+        longitude: -8.310286,
+        distance: "TBC",
+        type: "lake"
+    },
+    {
+        id: 8,
+        name: "Portumna Harbour",
+        county: "Galway",
+        latitude: 53.083405,
+        longitude: -8.220102,
+        distance: "TBC",
+        type: "lake"
+    },
+    {
+        id: 9,
+        name: "Twomilegate",
+        county: "Clare",
+        latitude: 52.83623,
+        longitude: -8.46424,
+        distance: "TBC",
+        type: "lake"
+    },
+    {
         id: 1,
         name: "Blackhead Lighthouse and Gleninagh Pier",
         county: "Clare",
@@ -50,15 +77,6 @@ const swimLocations = [
         tideStation: "IESHBWC080_0000_0100_MODELLED"
     },
     {
-        id: 6,
-        name: "Youghal Quay",
-        county: "Tipperary",
-        latitude: 52.898509,
-        longitude: -8.310286,
-        distance: "TBC",
-        type: "lake"
-    },
-    {
         id: 7,
         name: "Lambay Island",
         county: "Dublin",
@@ -67,14 +85,5 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         tideStation: "IEEABWC020_0000_0200_MODELLED"
-    },
-    {
-        id: 8,
-        name: "Portumna Harbour",
-        county: "Galway",
-        latitude: 53.083405,
-        longitude: -8.220102,
-        distance: "TBC",
-        type: "lake"
     }
 ];
