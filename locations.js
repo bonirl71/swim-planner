@@ -32,7 +32,6 @@ const swimLocations = [
         type: "lake"
     },
 
-
     // =========================
     // SEA LOCATIONS
     // =========================
