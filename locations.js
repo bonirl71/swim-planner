@@ -1,4 +1,9 @@
 const swimLocations = [
+
+    // =========================
+    // LAKE LOCATIONS
+    // =========================
+
     {
         id: 6,
         name: "Youghal Quay",
@@ -26,6 +31,12 @@ const swimLocations = [
         distance: "TBC",
         type: "lake"
     },
+
+
+    // =========================
+    // SEA LOCATIONS
+    // =========================
+
     {
         id: 1,
         name: "Blackhead Lighthouse and Gleninagh Pier",
