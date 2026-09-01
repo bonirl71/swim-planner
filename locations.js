@@ -32,6 +32,23 @@ const swimLocations = [
         type: "lake"
     },
 
+
+    // =========================
+    // LAGOON LOCATIONS
+    // =========================
+
+    {
+        id: 11,
+        name: "Taapuna Beach Sand Bank",
+        county: "Tahiti",
+        latitude: -17.60008633464791,
+        longitude: -149.6174561018536,
+        distance: "TBC",
+        type: "lagoon",
+        region: "french-polynesia"
+    },
+
+
     // =========================
     // SEA LOCATIONS
     // =========================
@@ -95,5 +112,25 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         tideStation: "IEEABWC020_0000_0200_MODELLED"
+    },
+    {
+        id: 10,
+        name: "Venus Point Bay",
+        county: "Tahiti",
+        latitude: -17.495652593749423,
+        longitude: -149.49680623257228,
+        distance: "TBC",
+        type: "sea",
+        region: "french-polynesia"
+    },
+    {
+        id: 12,
+        name: "Channel Tahiti to Moorea",
+        county: "Tahiti",
+        latitude: -17.596466756769523,
+        longitude: -149.7005889103907,
+        distance: "TBC",
+        type: "sea",
+        region: "french-polynesia"
     }
 ];
