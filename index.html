@@ -1020,6 +1020,48 @@ body.dark-theme .journey-leave {
 
 .app-menu-content .menu-item span { flex: 1; }
 
+.units-menu-item {
+    cursor: default;
+}
+
+.units-menu-item select {
+    flex: 0 1 130px;
+    min-width: 0;
+    padding: 7px 8px;
+    border: 1px solid #c7d8e2;
+    border-radius: 8px;
+    background: white;
+    color: #17344a;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+body.dark-theme .units-menu-item select {
+    background: #263746;
+    border-color: #5d7180;
+    color: #e7f0f5;
+}
+
+.language-menu-item { cursor: default; }
+
+.language-menu-item select {
+    flex: 0 1 130px;
+    min-width: 0;
+    padding: 7px 8px;
+    border: 1px solid #c7d8e2;
+    border-radius: 8px;
+    background: white;
+    color: #17344a;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+body.dark-theme .language-menu-item select {
+    background: #263746;
+    border-color: #5d7180;
+    color: #e7f0f5;
+}
+
 /* Menu buttons must not inherit the full-width primary button styling. */
 .app-menu-content .menu-item {
     min-height: 42px;
@@ -1110,6 +1152,46 @@ body.dark-theme .journey-leave {
 .forecast-metric { padding: 10px; background: white; border-radius: 9px; border: 1px solid #e1edf3; }
 .forecast-metric-label { display:block; font-size: 11px; color:#71818c; }
 .forecast-metric-value { display:block; margin-top:3px; font-weight:700; }
+
+/* =========================
+   WHAT'S NEW RELEASE NOTES
+   ========================= */
+.release-modal { display:none; position:fixed; inset:0; z-index:600; }
+.release-modal.open { display:block; }
+.release-modal-backdrop { position:absolute; inset:0; background:rgba(4,18,29,.72); }
+.release-modal-panel {
+    position:relative;
+    width:min(620px, calc(100vw - 32px));
+    max-height:calc(100vh - 32px);
+    overflow:auto;
+    margin:8vh auto 0;
+    padding:28px;
+    background:white;
+    color:#263f50;
+    border-radius:18px;
+    box-shadow:0 24px 70px rgba(0,0,0,.35);
+}
+.release-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+.release-eyebrow { color:#006994; font-size:12px; font-weight:800; letter-spacing:1.2px; margin-bottom:6px; }
+.release-modal-header h2 { margin:0; color:#006994; font-size:24px; line-height:1.25; }
+.release-intro { margin:20px 0 14px; line-height:1.6; }
+.release-list { list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+.release-list li { display:flex; gap:12px; padding:13px 14px; border:1px solid #d8e8f0; border-radius:12px; background:#f7fbfd; line-height:1.5; }
+.release-list strong { color:#006994; }
+.release-icon { font-size:21px; flex:0 0 26px; text-align:center; }
+.release-footer { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-top:22px; padding-top:16px; border-top:1px solid #d8e8f0; font-size:14px; }
+.release-ok { border:0; border-radius:9px; padding:10px 20px; background:#006994; color:white; font-weight:800; cursor:pointer; }
+.release-ok:hover { filter:brightness(1.08); }
+body.dark-theme .release-modal-panel { background:#202e39; color:#e1eaf0; }
+body.dark-theme .release-eyebrow, body.dark-theme .release-modal-header h2, body.dark-theme .release-list strong { color:#79d1ff; }
+body.dark-theme .release-list li { background:#263642; border-color:#435764; }
+body.dark-theme .release-footer { border-color:#435764; }
+@media (max-width:599px) {
+    .release-modal-panel { margin:4vh auto 0; padding:20px; }
+    .release-modal-header h2 { font-size:20px; }
+    .release-footer { align-items:stretch; flex-direction:column; }
+    .release-ok { width:100%; }
+}
 
 .guide-modal { display:none; position:fixed; inset:0; z-index:500; }
 .guide-modal.open { display:block; }
@@ -2084,12 +2166,32 @@ body.dark-theme .sea-forecast-summary {
             <button type="button" class="menu-item" onclick="openGuide()">
                 📖 <span>How to Use</span>
             </button>
+            <button type="button" class="menu-item" onclick="openReleaseNotes()">
+                🆕 <span>What's New</span>
+            </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.5.1</strong></span>
+                ℹ️ <span>App Version <strong>2.6.0</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
             </button>
+            <label class="menu-item units-menu-item" for="unitsSelect">
+                📏 <span>Units</span>
+                <select id="unitsSelect" aria-label="Choose measurement units" onclick="event.stopPropagation()" onchange="changeUnits(this.value)">
+                    <option value="metric">Metric — km, °C, m</option>
+                    <option value="imperial">Imperial — miles, °F, ft</option>
+                </select>
+            </label>
+            <label class="menu-item language-menu-item" for="languageSelect">
+                🌐 <span>Language</span>
+                <select id="languageSelect" aria-label="Choose language" onclick="event.stopPropagation()" onchange="changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                </select>
+            </label>
         </div>
     </details>
 
@@ -2097,6 +2199,31 @@ body.dark-theme .sea-forecast-summary {
 
 
 
+
+    <div class="release-modal" id="releaseModal" aria-hidden="true">
+        <div class="release-modal-backdrop" onclick="closeReleaseNotes()"></div>
+        <div class="release-modal-panel" role="dialog" aria-modal="true" aria-labelledby="releaseTitle">
+            <div class="release-modal-header">
+                <div>
+                    <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.6.0</h2>
+                </div>
+                <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
+            </div>
+            <p class="release-intro">Here’s what’s new in this release:</p>
+            <ul class="release-list">
+                <li><span class="release-icon">🌍</span><div><strong>New languages</strong><br>English, Chinese, Hindi, Spanish and French are now available.</div></li>
+                <li><span class="release-icon">🌡️</span><div><strong>Temperature &amp; measurement units</strong><br>Switch between Metric (°C, km, m) and Imperial (°F, miles, ft) units from the menu.</div></li>
+                <li><span class="release-icon">📍</span><div><strong>More swim locations</strong><br>New lake and Tahiti locations have been added.</div></li>
+                <li><span class="release-icon">🌦️</span><div><strong>Improved forecast information</strong><br>Forecast details, conditions and swim recommendations have been improved.</div></li>
+                <li><span class="release-icon">📱</span><div><strong>Improved mobile experience</strong><br>Forecast and information panels have been refined for easier use on phones and tablets.</div></li>
+            </ul>
+            <div class="release-footer">
+                <span>Thanks for using Open Water Swim Planner. 🌊</span>
+                <button type="button" class="release-ok" onclick="closeReleaseNotes(true)">Got it</button>
+            </div>
+        </div>
+    </div>
 
     <div class="guide-modal" id="guideModal" aria-hidden="true">
     <div class="guide-modal-backdrop" onclick="closeGuide()"></div>
@@ -2129,6 +2256,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><strong>Sea locations — Journey Planner.</strong> Use <strong>Click to plan your journey</strong> when you want to open the Journey Planner in a separate panel.</li>
                 <li><strong>Close information panels.</strong> Use the X/Close control in the panel. You can also click outside the panel to close it.</li>
                 <li><strong>Lake locations.</strong> Lake locations do not display the sea Tide Info or Journey Planner buttons. The lake forecast is presented using lake-specific information.</li>
+                <li><strong>Units.</strong> Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.</li>
                 <li><strong>Light / Dark theme.</strong> Use the theme option in the header to switch themes. Dark theme is the default.</li>
                 <li><strong>App information.</strong> Open the menu to access this guide and see the current App Version.</li>
             </ol>
@@ -2225,14 +2353,149 @@ body.dark-theme .sea-forecast-summary {
     <select id="highTideSelect">
         <option value="">Check swim conditions first...</option>
     </select>
-    <button type="button" onclick="predictSwimConditions()">🔮 Predict Swim Conditions</button>
+    <button type="button" onclick="predictSwimConditions()">🔮 ${translateString("Predict Swim Conditions")}</button>
     <div id="predictionResult"></div>
     <button type="button" onclick="calculateJourney()">📍 Calculate Journey From My Location</button>
     <p id="journeyResult">Waiting for location and tide information...</p>
 </div>
 
 </div>
-<script src="locations.js?v=4">
+<script>
+const swimLocations = [
+
+    // =========================
+    // LAKE LOCATIONS
+    // =========================
+
+    {
+        id: 6,
+        name: "Youghal Quay",
+        county: "Tipperary",
+        latitude: 52.898509,
+        longitude: -8.310286,
+        distance: "TBC",
+        type: "lake"
+    },
+    {
+        id: 8,
+        name: "Portumna Harbour",
+        county: "Galway",
+        latitude: 53.083405,
+        longitude: -8.220102,
+        distance: "TBC",
+        type: "lake"
+    },
+    {
+        id: 9,
+        name: "Twomilegate",
+        county: "Clare",
+        latitude: 52.83623,
+        longitude: -8.46424,
+        distance: "TBC",
+        type: "lake"
+    },
+
+    // =========================
+    // LAGOON LOCATIONS
+    // =========================
+
+    {
+        id: 11,
+        name: "Taapuna Beach Sand Bank",
+        county: "Tahiti",
+        latitude: -17.60008633464791,
+        longitude: -149.6174561018536,
+        distance: "TBC",
+        type: "lagoon",
+        region: "french-polynesia"
+    },
+
+    // =========================
+    // SEA LOCATIONS
+    // =========================
+
+    {
+        id: 1,
+        name: "Blackhead Lighthouse and Gleninagh Pier",
+        county: "Clare",
+        latitude: 53.148,
+        longitude: -9.265,
+        distance: "2.5 km",
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0100_MODELLED"
+    },
+    {
+        id: 2,
+        name: "Fanore Beach",
+        county: "Clare",
+        latitude: 53.125,
+        longitude: -9.290,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0100_MODELLED"
+    },
+    {
+        id: 3,
+        name: "Lahinch Beach",
+        county: "Clare",
+        latitude: 53.053,
+        longitude: -9.344,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IESHBWC100_0000_0100_MODELLED"
+    },
+    {
+        id: 4,
+        name: "Kilkee Bay",
+        county: "Clare",
+        latitude: 52.679141,
+        longitude: -9.652973,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IESHBWC070_0000_0400_MODELLED"
+    },
+    {
+        id: 5,
+        name: "Whitestrand",
+        county: "Clare",
+        latitude: 52.747723,
+        longitude: -9.549059,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IESHBWC080_0000_0100_MODELLED"
+    },
+    {
+        id: 7,
+        name: "Lambay Island",
+        county: "Dublin",
+        latitude: 53.49222995430973,
+        longitude: -6.015908380729172,
+        distance: "TBC",
+        type: "sea",
+        tideStation: "IEEABWC020_0000_0200_MODELLED"
+    },
+    {
+        id: 10,
+        name: "Venus Point Bay",
+        county: "Tahiti",
+        latitude: -17.495652593749423,
+        longitude: -149.49680623257228,
+        distance: "TBC",
+        type: "sea",
+        region: "french-polynesia"
+    },
+    {
+        id: 12,
+        name: "Channel Tahiti to Moorea",
+        county: "Tahiti",
+        latitude: -17.596466756769523,
+        longitude: -149.7005889103907,
+        distance: "TBC",
+        type: "sea",
+        region: "french-polynesia"
+    }
+];
+
 document.addEventListener("click", function(event) {
     if (!document.body.classList.contains("desktop-sea-travel-open")) return;
 
@@ -2252,26 +2515,102 @@ document.addEventListener("click", function(event) {
 
 
 /* =========================
+   UNIT SETTINGS
+   ========================= */
+
+const UNIT_STORAGE_KEY = "swimUnits";
+
+function getUnits() {
+    return localStorage.getItem(UNIT_STORAGE_KEY) === "imperial"
+        ? "imperial"
+        : "metric";
+}
+
+function formatTemperature(value, decimals = 1) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "Unavailable";
+    if (getUnits() === "imperial") {
+        return `${((n * 9 / 5) + 32).toFixed(decimals)}°F`;
+    }
+    return `${n.toFixed(decimals)}°C`;
+}
+
+function formatWind(value, decimals = 1) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "Unavailable";
+    if (getUnits() === "imperial") {
+        return `${(n * 2.236936).toFixed(decimals)} mph`;
+    }
+    return `${n.toFixed(decimals)} m/s`;
+}
+
+function formatWaveHeight(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "Unavailable";
+    if (getUnits() === "imperial") {
+        return `${(n * 3.28084).toFixed(decimals)} ft`;
+    }
+    return `${n.toFixed(decimals)} m`;
+}
+
+function formatTideHeight(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "Unavailable";
+    if (getUnits() === "imperial") {
+        return `${(n * 3.28084).toFixed(decimals)} ft`;
+    }
+    return `${n.toFixed(decimals)} m`;
+}
+
+function formatDistance(km, decimals = 1) {
+    const n = Number(km);
+    if (!Number.isFinite(n)) return "Unavailable";
+    if (getUnits() === "imperial") {
+        return `${(n * 0.621371).toFixed(decimals)} miles`;
+    }
+    return `${n.toFixed(decimals)} km`;
+}
+
+function changeUnits(value) {
+    localStorage.setItem(UNIT_STORAGE_KEY, value === "imperial" ? "imperial" : "metric");
+    closeMenu();
+
+    // Re-render the current location so every visible measurement updates.
+    const locationSelect = document.getElementById("locationSelect");
+    if (locationSelect && locationSelect.value) {
+        checkConditions();
+    }
+
+    showReleaseNotesIfNeeded();
+}
+
+function updateUnitsMenu() {
+    const select = document.getElementById("unitsSelect");
+    if (select) select.value = getUnits();
+}
+
+
+/* =========================
    WEATHER DESCRIPTION
    ========================= */
 
 function getWeatherDescription(code) {
 
-    if (code === 0) return "Clear sky ☀️";
+    if (code === 0) return translateString("Clear sky ☀️");
 
-    if ([1,2,3].includes(code)) return "Cloudy ☁️";
+    if ([1,2,3].includes(code)) return translateString("Cloudy ☁️");
 
-    if ([45,48].includes(code)) return "Fog 🌫️";
+    if ([45,48].includes(code)) return translateString("Fog 🌫️");
 
-    if (code >= 51 && code <= 67) return "Rain 🌧️";
+    if (code >= 51 && code <= 67) return translateString("Rain 🌧️");
 
-    if (code >= 71 && code <= 77) return "Snow ❄️";
+    if (code >= 71 && code <= 77) return translateString("Snow ❄️");
 
-    if (code >= 80 && code <= 82) return "Rain showers 🌦️";
+    if (code >= 80 && code <= 82) return translateString("Rain showers 🌦️");
 
-    if (code >= 95) return "Thunderstorm ⛈️";
+    if (code >= 95) return translateString("Thunderstorm ⛈️");
 
-    return "Unknown";
+    return translateString("Unknown");
 
 }
 
@@ -2293,7 +2632,7 @@ function getWindDirection(degrees) {
         "North-West"
     ];
 
-    return directions[Math.round(degrees / 45) % 8];
+    return translateString(directions[Math.round(degrees / 45) % 8]);
 
 }
 
@@ -2442,7 +2781,10 @@ function getLocationDisplayName(location) {
 function updateDesktopSeaActions(location) {
     const actions = document.getElementById("desktopSeaActions");
     if (!actions) return;
-    actions.style.display = (location && location.type !== "lake") ? "grid" : "none";
+    actions.style.display =
+        (location && location.type !== "lake" && location.tideStation)
+            ? "grid"
+            : "none";
 }
 
 async function checkConditions() {
@@ -2535,11 +2877,15 @@ if (seaTidesCard) {
             marineData =
                 await marineResponse.json();
 
-            const tideResponse =
-                await fetch(tideUrl);
+            // Only locations with an Irish Marine Institute tide station
+            // use the Irish tide API. International locations use marine data.
+            if (selectedLocation.tideStation) {
+                const tideResponse =
+                    await fetch(tideUrl);
 
-            tideData =
-                await tideResponse.json();
+                tideData =
+                    await tideResponse.json();
+            }
 
         }
 
@@ -2612,21 +2958,21 @@ if (seaTidesCard) {
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
-                    🌡️ Air temperature: <strong>${current.temperature_2m}°C</strong><br>
-                    🏞️ Lake water temperature: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? lakeWaterTemperature.toFixed(1) : "Unavailable"}°C</strong><br>
-                    💨 Wind: <strong>${windSpeed} m/s ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
-                    ☁️ Conditions: <strong>${getWeatherDescription(current.weather_code)}</strong>
+                    🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
+                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Unavailable")}</strong><br>
+                    💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
+                    ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
             `;
 
             document.getElementById("recommendation").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="lake-summary">
-                    <strong>${assessment.condition}</strong>
+                    <strong>${translateString(assessment.condition)}</strong>
                 </div>
-                ${assessment.advice}<br><br>
-                <strong>📍 Sheltered side</strong><br>
-                ${assessment.impact}
+                ${translateString(assessment.advice)}<br><br>
+                <strong>📍 ${translateString("Sheltered side")}</strong><br>
+                ${translateString(assessment.impact)}
             `;
 
             document.getElementById("seaTidesCard").style.display = "none";
@@ -2645,6 +2991,124 @@ if (seaTidesCard) {
 const lakeForecastCard = document.getElementById("lakeForecastCard");
 if (lakeForecastCard) {
     lakeForecastCard.style.display = "none";
+}
+
+/*
+   INTERNATIONAL SEA / LAGOON LOCATIONS
+   ------------------------------------
+   Locations without a tideStation use Open-Meteo weather + marine data.
+   Irish Marine Institute tide information is only used for locations
+   that explicitly provide a tideStation.
+*/
+if (!selectedLocation.tideStation) {
+
+    const windSpeed = Number(current.wind_speed_10m);
+    const windDirectionDegrees = Number(current.wind_direction_10m);
+    const windDirection = getWindDirection(windDirectionDegrees);
+
+    const waveHeight = Number(marineData.current.wave_height);
+    const wavePeriod = Number(marineData.current.wave_period);
+    const waveDirection = Number(marineData.current.wave_direction);
+    const waterTemperature = Number(marineData.current.sea_surface_temperature);
+
+    const swimScore = calculateSwimScore(
+        waveHeight,
+        wavePeriod,
+        windSpeed,
+        windDirection
+    );
+
+    let rating;
+    if (swimScore >= 80) rating = "🟢 EXCELLENT CONDITIONS";
+    else if (swimScore >= 60) rating = "🟡 GOOD CONDITIONS";
+    else if (swimScore >= 40) rating = "🟠 CHALLENGING CONDITIONS";
+    else rating = "🔴 POOR CONDITIONS";
+
+    const reasons = [];
+
+    if (windDirection === "West") {
+        reasons.push("✅ Westerly wind - ideal direction");
+    } else if (windDirection.includes("North")) {
+        reasons.push("⚠️ Northerly wind - less favourable");
+    } else {
+        reasons.push("ℹ️ Wind direction: " + windDirection);
+    }
+
+    if (windSpeed <= 3) {
+        reasons.push("✅ Light wind (" + windSpeed + ")");
+    } else if (windSpeed <= 5) {
+        reasons.push("🟡 Moderate wind (" + windSpeed + ")");
+    } else {
+        reasons.push("🔴 Strong wind (" + windSpeed + ")");
+    }
+
+    if (waveHeight <= 0.5) {
+        reasons.push("✅ Small waves (" + waveHeight + " m)");
+    } else if (waveHeight <= 1) {
+        reasons.push("🟡 Moderate waves (" + waveHeight + " m)");
+    } else {
+        reasons.push("🔴 Large waves (" + waveHeight + " m)");
+    }
+
+    if (Number.isFinite(waterTemperature)) {
+        if (waterTemperature >= 15) {
+            reasons.push("✅ Comfortable water temperature (" + waterTemperature + "°C)");
+        } else if (waterTemperature >= 12) {
+            reasons.push("🟡 Cold water (" + waterTemperature + "°C)");
+        } else {
+            reasons.push("🔴 Very cold water (" + waterTemperature + "°C)");
+        }
+    }
+
+    document.getElementById("conditions").innerHTML = `
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+        ${translateString("Air temperature")}:
+        ${formatTemperature(current.temperature_2m, 1)}
+        <br>
+        ${translateString("Water temperature")}:
+        ${Number.isFinite(waterTemperature) ? formatTemperature(waterTemperature, 1) : "Unavailable"}
+        <br>
+        ${translateString("Wind speed")}:
+        ${formatWind(windSpeed, 1)}
+        <br>
+        ${translateString("Wind direction")}:
+        ${getCompassDirection(windDirectionDegrees)}
+        <br>
+        ${translateString("Conditions")}:
+        ${getWeatherDescription(current.weather_code)}
+        <br><br>
+        ${translateString("Wave height")}:
+        ${Number.isFinite(waveHeight) ? formatWaveHeight(waveHeight, 2) : "Unavailable"}
+        <br>
+        ${translateString("Wave period")}:
+        ${Number.isFinite(wavePeriod) ? wavePeriod + " s" : "Unavailable"}
+        <br>
+        ${translateString("Swell direction")}:
+        ${Number.isFinite(waveDirection)
+            ? getCompassDirection(waveDirection) + " (" + waveDirection.toFixed(0) + "°)"
+            : "Unavailable"}
+    `;
+
+    document.getElementById("recommendation").innerHTML = `
+        <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+        🏊 ${translateString("Swim Score")}:
+        ${swimScore}/100
+        <br>
+        ${rating}
+        <br><br>
+        ${reasons.join("<br>")}
+    `;
+
+    const seaTidesCard = document.getElementById("seaTidesCard");
+    const travelPlannerCard = document.getElementById("travelPlannerCard");
+    if (seaTidesCard) seaTidesCard.style.display = "none";
+    if (travelPlannerCard) travelPlannerCard.style.display = "none";
+
+    window.currentSeaTides = null;
+
+    // International locations still get the full 7-day weather/marine forecast.
+    loadSeaForecast(selectedLocation);
+    return;
 }
 
 
@@ -2836,7 +3300,7 @@ if (lakeForecastCard) {
 
                         — ${dateTime}
 
-                        — ${tide.height.toFixed(2)} m
+                        — ${formatTideHeight(tide.height, 2)}
 
                     </div>
                     `;
@@ -2890,7 +3354,7 @@ if (lakeForecastCard) {
                 ${nextDateTime}
 
                 —
-                ${nextTide.height.toFixed(2)} m
+                ${formatTideHeight(nextTide.height, 2)}
 
             </div>
             `;
@@ -2951,9 +3415,7 @@ if (lakeForecastCard) {
                     +
                     " — "
                     +
-                    tide.height.toFixed(2)
-                    +
-                    " m";
+                    formatTideHeight(tide.height, 2);
 
 
                 highTideSelect.appendChild(
@@ -2984,7 +3446,7 @@ if (lakeForecastCard) {
                 weekday: "long", day: "numeric", month: "long",
                 hour: "2-digit", minute: "2-digit", hour12: false,
                 timeZone: "Europe/Dublin"
-            }) + " — High " + tide.height.toFixed(2) + " m";
+            }) + " — High " + formatTideHeight(tide.height, 2);
             seaTideSelect.appendChild(option);
         });
 
@@ -3005,40 +3467,40 @@ if (lakeForecastCard) {
         ).innerHTML =
         `
         <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
-        🌡 Air temperature:
-        ${current.temperature_2m}°C
+        ${translateString("Air temperature")}:
+        ${formatTemperature(current.temperature_2m, 1)}
         <br>
 
-        🌊 Water temperature:
-        ${marineData.current.sea_surface_temperature}°C
+        ${translateString("Water temperature")}:
+        ${formatTemperature(marineData.current.sea_surface_temperature, 1)}
         <br>
 
-        💨 Wind speed:
-        ${current.wind_speed_10m} m/s
+        ${translateString("Wind speed")}:
+        ${formatWind(current.wind_speed_10m, 1)}
         <br>
 
-        🧭 Wind direction:
+        ${translateString("Wind direction")}:
         ${getWindDirection(
             current.wind_direction_10m
         )}
         <br>
 
-        ☁ Conditions:
+        ${translateString("Conditions")}:
         ${getWeatherDescription(
             current.weather_code
         )}
 
         <br><br>
 
-        🌊 Wave height:
-        ${marineData.current.wave_height} m
+        ${translateString("Wave height")}:
+        ${formatWaveHeight(marineData.current.wave_height, 2)}
         <br>
 
-        ⏱ Wave period:
+        ${translateString("Wave period")}:
         ${marineData.current.wave_period} s
         <br>
 
-        🌊 Swell direction:
+        ${translateString("Swell direction")}:
         ${getCompassDirection(
             marineData.current.wave_direction
         )}
@@ -3115,8 +3577,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "✅ Light wind (" +
-                current.wind_speed_10m +
-                " m/s)"
+                formatWind(current.wind_speed_10m, 1) +
+                ")"
             );
 
         }
@@ -3127,8 +3589,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🟡 Moderate wind (" +
-                current.wind_speed_10m +
-                " m/s)"
+                formatWind(current.wind_speed_10m, 1) +
+                ")"
             );
 
         }
@@ -3137,8 +3599,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🔴 Strong wind (" +
-                current.wind_speed_10m +
-                " m/s)"
+                formatWind(current.wind_speed_10m, 1) +
+                ")"
             );
 
         }
@@ -3150,8 +3612,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "✅ Small waves (" +
-                marineData.current.wave_height +
-                " m)"
+                formatWaveHeight(marineData.current.wave_height, 2) +
+                ")"
             );
 
         }
@@ -3162,8 +3624,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🟡 Moderate waves (" +
-                marineData.current.wave_height +
-                " m)"
+                formatWaveHeight(marineData.current.wave_height, 2) +
+                ")"
             );
 
         }
@@ -3172,8 +3634,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🔴 Large waves (" +
-                marineData.current.wave_height +
-                " m)"
+                formatWaveHeight(marineData.current.wave_height, 2) +
+                ")"
             );
 
         }
@@ -3186,9 +3648,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "✅ Comfortable water temperature (" +
-                marineData.current
-                    .sea_surface_temperature +
-                "°C)"
+                formatTemperature(marineData.current.sea_surface_temperature, 1) +
+                ")"
             );
 
         }
@@ -3200,9 +3661,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🟡 Cold water (" +
-                marineData.current
-                    .sea_surface_temperature +
-                "°C)"
+                formatTemperature(marineData.current.sea_surface_temperature, 1) +
+                ")"
             );
 
         }
@@ -3211,9 +3671,8 @@ if (lakeForecastCard) {
 
             reasons.push(
                 "🔴 Very cold water (" +
-                marineData.current
-                    .sea_surface_temperature +
-                "°C)"
+                formatTemperature(marineData.current.sea_surface_temperature, 1) +
+                ")"
             );
 
         }
@@ -3264,16 +3723,16 @@ if (lakeForecastCard) {
         ).innerHTML =
         `
 
-        🏊 Swim Score:
+        🏊 ${translateString("Swim Score")}:
         ${swimScore}/100
 
         <br>
 
-        ${rating}
+        ${translateString(rating)}
 
         <br><br>
 
-        ${reasons.join("<br>")}
+        ${translateString(reasons.join("<br>"))}
 
         `;
 
@@ -3322,17 +3781,17 @@ function getSeaForecastAssessment(waveHeight, wavePeriod, windSpeed, windDegrees
     else if (windDirection.includes("North")) reasons.push("⚠️ Northerly wind - less favourable");
     else reasons.push("ℹ️ Wind direction: " + windDirection);
 
-    if (Number(windSpeed) <= 3) reasons.push(`✅ Light wind (${Number(windSpeed).toFixed(1)} m/s)`);
-    else if (Number(windSpeed) <= 5) reasons.push(`🟡 Moderate wind (${Number(windSpeed).toFixed(1)} m/s)`);
-    else reasons.push(`🔴 Strong wind (${Number(windSpeed).toFixed(1)} m/s)`);
+    if (Number(windSpeed) <= 3) reasons.push(`✅ Light wind (${formatWind(windSpeed, 1)})`);
+    else if (Number(windSpeed) <= 5) reasons.push(`🟡 Moderate wind (${formatWind(windSpeed, 1)})`);
+    else reasons.push(`🔴 Strong wind (${formatWind(windSpeed, 1)})`);
 
-    if (Number(waveHeight) <= 0.5) reasons.push(`✅ Small waves (${Number(waveHeight).toFixed(2)} m)`);
-    else if (Number(waveHeight) <= 1) reasons.push(`🟡 Moderate waves (${Number(waveHeight).toFixed(2)} m)`);
-    else reasons.push(`🔴 Large waves (${Number(waveHeight).toFixed(2)} m)`);
+    if (Number(waveHeight) <= 0.5) reasons.push(`✅ Small waves (${formatWaveHeight(waveHeight, 2)})`);
+    else if (Number(waveHeight) <= 1) reasons.push(`🟡 Moderate waves (${formatWaveHeight(waveHeight, 2)})`);
+    else reasons.push(`🔴 Large waves (${formatWaveHeight(waveHeight, 2)})`);
 
-    if (Number(waterTemp) >= 15) reasons.push(`✅ Comfortable water temperature (${Number(waterTemp).toFixed(1)}°C)`);
-    else if (Number(waterTemp) >= 12) reasons.push(`🟡 Cold water (${Number(waterTemp).toFixed(1)}°C)`);
-    else reasons.push(`🔴 Very cold water (${Number(waterTemp).toFixed(1)}°C)`);
+    if (Number(waterTemp) >= 15) reasons.push(`✅ Comfortable water temperature (${formatTemperature(waterTemp, 1)})`);
+    else if (Number(waterTemp) >= 12) reasons.push(`🟡 Cold water (${formatTemperature(waterTemp, 1)})`);
+    else reasons.push(`🔴 Very cold water (${formatTemperature(waterTemp, 1)})`);
 
     return { score, rating, reasons };
 }
@@ -3356,7 +3815,7 @@ async function loadSeaForecast(selectedLocation) {
     card.style.display = "block";
     const seaLocationLabel = document.getElementById("seaForecastLocation");
     if (seaLocationLabel) seaLocationLabel.textContent = ` — ${getLocationDisplayName(selectedLocation)}`;
-    daysContainer.innerHTML = "<p>⏳ Loading sea forecast...</p>";
+    daysContainer.innerHTML = `<p>⏳ ${translateString("Loading sea forecast...")}</p>`;
     detail.style.display = "none";
 
     try {
@@ -3464,12 +3923,12 @@ async function loadSeaForecast(selectedLocation) {
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showSeaForecastDay(${index})">
-                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
-                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
+                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : formatForecastWeekday(day.date, false)}</div>
+                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString(getLanguageLocale(), {day:"numeric",month:"short"})}</div>
                 <div class="forecast-icon">${getWeatherIcon(day.weatherCode)}</div>
-                <div class="forecast-temp">${Math.round(day.maxTemp)}°</div>
-                <div class="forecast-wind">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</div>
-                <div class="forecast-condition">${day.assessment.rating.replace(" CONDITIONS", "")}</div>
+                <div class="forecast-temp">${formatTemperature(day.maxTemp, 0)}</div>
+                <div class="forecast-wind">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</div>
+                <div class="forecast-condition">${translateRatingShort(day.assessment.rating)}</div>
             </button>
         `).join("");
 
@@ -3483,7 +3942,7 @@ async function loadSeaForecast(selectedLocation) {
         }
     } catch (error) {
         console.error("SEA FORECAST ERROR:", error);
-        daysContainer.innerHTML = "⚠️ Unable to load the sea forecast. Please try again.";
+        daysContainer.innerHTML = `⚠️ ${translateString("Unable to load the sea forecast. Please try again.")}`;
     }
 }
 
@@ -3503,10 +3962,8 @@ function showSeaForecastDay(index) {
     );
 
     const dateText = isForecastToday(day.date)
-        ? "Today"
-        : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
-            weekday:"long", day:"numeric", month:"long"
-        });
+        ? translateString("Today")
+        : formatForecastWeekday(day.date, true);
 
     const isMobile = window.matchMedia("(max-width: 599px)").matches;
 
@@ -3516,15 +3973,15 @@ function showSeaForecastDay(index) {
             <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
             <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
             <div class="mobile-day-summary">
-                <strong>${day.assessment.rating}</strong>
-                ${day.assessment.reasons.slice(0, 2).join(" · ")}<br>
-                🏊 Swim score: <strong style="display:inline;font-size:17px;">${day.assessment.score}/100</strong>
+                <strong>${translateString(day.assessment.rating)}</strong>
+                ${translateString(day.assessment.reasons.slice(0, 2).join(" · "))}<br>
+                🏊 ${translateString("Swim Score")} : <strong style="display:inline;font-size:17px;">${day.assessment.score}/100</strong>
             </div>
             <div class="mobile-forecast-actions">
-                <button type="button" onclick="showMobileSeaTides(${index})">🌊 Show tides for this day</button>
-                <button type="button" onclick="openMobileTravelPlanner(${index})">🚗 Make travel plans</button>
-                <button type="button" class="secondary-action" onclick="showMobileSeaForecastDetails(${index})">ℹ️ Show full forecast details</button>
-                <button type="button" class="secondary-action close-action" onclick="closeSeaForecastDetail()">Close</button>
+                <button type="button" onclick="showMobileSeaTides(${index})">🌊 ${translateString("Show tides for this day")}</button>
+                <button type="button" onclick="openMobileTravelPlanner(${index})">🚗 ${translateString("Make travel plans")}</button>
+                <button type="button" class="secondary-action" onclick="showMobileSeaForecastDetails(${index})">ℹ️ ${translateString("Show full forecast details")}</button>
+                <button type="button" class="secondary-action close-action" onclick="closeSeaForecastDetail()">${translateString("Close")}</button>
             </div>
             <div id="mobileSeaExtraPanel"></div>
         `;
@@ -3533,23 +3990,23 @@ function showSeaForecastDay(index) {
             <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
             <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
             <div class="sea-forecast-summary">
-                <strong>${day.assessment.rating}</strong><br>
-                ${day.assessment.reasons.slice(0, 2).join(" · ")}<br><br>
-                ${day.assessment.reasons.slice(2).join("<br>")}
+                <strong>${translateString(day.assessment.rating)}</strong><br>
+                ${translateString(day.assessment.reasons.slice(0, 2).join(" · "))}<br><br>
+                ${translateString(day.assessment.reasons.slice(2).join("<br>"))}
             </div>
             <div class="forecast-metrics">
-                <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Air temperature")}</span><span class="forecast-metric-value">${formatTemperature(day.maxTemp, 0)} / ${formatTemperature(day.minTemp, 0)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 1)} ${getCompassDirection(day.direction)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 1)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain}%</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Sea water")}</span><span class="forecast-metric-value">${formatTemperature(day.water, 1)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wave height")}</span><span class="forecast-metric-value">${formatWaveHeight(day.wave, 2)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wave period")}</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Swell direction")}</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
             </div>
             <div style="margin-top:14px;font-size:20px;font-weight:bold;color:#006994;">
-                🏊 Predicted Swim Score: ${day.assessment.score}/100
+                🏊 ${translateString("Predicted Swim Score")}: ${day.assessment.score}/100
             </div>
         `;
     }
@@ -3586,7 +4043,7 @@ function showMobileSeaTides(index) {
         <div class="mobile-extra-panel">
             <h4>🌊 Tides for ${new Date(date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"long", day:"numeric", month:"long"})}</h4>
             ${tides.length ? tides.map(tide => `
-                <div class="mobile-tide-row"><strong>${tide.type}</strong><br>${new Date(tide.time).toLocaleTimeString("en-IE", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Dublin"})} — ${Number(tide.height).toFixed(2)} m</div>
+                <div class="mobile-tide-row"><strong>${tide.type}</strong><br>${new Date(tide.time).toLocaleTimeString("en-IE", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Dublin"})} — ${formatTideHeight(tide.height, 2)}</div>
             `).join("") : "<p>No tide information is available for this day.</p>"}
         </div>`;
 }
@@ -3598,16 +4055,16 @@ function showMobileSeaForecastDetails(index) {
     const day = state.forecast[index];
     panel.innerHTML = `
         <div class="mobile-extra-panel">
-            <h4>📋 Full forecast</h4>
+            <h4>📋 ${translateString("Full forecast")}</h4>
             <div class="forecast-metrics">
-                <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${day.wind.toFixed(1)} m/s ${getCompassDirection(day.direction)}</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${day.gust.toFixed(1)} m/s</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain}%</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Sea water</span><span class="forecast-metric-value">${day.water.toFixed(1)}°C</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wave height</span><span class="forecast-metric-value">${day.wave.toFixed(2)} m</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Wave period</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
-                <div class="forecast-metric"><span class="forecast-metric-label">Swell direction</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Air temperature")}</span><span class="forecast-metric-value">${formatTemperature(day.maxTemp, 0)} / ${formatTemperature(day.minTemp, 0)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 1)} ${getCompassDirection(day.direction)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 1)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain}%</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Sea water")}</span><span class="forecast-metric-value">${formatTemperature(day.water, 1)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wave height")}</span><span class="forecast-metric-value">${formatWaveHeight(day.wave, 2)}</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wave period")}</span><span class="forecast-metric-value">${day.period.toFixed(1)} s</span></div>
+                <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Swell direction")}</span><span class="forecast-metric-value">${getCompassDirection(day.waveDirection)} (${day.waveDirection.toFixed(0)}°)</span></div>
             </div>
         </div>`;
 }
@@ -3641,7 +4098,7 @@ function openMobileTravelPlanner(index) {
             <button type="button" class="mobile-forecast-close"
                     onclick="closeMobileTideChoice()" aria-label="Close">✕</button>
             <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
-            <h3>🚗 Plan your swim</h3>
+            <h3>🚗 ${translateString("Plan your swim")}</h3>
             <p><strong>${dateText}</strong></p>
             <p>Select the <strong>high tide</strong> you want to swim for:</p>
             <select id="mobileTravelTideSelect">
@@ -3651,7 +4108,7 @@ function openMobileTravelPlanner(index) {
                         ${tide.time.toLocaleTimeString("en-IE", {
                             hour:"2-digit", minute:"2-digit", hour12:false,
                             timeZone:"Europe/Dublin"
-                        })} — ${Number(tide.height).toFixed(2)} m
+                        })} — ${formatTideHeight(tide.height, 2)}
                     </option>
                 `).join("")}
             </select>
@@ -3798,7 +4255,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
     card.style.display = "block";
     const lakeLocationLabel = document.getElementById("lakeForecastLocation");
     if (lakeLocationLabel) lakeLocationLabel.textContent = ` — ${getLocationDisplayName(selectedLocation)}`;
-    daysContainer.innerHTML = "<p>⏳ Loading lake forecast...</p>";
+    daysContainer.innerHTML = `<p>⏳ ${translateString("Loading lake forecast...")}</p>`;
     detail.style.display = "none";
 
     try {
@@ -3871,12 +4328,12 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showLakeForecastDay(${index})">
-                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"short"})}</div>
-                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {day:"numeric",month:"short"})}</div>
+                <div class="forecast-day-name">${isForecastToday(day.date) ? "Today" : formatForecastWeekday(day.date, false)}</div>
+                <div class="forecast-day-date">${isForecastToday(day.date) ? "" : new Date(day.date + "T12:00:00").toLocaleDateString(getLanguageLocale(), {day:"numeric",month:"short"})}</div>
                 <div class="forecast-icon">${getWeatherIcon(day.weatherCode)}</div>
-                <div class="forecast-temp">${Math.round(day.maxTemp)}°</div>
-                <div class="forecast-wind">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</div>
-                <div class="forecast-condition">${day.assessment.condition}</div>
+                <div class="forecast-temp">${formatTemperature(day.maxTemp, 0)}</div>
+                <div class="forecast-wind">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</div>
+                <div class="forecast-condition">${translateString(day.assessment.condition)}</div>
             </button>
         `).join("");
 
@@ -3892,7 +4349,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
 
     } catch (error) {
         console.error("LAKE FORECAST ERROR:", error);
-        daysContainer.innerHTML = "⚠️ Unable to load the lake forecast. Please try again.";
+        daysContainer.innerHTML = `⚠️ ${translateString("Unable to load the lake forecast. Please try again.")}`;
     }
 }
 
@@ -3909,10 +4366,8 @@ function showLakeForecastDay(index) {
     );
 
     const dateText = isForecastToday(day.date)
-        ? "Today"
-        : new Date(day.date + "T12:00:00").toLocaleDateString("en-IE", {
-            weekday:"long", day:"numeric", month:"long"
-        });
+        ? translateString("Today")
+        : formatForecastWeekday(day.date, true);
 
     const isMobile = window.matchMedia("(max-width: 599px)").matches;
 
@@ -3921,22 +4376,22 @@ function showLakeForecastDay(index) {
         <div class="mobile-context-location">📍 ${getLocationDisplayName(state.location)}</div>
         <h3>${getWeatherIcon(day.weatherCode)} ${dateText}</h3>
         <div class="lake-summary">
-            <strong>${day.assessment.condition}</strong><br>
-            ${day.assessment.impact}<br><br>
-            ${day.assessment.advice}
+            <strong>${translateString(day.assessment.condition)}</strong><br>
+            ${translateString(day.assessment.impact)}<br><br>
+            ${translateString(day.assessment.advice)}
         </div>
         <div class="forecast-metrics">
-            <div class="forecast-metric"><span class="forecast-metric-label">Air temperature</span><span class="forecast-metric-value">${Math.round(day.maxTemp)}°C / ${Math.round(day.minTemp)}°C</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Wind</span><span class="forecast-metric-value">${Math.round(day.wind)} m/s ${getCompassDirection(day.direction)}</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Gusts</span><span class="forecast-metric-value">${Math.round(day.gust)} m/s</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Rain probability</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Lake water</span><span class="forecast-metric-value">${state.waterTemp !== null ? state.waterTemp.toFixed(1) + "°C" : "Unavailable"}</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">Weather</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Air temperature")}</span><span class="forecast-metric-value">${formatTemperature(day.maxTemp, 0)} / ${formatTemperature(day.minTemp, 0)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : "Unavailable"}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
         ${isMobile ? `
             <div class="mobile-forecast-actions lake-mobile-actions">
-                <button type="button" class="secondary-action close-action" onclick="closeLakeForecastDetail()">Close</button>
+                <button type="button" class="secondary-action close-action" onclick="closeLakeForecastDetail()">${translateString("Close")}</button>
             </div>
         ` : ""}
     `;
@@ -4312,22 +4767,22 @@ async function predictSwimConditions() {
             <hr class="prediction-divider">
 
             🌡️ Air temperature:
-            <strong>${temperature}°C</strong>
+            <strong>${formatTemperature(temperature, 1)}</strong>
             <br>
 
-            🌊 Water temperature:
-            <strong>${waterTemperature}°C</strong>
+            ${translateString("Water temperature")}:
+            <strong>${formatTemperature(waterTemperature, 1)}</strong>
             <br>
 
             💨 Wind:
             <strong>
-                ${windSpeed} m/s
+                ${formatWind(windSpeed, 1)}
                 ${windDirectionText}
             </strong>
             <br>
 
             💨 Gusts:
-            <strong>${windGusts} m/s</strong>
+            <strong>${formatWind(windGusts, 1)}</strong>
             <br>
 
             🌧️ Rain probability:
@@ -4343,8 +4798,8 @@ async function predictSwimConditions() {
 
             <br><br>
 
-            🌊 Wave height:
-            <strong>${waveHeight} m</strong>
+            ${translateString("Wave height")}:
+            <strong>${formatWaveHeight(waveHeight, 2)}</strong>
             <br>
 
             ⏱️ Wave period:
@@ -4358,7 +4813,7 @@ async function predictSwimConditions() {
 
             <div class="prediction-score">
 
-                🏊 Predicted Swim Score:
+                🏊 ${translateString("Predicted Swim Score")}:
                 ${swimScore}/100
 
             </div>
@@ -4635,7 +5090,7 @@ async function calculateJourney() {
                 🛣️ <strong>Driving distance:</strong>
                 <br>
 
-                ${distanceKm.toFixed(1)} km
+                ${formatDistance(distanceKm, 1)}
 
                 <br><br>
 
@@ -4730,6 +5185,785 @@ async function calculateJourney() {
 }
 
 
+
+/* =========================
+   LANGUAGE SELECTION
+   =========================
+   Top 5 languages by total number of speakers:
+   English, Mandarin Chinese, Hindi, Spanish and French.
+*/
+
+const SWIM_LANGUAGE_KEY = "swimLanguage";
+
+const languageNames = {
+    en: "English",
+    zh: "中文",
+    hi: "हिन्दी",
+    es: "Español",
+    fr: "Français"
+};
+
+const languageText = {
+    en: {
+        "How to Use the Swim Planner": "How to Use the Swim Planner",
+        "How to Use": "How to Use",
+        "App Version": "App Version",
+        "Dark Theme": "Dark Theme",
+        "Light Theme": "Light Theme",
+        "Units": "Units",
+        "Language": "Language",
+        "Choose Swim Location": "Choose Swim Location",
+        "Current Conditions": "Current Conditions",
+        "Swim Recommendation": "Swim Recommendation",
+        "Sea Forecast": "Sea Forecast",
+        "Lake Forecast": "Lake Forecast",
+        "Tide Outlook": "Tide Outlook",
+        "Journey Planner": "Journey Planner",
+        "Click for tide info": "Click for tide info",
+        "Click to plan your journey": "Click to plan your journey",
+        "Show current conditions": "Show current conditions",
+        "Select a day to see the expected weather, wind, waves and sea conditions.": "Select a day to see the expected weather, wind, waves and sea conditions.",
+        "Select a day to see the expected weather, wind and lake conditions.": "Select a day to see the expected weather, wind and lake conditions.",
+        "Select a high tide to see the surrounding tide times.": "Select a high tide to see the surrounding tide times.",
+        "Choose the high tide you want to swim for:": "Choose the high tide you want to swim for:",
+        "Calculate Journey From My Location": "Calculate Journey From My Location",
+        "Predict Swim Conditions": "Predict Swim Conditions",
+        "Check swim conditions first...": "Check swim conditions first...",
+        "Waiting for location and tide information...": "Waiting for location and tide information...",
+        "Select a location and check conditions.": "Select a location and check conditions.",
+        "Waiting for data...": "Waiting for data...",
+        "Getting current conditions...": "Getting current conditions...",
+        "Loading conditions...": "Loading conditions...",
+        "Loading recommendation...": "Loading recommendation...",
+        "Loading sea forecast...": "Loading sea forecast...",
+        "Loading lake forecast...": "Loading lake forecast...",
+        "Unable to load the sea forecast. Please try again.": "Unable to load the sea forecast. Please try again.",
+        "Unable to load the lake forecast. Please try again.": "Unable to load the lake forecast. Please try again.",
+        "Please choose a high tide first.": "Please choose a high tide first.",
+        "Getting forecast conditions for your swim...": "Getting forecast conditions for your swim...",
+        "Swim Score": "Swim Score",
+        "Excellent conditions": "Excellent conditions",
+        "Good conditions": "Good conditions",
+        "Challenging conditions": "Challenging conditions",
+        "Poor conditions": "Poor conditions",
+        "Air temperature": "Air temperature",
+        "Water temperature": "Water temperature",
+        "Wind speed": "Wind speed",
+        "Wind direction": "Wind direction",
+        "Gusts": "Gusts",
+        "Rain probability": "Rain probability",
+        "Wave height": "Wave height",
+        "Wave period": "Wave period",
+        "Wave direction": "Wave direction",
+        "Swell direction": "Swell direction",
+        "Lake water": "Lake water",
+        "Sea water": "Sea water",
+        "Unavailable": "Unavailable",
+        "Today": "Today",
+        "Close": "Close",
+        "Phone": "Phone",
+        "Desktop PC": "Desktop PC",
+        "Lake Locations": "Lake Locations",
+        "Sea Locations": "Sea Locations",
+        "Lagoon Locations": "Lagoon Locations"
+    },
+    zh: {
+        "How to Use the Swim Planner": "游泳规划器使用指南",
+        "How to Use": "使用指南", "App Version": "应用版本",
+        "Dark Theme": "深色主题", "Light Theme": "浅色主题",
+        "Units": "单位", "Language": "语言",
+        "Choose Swim Location": "选择游泳地点", "Current Conditions": "当前条件",
+        "Swim Recommendation": "游泳建议", "Sea Forecast": "海况预报",
+        "Lake Forecast": "湖泊预报", "Tide Outlook": "潮汐预报",
+        "Journey Planner": "行程规划", "Click for tide info": "查看潮汐信息",
+        "Click to plan your journey": "规划行程", "Show current conditions": "显示当前条件",
+        "Select a day to see the expected weather, wind, waves and sea conditions.": "选择日期查看预计天气、风、海浪和海况。",
+        "Select a day to see the expected weather, wind and lake conditions.": "选择日期查看预计天气、风和湖泊条件。",
+        "Select a high tide to see the surrounding tide times.": "选择高潮以查看前后潮汐时间。",
+        "Choose the high tide you want to swim for:": "选择您想要游泳时对应的高潮：",
+        "Calculate Journey From My Location": "从我的位置计算行程",
+        "Predict Swim Conditions": "预测游泳条件",
+        "Check swim conditions first...": "请先检查游泳条件...",
+        "Waiting for location and tide information...": "等待地点和潮汐信息...",
+        "Select a location and check conditions.": "选择地点并查看条件。",
+        "Waiting for data...": "等待数据...",
+        "Getting current conditions...": "正在获取当前条件...",
+        "Loading conditions...": "正在加载条件...", "Loading recommendation...": "正在加载建议...",
+        "Loading sea forecast...": "正在加载海况预报...", "Loading lake forecast...": "正在加载湖泊预报...",
+        "Unable to load the sea forecast. Please try again.": "无法加载海况预报，请重试。",
+        "Unable to load the lake forecast. Please try again.": "无法加载湖泊预报，请重试。",
+        "Please choose a high tide first.": "请先选择高潮。",
+        "Getting forecast conditions for your swim...": "正在获取游泳预报条件...",
+        "Swim Score": "游泳评分", "Excellent conditions": "条件极佳",
+        "Good conditions": "条件良好", "Challenging conditions": "条件具有挑战性",
+        "Poor conditions": "条件较差", "Air temperature": "气温",
+        "Water temperature": "水温", "Wind speed": "风速", "Wind direction": "风向",
+        "Gusts": "阵风", "Rain probability": "降雨概率", "Wave height": "浪高",
+        "Wave period": "浪周期", "Wave direction": "浪向", "Swell direction": "涌浪方向",
+        "Lake water": "湖水", "Sea water": "海水", "Unavailable": "暂无数据",
+        "Today": "今天", "Close": "关闭", "Phone": "手机", "Desktop PC": "桌面电脑",
+        "Lake Locations": "湖泊地点", "Sea Locations": "海滨地点", "Lagoon Locations": "泻湖地点"
+    },
+    hi: {
+        "How to Use the Swim Planner": "स्विम प्लानर का उपयोग कैसे करें",
+        "How to Use": "कैसे उपयोग करें", "App Version": "ऐप संस्करण",
+        "Dark Theme": "डार्क थीम", "Light Theme": "लाइट थीम",
+        "Units": "इकाइयाँ", "Language": "भाषा",
+        "Choose Swim Location": "तैराकी स्थान चुनें", "Current Conditions": "वर्तमान स्थितियाँ",
+        "Swim Recommendation": "तैराकी सुझाव", "Sea Forecast": "समुद्री पूर्वानुमान",
+        "Lake Forecast": "झील का पूर्वानुमान", "Tide Outlook": "ज्वार पूर्वानुमान",
+        "Journey Planner": "यात्रा योजनाकार", "Click for tide info": "ज्वार की जानकारी देखें",
+        "Click to plan your journey": "अपनी यात्रा की योजना बनाएँ",
+        "Show current conditions": "वर्तमान स्थितियाँ दिखाएँ",
+        "Select a day to see the expected weather, wind, waves and sea conditions.": "अपेक्षित मौसम, हवा, लहरें और समुद्री स्थितियाँ देखने के लिए दिन चुनें।",
+        "Select a day to see the expected weather, wind and lake conditions.": "अपेक्षित मौसम, हवा और झील की स्थितियाँ देखने के लिए दिन चुनें।",
+        "Select a high tide to see the surrounding tide times.": "आसपास के ज्वार के समय देखने के लिए उच्च ज्वार चुनें।",
+        "Choose the high tide you want to swim for:": "जिस उच्च ज्वार पर तैरना है उसे चुनें:",
+        "Calculate Journey From My Location": "मेरे स्थान से यात्रा की गणना करें",
+        "Predict Swim Conditions": "तैराकी स्थितियों का अनुमान लगाएँ",
+        "Check swim conditions first...": "पहले तैराकी की स्थितियाँ जाँचें...",
+        "Waiting for location and tide information...": "स्थान और ज्वार की जानकारी की प्रतीक्षा...",
+        "Select a location and check conditions.": "स्थान चुनें और स्थितियाँ जाँचें।",
+        "Waiting for data...": "डेटा की प्रतीक्षा...",
+        "Getting current conditions...": "वर्तमान स्थितियाँ प्राप्त हो रही हैं...",
+        "Loading conditions...": "स्थितियाँ लोड हो रही हैं...", "Loading recommendation...": "सुझाव लोड हो रहा है...",
+        "Loading sea forecast...": "समुद्री पूर्वानुमान लोड हो रहा है...", "Loading lake forecast...": "झील का पूर्वानुमान लोड हो रहा है...",
+        "Unable to load the sea forecast. Please try again.": "समुद्री पूर्वानुमान लोड नहीं हो सका। फिर से प्रयास करें।",
+        "Unable to load the lake forecast. Please try again.": "झील का पूर्वानुमान लोड नहीं हो सका। फिर से प्रयास करें।",
+        "Please choose a high tide first.": "कृपया पहले उच्च ज्वार चुनें।",
+        "Getting forecast conditions for your swim...": "आपकी तैराकी के लिए पूर्वानुमान प्राप्त हो रहा है...",
+        "Swim Score": "तैराकी स्कोर", "Excellent conditions": "उत्कृष्ट स्थितियाँ",
+        "Good conditions": "अच्छी स्थितियाँ", "Challenging conditions": "चुनौतीपूर्ण स्थितियाँ",
+        "Poor conditions": "खराब स्थितियाँ", "Air temperature": "हवा का तापमान",
+        "Water temperature": "पानी का तापमान", "Wind speed": "हवा की गति", "Wind direction": "हवा की दिशा",
+        "Gusts": "हवा के झोंके", "Rain probability": "बारिश की संभावना", "Wave height": "लहरों की ऊँचाई",
+        "Wave period": "लहरों की अवधि", "Wave direction": "लहरों की दिशा", "Swell direction": "स्वेल की दिशा",
+        "Lake water": "झील का पानी", "Sea water": "समुद्र का पानी", "Unavailable": "उपलब्ध नहीं",
+        "Today": "आज", "Close": "बंद करें", "Phone": "फोन", "Desktop PC": "डेस्कटॉप कंप्यूटर",
+        "Lake Locations": "झील के स्थान", "Sea Locations": "समुद्री स्थान", "Lagoon Locations": "लैगून स्थान"
+    },
+    es: {
+        "How to Use the Swim Planner": "Cómo usar el planificador de natación",
+        "How to Use": "Cómo usar", "App Version": "Versión de la app",
+        "Dark Theme": "Tema oscuro", "Light Theme": "Tema claro",
+        "Units": "Unidades", "Language": "Idioma",
+        "Choose Swim Location": "Elegir lugar de natación", "Current Conditions": "Condiciones actuales",
+        "Swim Recommendation": "Recomendación de natación", "Sea Forecast": "Pronóstico del mar",
+        "Lake Forecast": "Pronóstico del lago", "Tide Outlook": "Pronóstico de mareas",
+        "Journey Planner": "Planificador de viaje", "Click for tide info": "Ver información de mareas",
+        "Click to plan your journey": "Planificar tu viaje", "Show current conditions": "Mostrar condiciones actuales",
+        "Select a day to see the expected weather, wind, waves and sea conditions.": "Selecciona un día para ver el tiempo, viento, olas y condiciones del mar previstas.",
+        "Select a day to see the expected weather, wind and lake conditions.": "Selecciona un día para ver el tiempo, viento y condiciones del lago previstas.",
+        "Select a high tide to see the surrounding tide times.": "Selecciona una marea alta para ver los horarios de marea cercanos.",
+        "Choose the high tide you want to swim for:": "Elige la marea alta para la que quieres nadar:",
+        "Calculate Journey From My Location": "Calcular viaje desde mi ubicación",
+        "Predict Swim Conditions": "Predecir condiciones de natación",
+        "Check swim conditions first...": "Comprueba primero las condiciones de natación...",
+        "Waiting for location and tide information...": "Esperando información de ubicación y mareas...",
+        "Select a location and check conditions.": "Selecciona una ubicación y comprueba las condiciones.",
+        "Waiting for data...": "Esperando datos...", "Getting current conditions...": "Obteniendo condiciones actuales...",
+        "Loading conditions...": "Cargando condiciones...", "Loading recommendation...": "Cargando recomendación...",
+        "Loading sea forecast...": "Cargando pronóstico del mar...", "Loading lake forecast...": "Cargando pronóstico del lago...",
+        "Unable to load the sea forecast. Please try again.": "No se pudo cargar el pronóstico del mar. Inténtalo de nuevo.",
+        "Unable to load the lake forecast. Please try again.": "No se pudo cargar el pronóstico del lago. Inténtalo de nuevo.",
+        "Please choose a high tide first.": "Elige primero una marea alta.",
+        "Getting forecast conditions for your swim...": "Obteniendo las condiciones previstas para tu natación...",
+        "Swim Score": "Puntuación de natación", "Excellent conditions": "Condiciones excelentes",
+        "Good conditions": "Buenas condiciones", "Challenging conditions": "Condiciones difíciles",
+        "Poor conditions": "Malas condiciones", "Air temperature": "Temperatura del aire",
+        "Water temperature": "Temperatura del agua", "Wind speed": "Velocidad del viento", "Wind direction": "Dirección del viento",
+        "Gusts": "Ráfagas", "Rain probability": "Probabilidad de lluvia", "Wave height": "Altura de las olas",
+        "Wave period": "Período de las olas", "Wave direction": "Dirección de las olas", "Swell direction": "Dirección del oleaje",
+        "Lake water": "Agua del lago", "Sea water": "Agua del mar", "Unavailable": "No disponible",
+        "Today": "Hoy", "Close": "Cerrar", "Phone": "Teléfono", "Desktop PC": "PC de escritorio",
+        "Lake Locations": "Lugares de lago", "Sea Locations": "Lugares de mar", "Lagoon Locations": "Lugares de laguna"
+    },
+    fr: {
+        "How to Use the Swim Planner": "Comment utiliser le planificateur de natation",
+        "How to Use": "Comment utiliser", "App Version": "Version de l'application",
+        "Dark Theme": "Thème sombre", "Light Theme": "Thème clair",
+        "Units": "Unités", "Language": "Langue",
+        "Choose Swim Location": "Choisir le lieu de baignade", "Current Conditions": "Conditions actuelles",
+        "Swim Recommendation": "Recommandation de baignade", "Sea Forecast": "Prévisions marines",
+        "Lake Forecast": "Prévisions du lac", "Tide Outlook": "Prévisions des marées",
+        "Journey Planner": "Planificateur de trajet", "Click for tide info": "Voir les informations de marée",
+        "Click to plan your journey": "Planifier votre trajet", "Show current conditions": "Afficher les conditions actuelles",
+        "Select a day to see the expected weather, wind, waves and sea conditions.": "Sélectionnez un jour pour voir la météo, le vent, les vagues et les conditions marines prévues.",
+        "Select a day to see the expected weather, wind and lake conditions.": "Sélectionnez un jour pour voir la météo, le vent et les conditions du lac prévues.",
+        "Select a high tide to see the surrounding tide times.": "Sélectionnez une marée haute pour voir les horaires de marée environnants.",
+        "Choose the high tide you want to swim for:": "Choisissez la marée haute pour laquelle vous souhaitez nager :",
+        "Calculate Journey From My Location": "Calculer le trajet depuis ma position",
+        "Predict Swim Conditions": "Prévoir les conditions de baignade",
+        "Check swim conditions first...": "Vérifiez d'abord les conditions de baignade...",
+        "Waiting for location and tide information...": "En attente des informations de lieu et de marée...",
+        "Select a location and check conditions.": "Sélectionnez un lieu et vérifiez les conditions.",
+        "Waiting for data...": "En attente des données...", "Getting current conditions...": "Obtention des conditions actuelles...",
+        "Loading conditions...": "Chargement des conditions...", "Loading recommendation...": "Chargement de la recommandation...",
+        "Loading sea forecast...": "Chargement des prévisions marines...", "Loading lake forecast...": "Chargement des prévisions du lac...",
+        "Unable to load the sea forecast. Please try again.": "Impossible de charger les prévisions marines. Veuillez réessayer.",
+        "Unable to load the lake forecast. Please try again.": "Impossible de charger les prévisions du lac. Veuillez réessayer.",
+        "Please choose a high tide first.": "Veuillez d'abord choisir une marée haute.",
+        "Getting forecast conditions for your swim...": "Obtention des conditions prévues pour votre baignade...",
+        "Swim Score": "Score de baignade", "Excellent conditions": "Excellentes conditions",
+        "Good conditions": "Bonnes conditions", "Challenging conditions": "Conditions difficiles",
+        "Poor conditions": "Mauvaises conditions", "Air temperature": "Température de l'air",
+        "Water temperature": "Température de l'eau", "Wind speed": "Vitesse du vent", "Wind direction": "Direction du vent",
+        "Gusts": "Rafales", "Rain probability": "Probabilité de pluie", "Wave height": "Hauteur des vagues",
+        "Wave period": "Période des vagues", "Wave direction": "Direction des vagues", "Swell direction": "Direction de la houle",
+        "Lake water": "Eau du lac", "Sea water": "Eau de mer", "Unavailable": "Indisponible",
+        "Today": "Aujourd'hui", "Close": "Fermer", "Phone": "Téléphone", "Desktop PC": "Ordinateur",
+        "Lake Locations": "Lieux de lac", "Sea Locations": "Lieux de mer", "Lagoon Locations": "Lieux de lagon"
+    }
+};
+
+function getLanguage() {
+    const saved = localStorage.getItem(SWIM_LANGUAGE_KEY);
+    return languageText[saved] ? saved : "en";
+}
+
+function changeLanguage(language) {
+    if (!languageText[language]) language = "en";
+    localStorage.setItem(SWIM_LANGUAGE_KEY, language);
+    document.documentElement.lang = language;
+    document.documentElement.dir = "ltr";
+    updateLanguageMenu();
+    translatePage();
+
+    // Re-render the currently selected location so dynamic forecast/condition
+    // content is regenerated from English and then translated consistently.
+    const locationSelect = document.getElementById("locationSelect");
+    if (locationSelect && locationSelect.value && typeof checkConditions === "function") {
+        checkConditions().finally(() => queueLanguageTranslation());
+    }
+
+    closeMenu();
+}
+
+function updateLanguageMenu() {
+    const select = document.getElementById("languageSelect");
+    if (select) select.value = getLanguage();
+}
+
+
+const extraLanguageText = {
+    "zh": {
+        "Sea Swim Planner": "海泳规划器",
+        "Open Water Swim Planner": "开放水域游泳规划器",
+        "Sea & lake conditions, forecasts and swim planning": "海洋与湖泊状况、预报和游泳规划",
+        "7-DAY OUTLOOK": "7天预报",
+        "SWIM LOCATION": "游泳地点",
+        "How to Use the Swim Planner": "游泳规划器使用指南",
+        "Choose your swim location.": "选择您的游泳地点。",
+        "Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.": "应用打开时默认选择Youghal Quay。如有需要，请从地点菜单选择其他海边或湖泊地点。",
+        "View the forecast.": "查看预报。",
+        "The forecast loads automatically when you choose a location. The 7-day forecast is the main view.": "选择地点后预报会自动加载。7天预报是主要视图。",
+        "Select a day.": "选择日期。",
+        "Tap a forecast day to open the information for that day. If the selected day is today, it is shown as": "点击预报日期查看当天信息。如果选择的是今天，会显示为",
+        "Current conditions.": "当前状况。",
+        "Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.": "为了减少手机页面的杂乱，当前状况和游泳建议不会显示在手机主视图中，但会在桌面版主视图中提供。",
+        "Sea locations — Tide Info.": "海边地点 — 潮汐信息。",
+        "When viewing a sea forecast day, choose the tide option if you want tide information for that date.": "查看海洋预报日期时，如需当天潮汐信息，请选择潮汐选项。",
+        "Sea locations — Make Travel Plans.": "海边地点 — 制定行程。",
+        "Make travel plans": "制定行程",
+        "for the forecast day. You will first be asked to choose the high tide you want to swim for. After selecting the tide, continue to the Journey Planner to see the travel plan.": "查看预报日期。系统会先要求您选择计划游泳时段的高潮。选择潮汐后，进入行程规划查看行程。",
+        "Lake locations.": "湖泊地点。",
+        "Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.": "湖泊预报不使用海洋潮汐信息。选择预报日期即可查看当天湖泊信息。",
+        "Close a pop-up.": "关闭弹出窗口。",
+        "Use the Close button or X when available.": "如有关闭按钮或X，请使用它。",
+        "Desktop PC": "桌面电脑",
+        "Youghal Quay is the default location when the app opens. Selecting a location automatically loads its current conditions, Swim Recommendation and forecast.": "应用打开时默认选择Youghal Quay。选择地点后会自动加载当前状况、游泳建议和预报。",
+        "The 7-day forecast is displayed for the selected location. Select a forecast day to view the detailed information for that day. If the selected day is today, it is shown as": "所选地点会显示7天预报。选择某天即可查看详细信息。如果选择的是今天，会显示为",
+        "For sea locations, use": "对于海边地点，请使用",
+        "when you want to see the tide information. It opens in a separate panel so the main forecast screen stays uncluttered.": "查看潮汐信息。潮汐信息会在独立面板中打开，以保持主预报页面整洁。",
+        "Sea locations — Journey Planner.": "海边地点 — 行程规划。",
+        "Use": "使用",
+        "when you want to open the Journey Planner in a separate panel.": "打开独立的行程规划面板。",
+        "Close information panels.": "关闭信息面板。",
+        "Use the X/Close control in the panel. You can also click outside the panel to close it.": "使用面板中的X/关闭控件。也可以点击面板外部关闭。",
+        "Lake locations do not display the sea Tide Info or Journey Planner buttons. The lake forecast is presented using lake-specific information.": "湖泊地点不会显示海洋潮汐信息或行程规划按钮。湖泊预报使用针对湖泊的信息。",
+        "Units.": "单位。",
+        "Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.": "使用顶部菜单中的单位选项，在公制（km、°C、米）和英制（英里、°F、英尺）之间切换。风速会在m/s和mph之间切换。",
+        "Light / Dark theme.": "浅色/深色主题。",
+        "Use the theme option in the header to switch themes. Dark theme is the default.": "使用顶部的主题选项切换主题。默认使用深色主题。",
+        "App information.": "应用信息。",
+        "Open the menu to access this guide and see the current App Version.": "打开菜单查看本指南和当前应用版本。",
+        "Forecast guidance only": "仅供预报参考",
+        "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "预报状况可能会变化，尤其是提前数天的预报。预测仅供参考，不应作为游泳安全评估的依据。游泳前请务必查看最新预报和当地状况。",
+        "Air temperature": "气温",
+        "Water temperature": "水温",
+        "Wind speed": "风速",
+        "Wind direction": "风向",
+        "Gusts": "阵风",
+        "Rain probability": "降雨概率",
+        "Wave height": "浪高",
+        "Wave period": "浪周期",
+        "Wave direction": "浪向",
+        "Swell direction": "涌浪方向",
+        "Wind": "风",
+        "Conditions": "天气状况",
+        "Clear sky ☀️": "晴空 ☀️",
+        "Cloudy ☁️": "多云 ☁️",
+        "Fog 🌫️": "雾 🌫️",
+        "Rain 🌧️": "下雨 🌧️",
+        "Snow ❄️": "降雪 ❄️",
+        "Rain showers 🌦️": "阵雨 🌦️",
+        "Thunderstorm ⛈️": "雷暴 ⛈️",
+        "Unknown": "未知",
+        "North": "北风",
+        "North-East": "东北风",
+        "East": "东风",
+        "South-East": "东南风",
+        "South": "南风",
+        "South-West": "西南风",
+        "West": "西风",
+        "North-West": "西北风",
+        "Selected high tide": "所选高潮",
+        "High Tide": "高潮",
+        "Low Tide": "低潮",
+        "Tides for": "潮汐 —",
+        "Full forecast": "完整预报",
+        "Plan your swim": "规划您的游泳",
+        "Predicted Swim Conditions": "预测游泳条件",
+        "Predicted Swim Score": "预测游泳评分",
+        "Strong wind may make conditions significantly rougher than normal.": "强风可能使状况明显比平时更恶劣。",
+        "Moderate wind — expect increased chop.": "中等风力——预计浪花会增加。",
+        "CALM TO SLIGHT CHOP": "平静至轻微浪涌",
+        "INCREASING CHOP": "浪涌增加",
+        "CHOPPY": "有浪",
+        "SLIGHTLY CHOPPY": "轻微有浪",
+        "CHOPPY / STRONG WIND": "有浪 / 强风",
+        "Youghal side: Calm · Tomona side: A little choppier": "Youghal一侧：平静 · Tomona一侧：稍有浪",
+        "Youghal side: A little choppier · Tomona side: Calm": "Youghal一侧：稍有浪 · Tomona一侧：平静",
+        "Both sides becoming more exposed": "两侧逐渐更加暴露",
+        "Both sides exposed to chop": "两侧都有浪",
+        "Both sides somewhat sheltered": "两侧相对有遮蔽",
+        "Generally sheltered with some chop": "总体有遮蔽，但有些浪",
+        "Youghal side: Generally sheltered · Tomona side: Some exposure": "Youghal一侧：总体有遮蔽 · Tomona一侧：部分暴露",
+        "Youghal side is the better option in a southerly wind.": "南风时Youghal一侧更适合。",
+        "Tomona side is the better option in a northerly wind.": "北风时Tomona一侧更适合。",
+        "South-westerly wind creates increasing chop.": "西南风会增加浪涌。",
+        "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind.": "西风会使湖面产生浪涌。向Caddy's Point和Garrykennedy方向游泳意味着迎风游。",
+        "North-westerly wind creates increasing chop, particularly on exposed sections.": "西北风会增加浪涌，尤其是在暴露区域。",
+        "Easterly wind is generally more sheltered than westerly, but some chop is expected.": "东风通常比西风更有遮蔽，但仍可能有些浪。",
+        "North-easterly wind should produce relatively modest chop.": "东北风通常只会产生较小的浪涌。",
+        "South-easterly wind should leave the Youghal side relatively sheltered.": "东南风时Youghal一侧通常较有遮蔽。",
+        "Small waves": "小浪",
+        "Moderate waves": "中浪",
+        "Large waves": "大浪",
+        "Comfortable water temperature": "舒适的水温",
+        "Cold water": "冷水",
+        "Very cold water": "非常冷的水",
+        "Light wind": "微风",
+        "Moderate wind": "中等风力",
+        "Strong wind": "强风",
+        "Sheltered side": "有遮蔽的一侧",
+        "Check swim conditions first...": "请先检查游泳状况...",
+        "Unable to get your location. Please allow location access.": "无法获取您的位置。请允许位置访问。",
+        "Location access was denied.": "位置访问被拒绝。",
+        "Your location is unavailable.": "无法获取您的位置。",
+        "Location request timed out.": "位置请求超时。",
+        "Unable to calculate the journey.": "无法计算行程。",
+        "Journey time is an estimate and does not include traffic, stops or delays.": "行程时间仅为估算，不包括交通、停车或延误。"
+    },
+    "es": {
+        "Sea Swim Planner": "Planificador de natación en el mar",
+        "Open Water Swim Planner": "Planificador de natación en aguas abiertas",
+        "Sea & lake conditions, forecasts and swim planning": "Condiciones del mar y lagos, pronósticos y planificación de natación",
+        "7-DAY OUTLOOK": "PRONÓSTICO DE 7 DÍAS",
+        "SWIM LOCATION": "LUGAR DE NATACIÓN",
+        "Choose your swim location.": "Elige tu lugar de natación.",
+        "View the forecast.": "Ver el pronóstico.",
+        "Select a day.": "Selecciona un día.",
+        "Current conditions.": "Condiciones actuales.",
+        "Close a pop-up.": "Cerrar una ventana emergente.",
+        "Use the Close button or X when available.": "Usa el botón Cerrar o X cuando esté disponible.",
+        "Desktop PC": "PC de escritorio",
+        "Air temperature": "Temperatura del aire",
+        "Water temperature": "Temperatura del agua",
+        "Wind speed": "Velocidad del viento",
+        "Wind direction": "Dirección del viento",
+        "Gusts": "Ráfagas",
+        "Rain probability": "Probabilidad de lluvia",
+        "Wave height": "Altura de las olas",
+        "Wave period": "Período de las olas",
+        "Wave direction": "Dirección de las olas",
+        "Swell direction": "Dirección del oleaje",
+        "Wind": "Viento",
+        "Conditions": "Condiciones meteorológicas",
+        "Clear sky ☀️": "Cielo despejado ☀️",
+        "Cloudy ☁️": "Nublado ☁️",
+        "Fog 🌫️": "Niebla 🌫️",
+        "Rain 🌧️": "Lluvia 🌧️",
+        "Snow ❄️": "Nieve ❄️",
+        "Rain showers 🌦️": "Chubascos 🌦️",
+        "Thunderstorm ⛈️": "Tormenta ⛈️",
+        "Unknown": "Desconocido",
+        "Selected high tide": "Marea alta seleccionada",
+        "High Tide": "Marea alta",
+        "Low Tide": "Marea baja",
+        "Full forecast": "Pronóstico completo",
+        "Plan your swim": "Planifica tu natación",
+        "Predicted Swim Conditions": "Condiciones de natación previstas",
+        "Predicted Swim Score": "Puntuación prevista",
+        "Strong wind may make conditions significantly rougher than normal.": "El viento fuerte puede hacer que las condiciones sean mucho más difíciles de lo normal.",
+        "Moderate wind — expect increased chop.": "Viento moderado — espera más oleaje.",
+        "CALM TO SLIGHT CHOP": "CALMA A OLEAJE LEVE",
+        "INCREASING CHOP": "OLEAJE CRECIENTE",
+        "CHOPPY": "CON OLEAJE",
+        "SLIGHTLY CHOPPY": "LIGERAMENTE OLEADO",
+        "CHOPPY / STRONG WIND": "OLEAJE / VIENTO FUERTE",
+        "Sheltered side": "Lado protegido",
+        "Small waves": "Olas pequeñas",
+        "Moderate waves": "Olas moderadas",
+        "Large waves": "Olas grandes",
+        "Comfortable water temperature": "Temperatura del agua agradable",
+        "Cold water": "Agua fría",
+        "Very cold water": "Agua muy fría",
+        "Light wind": "Viento ligero",
+        "Moderate wind": "Viento moderado",
+        "Strong wind": "Viento fuerte",
+        "Unable to calculate the journey.": "No se pudo calcular el viaje.",
+        "Journey time is an estimate and does not include traffic, stops or delays.": "El tiempo de viaje es estimado y no incluye tráfico, paradas ni retrasos.",
+        "Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.": "Youghal Quay es el lugar predeterminado al abrir la app. Selecciona otro lugar de mar o lago si es necesario.",
+        "The forecast loads automatically when you choose a location. The 7-day forecast is the main view.": "El pronóstico se carga automáticamente al elegir un lugar. El pronóstico de 7 días es la vista principal.",
+        "Tap a forecast day to open the information for that day. If the selected day is today, it is shown as": "Toca un día del pronóstico para ver su información. Si el día seleccionado es hoy, se muestra como",
+        "Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.": "Las condiciones actuales y la recomendación de natación no aparecen en la vista principal del teléfono para reducir el desorden. Siguen disponibles en la vista principal de escritorio.",
+        "When viewing a sea forecast day, choose the tide option if you want tide information for that date.": "Al ver un día del pronóstico marino, selecciona la opción de mareas si quieres información de mareas para esa fecha.",
+        "Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.": "Los pronósticos de lago no utilizan información de mareas marinas. Selecciona un día para ver la información del lago de esa fecha.",
+        "Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.": "Usa la opción Unidades del menú superior para cambiar entre métrico (km, °C, metros) e imperial (millas, °F, pies). La velocidad del viento cambia entre m/s y mph.",
+        "Use the theme option in the header to switch themes. Dark theme is the default.": "Usa la opción de tema del encabezado para cambiar de tema. El tema oscuro es el predeterminado.",
+        "Open the menu to access this guide and see the current App Version.": "Abre el menú para acceder a esta guía y ver la versión actual de la app.",
+        "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "Las condiciones previstas pueden cambiar, especialmente con varios días de antelación. Las predicciones son solo orientativas y no deben utilizarse para evaluar la seguridad de la natación. Comprueba siempre el pronóstico más reciente y las condiciones locales antes de nadar."
+    },
+    "fr": {
+        "Sea Swim Planner": "Planificateur de nage en mer",
+        "Open Water Swim Planner": "Planificateur de nage en eau libre",
+        "Sea & lake conditions, forecasts and swim planning": "Conditions de mer et de lac, prévisions et planification de nage",
+        "7-DAY OUTLOOK": "PRÉVISIONS À 7 JOURS",
+        "SWIM LOCATION": "LIEU DE BAIGNADE",
+        "Choose your swim location.": "Choisissez votre lieu de baignade.",
+        "View the forecast.": "Voir les prévisions.",
+        "Select a day.": "Sélectionnez un jour.",
+        "Current conditions.": "Conditions actuelles.",
+        "Close a pop-up.": "Fermer une fenêtre contextuelle.",
+        "Use the Close button or X when available.": "Utilisez le bouton Fermer ou X lorsqu’il est disponible.",
+        "Desktop PC": "Ordinateur",
+        "Air temperature": "Température de l’air",
+        "Water temperature": "Température de l’eau",
+        "Wind speed": "Vitesse du vent",
+        "Wind direction": "Direction du vent",
+        "Gusts": "Rafales",
+        "Rain probability": "Probabilité de pluie",
+        "Wave height": "Hauteur des vagues",
+        "Wave period": "Période des vagues",
+        "Wave direction": "Direction des vagues",
+        "Swell direction": "Direction de la houle",
+        "Wind": "Vent",
+        "Conditions": "Conditions météo",
+        "Clear sky ☀️": "Ciel dégagé ☀️",
+        "Cloudy ☁️": "Nuageux ☁️",
+        "Fog 🌫️": "Brouillard 🌫️",
+        "Rain 🌧️": "Pluie 🌧️",
+        "Snow ❄️": "Neige ❄️",
+        "Rain showers 🌦️": "Averses 🌦️",
+        "Thunderstorm ⛈️": "Orage ⛈️",
+        "Unknown": "Inconnu",
+        "Selected high tide": "Marée haute sélectionnée",
+        "High Tide": "Marée haute",
+        "Low Tide": "Marée basse",
+        "Full forecast": "Prévisions complètes",
+        "Plan your swim": "Planifiez votre baignade",
+        "Predicted Swim Conditions": "Conditions de baignade prévues",
+        "Predicted Swim Score": "Score de baignade prévu",
+        "Strong wind may make conditions significantly rougher than normal.": "Un vent fort peut rendre les conditions nettement plus difficiles que d’habitude.",
+        "Moderate wind — expect increased chop.": "Vent modéré — attendez-vous à davantage de clapot.",
+        "CALM TO SLIGHT CHOP": "CALME À FAIBLE CLAPOT",
+        "INCREASING CHOP": "CLAPOT EN AUGMENTATION",
+        "CHOPPY": "AGITÉ",
+        "SLIGHTLY CHOPPY": "LÉGÈREMENT AGITÉ",
+        "CHOPPY / STRONG WIND": "AGITÉ / VENT FORT",
+        "Sheltered side": "Côté abrité",
+        "Small waves": "Petites vagues",
+        "Moderate waves": "Vagues modérées",
+        "Large waves": "Grosses vagues",
+        "Comfortable water temperature": "Température de l’eau confortable",
+        "Cold water": "Eau froide",
+        "Very cold water": "Eau très froide",
+        "Light wind": "Vent léger",
+        "Moderate wind": "Vent modéré",
+        "Strong wind": "Vent fort",
+        "Unable to calculate the journey.": "Impossible de calculer le trajet.",
+        "Journey time is an estimate and does not include traffic, stops or delays.": "La durée du trajet est une estimation et ne comprend ni circulation, ni arrêts, ni retards.",
+        "Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.": "Youghal Quay est le lieu par défaut à l’ouverture de l’application. Sélectionnez un autre lieu de mer ou de lac si nécessaire.",
+        "The forecast loads automatically when you choose a location. The 7-day forecast is the main view.": "Les prévisions se chargent automatiquement lorsque vous choisissez un lieu. Les prévisions à 7 jours sont la vue principale.",
+        "Tap a forecast day to open the information for that day. If the selected day is today, it is shown as": "Touchez un jour des prévisions pour voir ses informations. Si le jour sélectionné est aujourd’hui, il s’affiche comme",
+        "Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.": "Les conditions actuelles et la recommandation de baignade sont retirées de la vue principale sur téléphone pour alléger l’affichage. Elles restent disponibles sur ordinateur.",
+        "When viewing a sea forecast day, choose the tide option if you want tide information for that date.": "Lors de l’affichage d’un jour de prévisions marines, choisissez l’option de marée pour voir les informations de cette date.",
+        "Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.": "Les prévisions des lacs n’utilisent pas les informations de marée marine. Sélectionnez un jour pour voir les informations du lac à cette date.",
+        "Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.": "Utilisez l’option Unités du menu pour passer du système métrique (km, °C, mètres) à l’impérial (miles, °F, pieds). La vitesse du vent passe de m/s à mph.",
+        "Use the theme option in the header to switch themes. Dark theme is the default.": "Utilisez l’option de thème dans l’en-tête pour changer de thème. Le thème sombre est utilisé par défaut.",
+        "Open the menu to access this guide and see the current App Version.": "Ouvrez le menu pour accéder à ce guide et voir la version actuelle de l’application.",
+        "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "Les conditions prévues peuvent changer, surtout plusieurs jours à l’avance. Les prévisions sont indicatives et ne doivent pas servir à évaluer la sécurité de la baignade. Vérifiez toujours les dernières prévisions et les conditions locales avant de nager."
+    },
+    "hi": {
+        "Sea Swim Planner": "समुद्री तैराकी प्लानर",
+        "Open Water Swim Planner": "ओपन वॉटर स्विम प्लानर",
+        "Sea & lake conditions, forecasts and swim planning": "समुद्र और झील की स्थितियाँ, पूर्वानुमान और तैराकी योजना",
+        "7-DAY OUTLOOK": "7-दिन का पूर्वानुमान",
+        "SWIM LOCATION": "तैराकी स्थान",
+        "Choose your swim location.": "अपना तैराकी स्थान चुनें।",
+        "View the forecast.": "पूर्वानुमान देखें।",
+        "Select a day.": "एक दिन चुनें।",
+        "Current conditions.": "वर्तमान स्थितियाँ।",
+        "Close a pop-up.": "पॉप-अप बंद करें।",
+        "Use the Close button or X when available.": "उपलब्ध होने पर Close बटन या X का उपयोग करें।",
+        "Desktop PC": "डेस्कटॉप कंप्यूटर",
+        "Air temperature": "हवा का तापमान",
+        "Water temperature": "पानी का तापमान",
+        "Wind speed": "हवा की गति",
+        "Wind direction": "हवा की दिशा",
+        "Gusts": "हवा के झोंके",
+        "Rain probability": "बारिश की संभावना",
+        "Wave height": "लहरों की ऊँचाई",
+        "Wave period": "लहरों की अवधि",
+        "Wave direction": "लहरों की दिशा",
+        "Swell direction": "स्वेल की दिशा",
+        "Wind": "हवा",
+        "Conditions": "मौसम की स्थिति",
+        "Clear sky ☀️": "साफ आसमान ☀️",
+        "Cloudy ☁️": "बादल छाए हुए ☁️",
+        "Fog 🌫️": "कोहरा 🌫️",
+        "Rain 🌧️": "बारिश 🌧️",
+        "Snow ❄️": "बर्फबारी ❄️",
+        "Rain showers 🌦️": "बारिश की बौछारें 🌦️",
+        "Thunderstorm ⛈️": "आंधी-तूफान ⛈️",
+        "Unknown": "अज्ञात",
+        "Selected high tide": "चयनित उच्च ज्वार",
+        "High Tide": "उच्च ज्वार",
+        "Low Tide": "निम्न ज्वार",
+        "Full forecast": "पूरा पूर्वानुमान",
+        "Plan your swim": "अपनी तैराकी की योजना बनाएँ",
+        "Predicted Swim Conditions": "अनुमानित तैराकी स्थितियाँ",
+        "Predicted Swim Score": "अनुमानित तैराकी स्कोर",
+        "Strong wind may make conditions significantly rougher than normal.": "तेज़ हवा सामान्य से काफी कठिन परिस्थितियाँ बना सकती है।",
+        "Moderate wind — expect increased chop.": "मध्यम हवा — लहरें बढ़ने की उम्मीद है।",
+        "CALM TO SLIGHT CHOP": "शांत से हल्की लहरें",
+        "INCREASING CHOP": "बढ़ती लहरें",
+        "CHOPPY": "लहरदार",
+        "SLIGHTLY CHOPPY": "थोड़ी लहरदार",
+        "CHOPPY / STRONG WIND": "लहरदार / तेज़ हवा",
+        "Sheltered side": "आश्रय वाला किनारा",
+        "Small waves": "छोटी लहरें",
+        "Moderate waves": "मध्यम लहरें",
+        "Large waves": "बड़ी लहरें",
+        "Comfortable water temperature": "आरामदायक पानी का तापमान",
+        "Cold water": "ठंडा पानी",
+        "Very cold water": "बहुत ठंडा पानी",
+        "Light wind": "हल्की हवा",
+        "Moderate wind": "मध्यम हवा",
+        "Strong wind": "तेज़ हवा",
+        "Unable to calculate the journey.": "यात्रा की गणना नहीं हो सकी।",
+        "Journey time is an estimate and does not include traffic, stops or delays.": "यात्रा का समय अनुमानित है और इसमें ट्रैफिक, रुकना या देरी शामिल नहीं है।",
+        "Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.": "ऐप खुलने पर Youghal Quay डिफ़ॉल्ट स्थान होता है। आवश्यकता होने पर मेनू से कोई अन्य समुद्री या झील का स्थान चुनें।",
+        "The forecast loads automatically when you choose a location. The 7-day forecast is the main view.": "स्थान चुनने पर पूर्वानुमान अपने आप लोड होता है। 7-दिन का पूर्वानुमान मुख्य दृश्य है।",
+        "Tap a forecast day to open the information for that day. If the selected day is today, it is shown as": "उस दिन की जानकारी खोलने के लिए पूर्वानुमान के दिन पर टैप करें। यदि चुना गया दिन आज है, तो इसे इस रूप में दिखाया जाता है",
+        "Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.": "अव्यवस्था कम करने के लिए वर्तमान स्थितियाँ और तैराकी सुझाव फोन की मुख्य स्क्रीन पर नहीं दिखते। वे डेस्कटॉप मुख्य स्क्रीन पर उपलब्ध रहते हैं।",
+        "When viewing a sea forecast day, choose the tide option if you want tide information for that date.": "समुद्री पूर्वानुमान का दिन देखते समय उस तारीख की ज्वार जानकारी के लिए ज्वार विकल्प चुनें।",
+        "Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.": "झील के पूर्वानुमान में समुद्री ज्वार की जानकारी का उपयोग नहीं होता। उस तारीख की झील की जानकारी देखने के लिए एक दिन चुनें।",
+        "Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.": "ऊपरी मेनू में इकाइयाँ विकल्प से मीट्रिक (km, °C, मीटर) और इम्पीरियल (मील, °F, फीट) के बीच बदलें। हवा की गति m/s और mph में बदलती है।",
+        "Use the theme option in the header to switch themes. Dark theme is the default.": "हेडर में थीम विकल्प से थीम बदलें। डार्क थीम डिफ़ॉल्ट है।",
+        "Open the menu to access this guide and see the current App Version.": "इस गाइड और वर्तमान ऐप संस्करण को देखने के लिए मेनू खोलें।",
+        "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "पूर्वानुमान की स्थितियाँ बदल सकती हैं, खासकर कई दिन पहले के पूर्वानुमान। अनुमान केवल मार्गदर्शन हैं और इन्हें तैराकी की सुरक्षा के आकलन के रूप में नहीं लेना चाहिए। तैरने से पहले हमेशा नवीनतम पूर्वानुमान और स्थानीय स्थितियाँ जाँचें।"
+    }
+};
+Object.keys(extraLanguageText).forEach(lang => {
+    if (languageText[lang]) Object.assign(languageText[lang], extraLanguageText[lang]);
+});
+// Additional labels used by dynamically generated forecast/condition cards.
+const dynamicLabelTranslations = {
+  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧"},
+  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा"},
+  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido"},
+  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité"}
+};
+Object.keys(dynamicLabelTranslations).forEach(lang => {
+  if (languageText[lang]) Object.assign(languageText[lang], dynamicLabelTranslations[lang]);
+});
+const dynamicUiTranslations = {
+  zh: {"Show tides for this day":"显示当天潮汐","Make travel plans":"制定行程","Show full forecast details":"显示完整预报详情","Plan your swim":"规划您的游泳","Predict Swim Conditions":"预测游泳条件"},
+  hi: {"Show tides for this day":"इस दिन का ज्वार दिखाएँ","Make travel plans":"यात्रा की योजना बनाएँ","Show full forecast details":"पूरा पूर्वानुमान दिखाएँ","Plan your swim":"अपनी तैराकी की योजना बनाएँ","Predict Swim Conditions":"तैराकी की स्थितियों का अनुमान लगाएँ"},
+  es: {"Show tides for this day":"Mostrar las mareas de este día","Make travel plans":"Planificar el viaje","Show full forecast details":"Mostrar el pronóstico completo","Plan your swim":"Planificar tu natación","Predict Swim Conditions":"Predecir las condiciones de natación"},
+  fr: {"Show tides for this day":"Afficher les marées de ce jour","Make travel plans":"Planifier le trajet","Show full forecast details":"Afficher les prévisions complètes","Plan your swim":"Planifier votre baignade","Predict Swim Conditions":"Prévoir les conditions de baignade"}
+};
+Object.keys(dynamicUiTranslations).forEach(lang => {
+  if (languageText[lang]) Object.assign(languageText[lang], dynamicUiTranslations[lang]);
+});
+
+
+
+function translateString(value) {
+    const lang = getLanguage();
+    const dict = languageText[lang] || languageText.en;
+    if (dict[value]) return dict[value];
+
+    // Translate phrases embedded in dynamic HTML. Use ALL keys in the
+    // selected dictionary, including the extended dynamic-content phrases.
+    // This is important for strings such as "Air temperature: 23.4°C"
+    // where the whole text node is not an exact dictionary match.
+    let result = String(value);
+    Object.keys(dict)
+        .filter(key => key && dict[key] && key !== dict[key])
+        .sort((a, b) => b.length - a.length)
+        .forEach(key => {
+            result = result.split(key).join(dict[key]);
+        });
+
+    // Ratings are generated in uppercase by the scoring code.
+    const ratingMap = {
+        "EXCELLENT CONDITIONS": dict["Excellent conditions"],
+        "GOOD CONDITIONS": dict["Good conditions"],
+        "CHALLENGING CONDITIONS": dict["Challenging conditions"],
+        "POOR CONDITIONS": dict["Poor conditions"]
+    };
+    Object.keys(ratingMap).forEach(key => {
+        if (ratingMap[key]) result = result.split(key).join(ratingMap[key].toUpperCase());
+    });
+
+    return result;
+}
+
+function getLanguageLocale() {
+    return {
+        en: "en-IE",
+        zh: "zh-CN",
+        hi: "hi-IN",
+        es: "es-ES",
+        fr: "fr-FR"
+    }[getLanguage()] || "en-IE";
+}
+
+function translateRating(rating) {
+    return translateString(rating);
+}
+
+function translateRatingShort(rating) {
+    const key = String(rating || "").toUpperCase();
+    if (key.includes("EXCELLENT")) return translateString("Excellent conditions").replace(/\s+conditions?$/i, "");
+    if (key.includes("GOOD")) return translateString("Good conditions").replace(/\s+conditions?$/i, "");
+    if (key.includes("CHALLENGING")) return translateString("Challenging conditions").replace(/\s+conditions?$/i, "");
+    if (key.includes("POOR")) return translateString("Poor conditions").replace(/\s+conditions?$/i, "");
+    return translateString(rating);
+}
+
+function formatForecastWeekday(date, long = false) {
+    if (isForecastToday(date)) return translateString("Today");
+    const dayIndex = new Date(date + "T12:00:00").getDay();
+    const short = {
+        en: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+        zh: ["周日","周一","周二","周三","周四","周五","周六"],
+        hi: ["रवि","सोम","मंगल","बुध","गुरु","शुक्र","शनि"],
+        es: ["dom","lun","mar","mié","jue","vie","sáb"],
+        fr: ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."]
+    };
+    if (!long) return (short[getLanguage()] || short.en)[dayIndex];
+    return new Date(date + "T12:00:00").toLocaleDateString(getLanguageLocale(), {weekday:"long", day:"numeric", month:"long"});
+}
+
+function translatePage() {
+    const root = document.body;
+    if (!root) return;
+    window.__swimTranslating = true;
+
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode(node) {
+                if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                const parent = node.parentElement;
+                if (!parent) return NodeFilter.FILTER_REJECT;
+                if (["SCRIPT", "STYLE", "OPTION"].includes(parent.tagName)) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        }
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    // Always translate from the original English text so switching directly
+    // between languages remains reliable.
+    nodes.forEach(node => {
+        if (node.__swimOriginalText === undefined) {
+            node.__swimOriginalText = node.nodeValue;
+        }
+        const original = node.__swimOriginalText;
+        const translated = translateString(original);
+        if (node.nodeValue !== translated) {
+            node.nodeValue = translated;
+        }
+    });
+
+    // Translate select options separately.
+    document.querySelectorAll("option").forEach(option => {
+        if (option.__swimOriginalText === undefined) {
+            option.__swimOriginalText = option.textContent;
+        }
+        const original = option.__swimOriginalText;
+        const translated = translateString(original);
+        if (option.textContent !== translated) {
+            option.textContent = translated;
+        }
+    });
+
+    updateLanguageMenu();
+    updateThemeMenu();
+    window.__swimTranslating = false;
+}
+
+let languageObserverStarted = false;
+let languageObserver = null;
+let languageTranslationQueued = false;
+
+function queueLanguageTranslation() {
+    if (languageTranslationQueued || !document.body) return;
+    languageTranslationQueued = true;
+    requestAnimationFrame(() => {
+        languageTranslationQueued = false;
+        translatePage();
+    });
+}
+
+function startLanguageObserver() {
+    if (languageObserverStarted || !document.body) return;
+    languageObserverStarted = true;
+
+    languageObserver = new MutationObserver(() => {
+        // Ignore our own text replacements. Original English is stored on
+        // each text node, so the next real render can always be translated.
+        if (window.__swimTranslating) return;
+        queueLanguageTranslation();
+    });
+
+    languageObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+
+    translatePage();
+}
+
+function initialiseLanguage() {
+    const language = getLanguage();
+    document.documentElement.lang = language;
+    document.documentElement.dir = "ltr";
+    updateLanguageMenu();
+    startLanguageObserver();
+}
+
 /* =========================
    APP MENU / THEME
    ========================= */
@@ -4790,6 +6024,8 @@ if (localStorage.getItem("swimTheme") !== "light") {
     document.body.classList.add("dark-theme");
 }
 updateThemeMenu();
+updateUnitsMenu();
+initialiseLanguage();
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
@@ -4832,19 +6068,51 @@ function showSeaTide(index) {
 
     detail.innerHTML = `
         <strong>🌊 Selected high tide</strong><br>
-        ${formatTide(selected)} — ${selected.height.toFixed(2)} m
+        ${formatTide(selected)} — ${formatTideHeight(selected.height, 2)}
         <div class="tide-detail-grid">
             ${surrounding.map(tide => `
                 <div class="tide-detail-item">
                     <span class="tide-detail-label">${tide.type}</span>
-                    <span class="tide-detail-value">${formatTide(tide)} — ${tide.height.toFixed(2)} m</span>
+                    <span class="tide-detail-value">${formatTide(tide)} — ${formatTideHeight(tide.height, 2)}</span>
                 </div>
             `).join("")}
         </div>
     `;
 }
 
+/* =========================
+   WHAT'S NEW / RELEASE NOTES
+   ========================= */
+const SWIM_RELEASE_VERSION = "2.6.0";
+const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
+
+function openReleaseNotes(markSeen = false) {
+    const modal = document.getElementById("releaseModal");
+    if (!modal) return;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    if (markSeen) localStorage.setItem(SWIM_RELEASE_KEY, SWIM_RELEASE_VERSION);
+}
+
+function closeReleaseNotes(markSeen = true) {
+    const modal = document.getElementById("releaseModal");
+    if (!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    if (markSeen) localStorage.setItem(SWIM_RELEASE_KEY, SWIM_RELEASE_VERSION);
+}
+
+function showReleaseNotesIfNeeded() {
+    if (localStorage.getItem(SWIM_RELEASE_KEY) !== SWIM_RELEASE_VERSION) {
+        setTimeout(() => openReleaseNotes(), 700);
+    }
+}
+
 function initialiseApp() {
+    // Release notes are checked immediately so the first-open notice is
+    // independent of weather/API loading.
+    showReleaseNotesIfNeeded();
+
     loadLocations();
 
     const locationSelect =
@@ -4853,6 +6121,8 @@ function initialiseApp() {
     if (locationSelect && locationSelect.value) {
         checkConditions();
     }
+
+    // After the visitor dismisses them, they remain available from the app menu.
 }
 
 if (document.readyState === "loading") {
@@ -4860,6 +6130,14 @@ if (document.readyState === "loading") {
 } else {
     initialiseApp();
 }
+
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        const releaseModal = document.getElementById("releaseModal");
+        if (releaseModal && releaseModal.classList.contains("open")) closeReleaseNotes();
+    }
+});
 
 
 /* =========================
