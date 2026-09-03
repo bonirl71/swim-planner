@@ -2170,7 +2170,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.0</strong></span>
+                ℹ️ <span>App Version <strong>2.7.1</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2207,7 +2207,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.0</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.1</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -3091,7 +3091,7 @@ if (seaTidesCard) {
                     <strong>${translateString(assessment.condition)}</strong>
                 </div>
                 ${translateString(assessment.advice)}<br><br>
-                <strong>📍 ${translateString(selectedLocation.id === 6 ? "Sheltered side" : "Conditions")}</strong><br>
+                ${selectedLocation.id === 6 ? `<strong>📍 ${translateString("Sheltered side")}</strong><br>` : `<strong>📍 ${translateString("Conditions")}</strong><br>`}
                 ${translateString(assessment.impact)}
             `;
 
@@ -4382,10 +4382,9 @@ function getGenericLakeAssessment(windDegrees, windSpeed) {
 }
 
 function getLakeAssessment(selectedLocation, windDegrees, windSpeed) {
-    if (selectedLocation && selectedLocation.id === 6) {
-        return getYoughalLakeAssessment(windDegrees, windSpeed);
-    }
-    return getGenericLakeAssessment(windDegrees, windSpeed);
+    return selectedLocation && selectedLocation.id === 6
+        ? getYoughalLakeAssessment(windDegrees, windSpeed)
+        : getGenericLakeAssessment(windDegrees, windSpeed);
 }
 
 function getWeatherIcon(code) {
@@ -5690,7 +5689,6 @@ languageText.uk = Object.assign({}, languageText.en, {
     "Comfortable water temperature": "Комфортна температура води", "Cold water": "Холодна вода", "Very cold water": "Дуже холодна вода",
     "Light wind": "Легкий вітер", "Moderate wind": "Помірний вітер", "Strong wind": "Сильний вітер",
     "Sheltered side": "Захищений бік",
-    "Conditions": "Умови",
     "Unable to calculate the journey.": "Не вдалося розрахувати поїздку.",
     "Journey time is an estimate and does not include traffic, stops or delays.": "Час поїздки є приблизним і не враховує затори, зупинки чи затримки."
 });
@@ -6173,11 +6171,11 @@ Object.keys(extraLanguageText).forEach(lang => {
 });
 // Additional labels used by dynamically generated forecast/condition cards.
 const dynamicLabelTranslations = {
-  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Conditions":"状况","Information not available for this location":"此位置暂无可用信息"},
-  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Conditions":"स्थितियाँ","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
-  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Conditions":"Condiciones","Information not available for this location":"Información no disponible para esta ubicación"},
-  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Conditions":"Conditions","Information not available for this location":"Informations non disponibles pour cet emplacement"},
-  uk: {"Lake water temperature":"Температура води в озері","Weather":"Погода","Sheltered side":"Захищений бік","Conditions":"Умови","Information not available for this location":"Інформація недоступна для цього місця"}
+  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Information not available for this location":"此位置暂无可用信息"},
+  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
+  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Information not available for this location":"Información no disponible para esta ubicación"},
+  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Information not available for this location":"Informations non disponibles pour cet emplacement"},
+  uk: {"Lake water temperature":"Температура води в озері","Weather":"Погода","Sheltered side":"Захищений бік","Information not available for this location":"Інформація недоступна для цього місця"}
 };
 /* Ukrainian labels for dynamically generated cards and release notes. */
 Object.assign(languageText.uk, {
@@ -6504,7 +6502,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.0";
+const SWIM_RELEASE_VERSION = "2.7.1";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
