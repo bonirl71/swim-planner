@@ -2214,7 +2214,7 @@ body.dark-theme .sea-forecast-summary {
             <p class="release-intro">Here’s what’s new in this release:</p>
             <ul class="release-list">
                 <li><span class="release-icon">🌍</span><div><strong>Ukrainian language added</strong><br>Ukrainian is now available throughout the app, including menus, forecasts and dynamic information.</div></li>
-                <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Youghal-specific local knowledge is now restricted to Youghal Quay. Other lakes use generic lake-condition guidance.</div></li>
+                <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Lake wind assessments are now location-specific. Youghal Quay keeps its local wind guidance; Twomilegate uses its known east/north-east exposure; other lakes do not receive invented compass-direction claims.</div></li>
                 <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
                 <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
@@ -4332,59 +4332,67 @@ function getYoughalLakeAssessment(windDegrees, windSpeed) {
     return { condition, impact, advice };
 }
 
-function getGenericLakeAssessment(windDegrees, windSpeed) {
-    let condition;
-    let impact;
-    let advice;
+/*
+   Lake wind behaviour is location-specific. Do not apply one compass-direction
+   rule to every lake: wind impact depends on the lake shape, fetch and the
+   swimmer's shoreline. Where we do not have reliable local exposure information,
+   the app deliberately avoids inventing directional claims and uses wind speed
+   only.
+*/
+function getLocationSpecificLakeAssessment(selectedLocation, windDegrees, windSpeed) {
+    // Twomilegate is on the western shore of Lough Derg. Local angling guidance
+    // specifically warns about strong easterly and north-easterly winds.
+    if (selectedLocation && selectedLocation.id === 9) {
+        const eastExposure = windDegrees >= 67.5 && windDegrees < 112.5;
+        const northEastExposure = windDegrees >= 22.5 && windDegrees < 67.5;
 
-    if (windDegrees >= 157.5 && windDegrees < 202.5) {
-        condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Generally sheltered";
-        advice = "Southerly wind should generally produce calmer conditions.";
-    } else if (windDegrees >= 337.5 || windDegrees < 22.5) {
-        condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Generally sheltered";
-        advice = "Northerly wind should generally produce calmer conditions.";
-    } else if (windDegrees >= 202.5 && windDegrees < 247.5) {
-        condition = "🟠 INCREASING CHOP";
-        impact = "Some areas may become more exposed";
-        advice = "South-westerly wind creates increasing chop.";
-    } else if (windDegrees >= 247.5 && windDegrees < 292.5) {
-        condition = "🔴 CHOPPY";
-        impact = "Expect chop across exposed areas";
-        advice = "Westerly wind creates chop across the lake.";
-    } else if (windDegrees >= 292.5 && windDegrees < 337.5) {
-        condition = "🟠 INCREASING CHOP";
-        impact = "Some areas may become more exposed";
-        advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
-    } else if (windDegrees >= 67.5 && windDegrees < 112.5) {
-        condition = "🟡 SLIGHTLY CHOPPY";
-        impact = "Some areas may remain sheltered";
-        advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
-    } else if (windDegrees >= 22.5 && windDegrees < 67.5) {
-        condition = "🟡 SLIGHTLY CHOPPY";
-        impact = "Generally sheltered with some chop";
-        advice = "North-easterly wind should produce relatively modest chop.";
-    } else {
-        condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Generally sheltered with some chop";
-        advice = "South-easterly wind should generally produce relatively modest chop.";
+        if (eastExposure || northEastExposure) {
+            let condition = windSpeed > 5 ? "🔴 EXPOSED / CHOPPY" : "🟠 INCREASING CHOP";
+            let impact = "More exposed to wind-driven chop from this direction";
+            let advice = eastExposure
+                ? "Easterly wind can make Twomilegate more exposed; take extra care as wind strength increases."
+                : "North-easterly wind can make Twomilegate more exposed; take extra care as wind strength increases.";
+
+            if (windSpeed > 7) {
+                condition = "🔴 EXPOSED / STRONG WIND";
+                advice += " Strong wind may make conditions unsuitable for swimming.";
+            } else if (windSpeed > 5) {
+                advice += " Moderate wind — expect increased chop.";
+            }
+            return { condition, impact, advice };
+        }
     }
 
+    // For locations where we do not yet have verified local wind-exposure
+    // information, do not pretend that N/E/S/W have the same meaning everywhere.
     if (windSpeed > 7) {
-        condition = "🔴 CHOPPY / STRONG WIND";
-        advice += " Strong wind may make conditions significantly rougher than normal.";
-    } else if (windSpeed > 5) {
-        advice += " Moderate wind — expect increased chop.";
+        return {
+            condition: "🔴 STRONG WIND",
+            impact: "Wind impact depends on the local lake shape and exposure",
+            advice: "Strong wind can make lake conditions rough. Local wind exposure is not yet modelled for this location."
+        };
     }
 
-    return { condition, impact, advice };
+    if (windSpeed > 5) {
+        return {
+            condition: "🟠 MODERATE WIND",
+            impact: "Wind impact depends on the local lake shape and exposure",
+            advice: "Moderate wind may increase chop. Local wind exposure is not yet modelled for this location."
+        };
+    }
+
+    return {
+        condition: "🟢 LIGHT WIND",
+        impact: "Generally lower risk of wind-driven chop",
+        advice: "Light wind should limit wind-driven chop, although local shelter and exposure vary by lake."
+    };
 }
 
 function getLakeAssessment(selectedLocation, windDegrees, windSpeed) {
-    return selectedLocation && selectedLocation.id === 6
-        ? getYoughalLakeAssessment(windDegrees, windSpeed)
-        : getGenericLakeAssessment(windDegrees, windSpeed);
+    if (selectedLocation && selectedLocation.id === 6) {
+        return getYoughalLakeAssessment(windDegrees, windSpeed);
+    }
+    return getLocationSpecificLakeAssessment(selectedLocation, windDegrees, windSpeed);
 }
 
 function getWeatherIcon(code) {
