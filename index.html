@@ -2170,7 +2170,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.6.0</strong></span>
+                ℹ️ <span>App Version <strong>2.7.0</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2207,17 +2207,17 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.6.1</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.0</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
             <p class="release-intro">Here’s what’s new in this release:</p>
             <ul class="release-list">
-                <li><span class="release-icon">🌍</span><div><strong>New languages</strong><br>English, Chinese, Hindi, Spanish, French and Ukrainian are now available.</div></li>
-                <li><span class="release-icon">🌡️</span><div><strong>Temperature &amp; measurement units</strong><br>Switch between Metric (°C, km, m) and Imperial (°F, miles, ft) units from the menu.</div></li>
-                <li><span class="release-icon">📍</span><div><strong>More swim locations</strong><br>New lake and Tahiti locations have been added.</div></li>
-                <li><span class="release-icon">🌦️</span><div><strong>Improved forecast information</strong><br>Forecast details, conditions and swim recommendations have been improved.</div></li>
-                <li><span class="release-icon">📱</span><div><strong>Improved mobile experience</strong><br>Forecast and information panels have been refined for easier use on phones and tablets.</div></li>
+                <li><span class="release-icon">🌍</span><div><strong>Ukrainian language added</strong><br>Ukrainian is now available throughout the app, including menus, forecasts and dynamic information.</div></li>
+                <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Youghal-specific local knowledge is now restricted to Youghal Quay. Other lakes use generic lake-condition guidance.</div></li>
+                <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
+                <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
+                <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
             </ul>
             <div class="release-footer">
                 <span>Thanks for using Open Water Swim Planner. 🌊</span>
@@ -2401,7 +2401,7 @@ const swimLocations = [
     {
         id: 13,
         country: "Ukraine",
-        name: "Blue Lake",
+        name: "Blue Lake (Kyiv Ukraine)",
         county: "Kyiv Oblast",
         latitude: 50.2486488821285,
         longitude: 30.56133373633814,
@@ -2411,7 +2411,7 @@ const swimLocations = [
     {
         id: 14,
         country: "Ukraine",
-        name: "Gloria Lake",
+        name: "Gloria Lake (Kyiv Ukraine)",
         county: "Kyiv Oblast",
         latitude: 50.56906891068027,
         longitude: 29.922190199229075,
@@ -3073,7 +3073,7 @@ if (seaTidesCard) {
             const windSpeed = Number(current.wind_speed_10m);
             const windDegrees = Number(current.wind_direction_10m);
             const windDirection = getWindDirection(windDegrees);
-            const assessment = getLakeAssessment(windDegrees, windSpeed);
+            const assessment = getLakeAssessment(windDegrees, windSpeed, selectedLocation.id === 6);
 
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
@@ -4283,34 +4283,46 @@ function closeSeaForecastDetail() {
    LAKE FORECAST
    ========================= */
 
-function getLakeAssessment(windDegrees, windSpeed) {
+function getLakeAssessment(windDegrees, windSpeed, isYoughal = false) {
     let condition;
     let impact;
     let advice;
 
     if (windDegrees >= 157.5 && windDegrees < 202.5) {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Youghal side: Calm · Tomona side: A little choppier";
-        advice = "Youghal side is the better option in a southerly wind.";
+        if (isYoughal) {
+            impact = "Youghal side: Calm · Tomona side: A little choppier";
+            advice = "Youghal side is the better option in a southerly wind.";
+        } else {
+            impact = "Generally sheltered";
+            advice = "Southerly wind should generally produce calmer conditions.";
+        }
     } else if (windDegrees >= 337.5 || windDegrees < 22.5) {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Youghal side: A little choppier · Tomona side: Calm";
-        advice = "Tomona side is the better option in a northerly wind.";
+        if (isYoughal) {
+            impact = "Youghal side: A little choppier · Tomona side: Calm";
+            advice = "Tomona side is the better option in a northerly wind.";
+        } else {
+            impact = "Generally sheltered";
+            advice = "Northerly wind should generally produce calmer conditions.";
+        }
     } else if (windDegrees >= 202.5 && windDegrees < 247.5) {
         condition = "🟠 INCREASING CHOP";
-        impact = "Both sides becoming more exposed";
+        impact = isYoughal ? "Both sides becoming more exposed" : "Some areas may become more exposed";
         advice = "South-westerly wind creates increasing chop.";
     } else if (windDegrees >= 247.5 && windDegrees < 292.5) {
         condition = "🔴 CHOPPY";
-        impact = "Both sides exposed to chop";
-        advice = "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind.";
+        impact = isYoughal ? "Both sides exposed to chop" : "Expect chop across exposed areas";
+        advice = isYoughal
+            ? "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind."
+            : "Westerly wind creates chop across the lake.";
     } else if (windDegrees >= 292.5 && windDegrees < 337.5) {
         condition = "🟠 INCREASING CHOP";
-        impact = "Both sides becoming more exposed";
+        impact = isYoughal ? "Both sides becoming more exposed" : "Some areas may become more exposed";
         advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
     } else if (windDegrees >= 67.5 && windDegrees < 112.5) {
         condition = "🟡 SLIGHTLY CHOPPY";
-        impact = "Both sides somewhat sheltered";
+        impact = isYoughal ? "Both sides somewhat sheltered" : "Some areas may remain sheltered";
         advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
     } else if (windDegrees >= 22.5 && windDegrees < 67.5) {
         condition = "🟡 SLIGHTLY CHOPPY";
@@ -4318,8 +4330,13 @@ function getLakeAssessment(windDegrees, windSpeed) {
         advice = "North-easterly wind should produce relatively modest chop.";
     } else {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
-        advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
+        if (isYoughal) {
+            impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
+            advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
+        } else {
+            impact = "Generally sheltered with some chop";
+            advice = "South-easterly wind should generally produce relatively modest chop.";
+        }
     }
 
     if (windSpeed > 7) {
@@ -4419,7 +4436,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             gust: d.wind_gusts_10m_max[i],
             direction: d.wind_direction_10m_dominant[i],
             rain: d.precipitation_probability_max[i],
-            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
+            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i], selectedLocation.id === 6)
         }));
 
         /*
@@ -4437,7 +4454,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
                 today.wind = currentWind;
                 today.direction = currentDirection;
-                today.assessment = getLakeAssessment(currentDirection, currentWind);
+                today.assessment = getLakeAssessment(currentDirection, currentWind, selectedLocation.id === 6);
             }
             if (Number.isFinite(currentTemp)) {
                 today.maxTemp = currentTemp;
@@ -6447,7 +6464,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.6.1";
+const SWIM_RELEASE_VERSION = "2.7.0";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
