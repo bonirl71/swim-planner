@@ -3073,7 +3073,7 @@ if (seaTidesCard) {
             const windSpeed = Number(current.wind_speed_10m);
             const windDegrees = Number(current.wind_direction_10m);
             const windDirection = getWindDirection(windDegrees);
-            const assessment = getLakeAssessment(windDegrees, windSpeed, selectedLocation.id === 6);
+            const assessment = getLakeAssessment(selectedLocation, windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
@@ -3091,7 +3091,7 @@ if (seaTidesCard) {
                     <strong>${translateString(assessment.condition)}</strong>
                 </div>
                 ${translateString(assessment.advice)}<br><br>
-                <strong>📍 ${translateString("Sheltered side")}</strong><br>
+                <strong>📍 ${translateString(selectedLocation.id === 6 ? "Sheltered side" : "Conditions")}</strong><br>
                 ${translateString(assessment.impact)}
             `;
 
@@ -4283,46 +4283,34 @@ function closeSeaForecastDetail() {
    LAKE FORECAST
    ========================= */
 
-function getLakeAssessment(windDegrees, windSpeed, isYoughal = false) {
+function getYoughalLakeAssessment(windDegrees, windSpeed) {
     let condition;
     let impact;
     let advice;
 
     if (windDegrees >= 157.5 && windDegrees < 202.5) {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        if (isYoughal) {
-            impact = "Youghal side: Calm · Tomona side: A little choppier";
-            advice = "Youghal side is the better option in a southerly wind.";
-        } else {
-            impact = "Generally sheltered";
-            advice = "Southerly wind should generally produce calmer conditions.";
-        }
+        impact = "Youghal side: Calm · Tomona side: A little choppier";
+        advice = "Youghal side is the better option in a southerly wind.";
     } else if (windDegrees >= 337.5 || windDegrees < 22.5) {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        if (isYoughal) {
-            impact = "Youghal side: A little choppier · Tomona side: Calm";
-            advice = "Tomona side is the better option in a northerly wind.";
-        } else {
-            impact = "Generally sheltered";
-            advice = "Northerly wind should generally produce calmer conditions.";
-        }
+        impact = "Youghal side: A little choppier · Tomona side: Calm";
+        advice = "Tomona side is the better option in a northerly wind.";
     } else if (windDegrees >= 202.5 && windDegrees < 247.5) {
         condition = "🟠 INCREASING CHOP";
-        impact = isYoughal ? "Both sides becoming more exposed" : "Some areas may become more exposed";
+        impact = "Both sides becoming more exposed";
         advice = "South-westerly wind creates increasing chop.";
     } else if (windDegrees >= 247.5 && windDegrees < 292.5) {
         condition = "🔴 CHOPPY";
-        impact = isYoughal ? "Both sides exposed to chop" : "Expect chop across exposed areas";
-        advice = isYoughal
-            ? "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind."
-            : "Westerly wind creates chop across the lake.";
+        impact = "Both sides exposed to chop";
+        advice = "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind.";
     } else if (windDegrees >= 292.5 && windDegrees < 337.5) {
         condition = "🟠 INCREASING CHOP";
-        impact = isYoughal ? "Both sides becoming more exposed" : "Some areas may become more exposed";
+        impact = "Both sides becoming more exposed";
         advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
     } else if (windDegrees >= 67.5 && windDegrees < 112.5) {
         condition = "🟡 SLIGHTLY CHOPPY";
-        impact = isYoughal ? "Both sides somewhat sheltered" : "Some areas may remain sheltered";
+        impact = "Both sides somewhat sheltered";
         advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
     } else if (windDegrees >= 22.5 && windDegrees < 67.5) {
         condition = "🟡 SLIGHTLY CHOPPY";
@@ -4330,13 +4318,8 @@ function getLakeAssessment(windDegrees, windSpeed, isYoughal = false) {
         advice = "North-easterly wind should produce relatively modest chop.";
     } else {
         condition = "🟢 CALM TO SLIGHT CHOP";
-        if (isYoughal) {
-            impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
-            advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
-        } else {
-            impact = "Generally sheltered with some chop";
-            advice = "South-easterly wind should generally produce relatively modest chop.";
-        }
+        impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
+        advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
     }
 
     if (windSpeed > 7) {
@@ -4347,6 +4330,62 @@ function getLakeAssessment(windDegrees, windSpeed, isYoughal = false) {
     }
 
     return { condition, impact, advice };
+}
+
+function getGenericLakeAssessment(windDegrees, windSpeed) {
+    let condition;
+    let impact;
+    let advice;
+
+    if (windDegrees >= 157.5 && windDegrees < 202.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Generally sheltered";
+        advice = "Southerly wind should generally produce calmer conditions.";
+    } else if (windDegrees >= 337.5 || windDegrees < 22.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Generally sheltered";
+        advice = "Northerly wind should generally produce calmer conditions.";
+    } else if (windDegrees >= 202.5 && windDegrees < 247.5) {
+        condition = "🟠 INCREASING CHOP";
+        impact = "Some areas may become more exposed";
+        advice = "South-westerly wind creates increasing chop.";
+    } else if (windDegrees >= 247.5 && windDegrees < 292.5) {
+        condition = "🔴 CHOPPY";
+        impact = "Expect chop across exposed areas";
+        advice = "Westerly wind creates chop across the lake.";
+    } else if (windDegrees >= 292.5 && windDegrees < 337.5) {
+        condition = "🟠 INCREASING CHOP";
+        impact = "Some areas may become more exposed";
+        advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
+    } else if (windDegrees >= 67.5 && windDegrees < 112.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        impact = "Some areas may remain sheltered";
+        advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
+    } else if (windDegrees >= 22.5 && windDegrees < 67.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        impact = "Generally sheltered with some chop";
+        advice = "North-easterly wind should produce relatively modest chop.";
+    } else {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Generally sheltered with some chop";
+        advice = "South-easterly wind should generally produce relatively modest chop.";
+    }
+
+    if (windSpeed > 7) {
+        condition = "🔴 CHOPPY / STRONG WIND";
+        advice += " Strong wind may make conditions significantly rougher than normal.";
+    } else if (windSpeed > 5) {
+        advice += " Moderate wind — expect increased chop.";
+    }
+
+    return { condition, impact, advice };
+}
+
+function getLakeAssessment(selectedLocation, windDegrees, windSpeed) {
+    if (selectedLocation && selectedLocation.id === 6) {
+        return getYoughalLakeAssessment(windDegrees, windSpeed);
+    }
+    return getGenericLakeAssessment(windDegrees, windSpeed);
 }
 
 function getWeatherIcon(code) {
@@ -4436,7 +4475,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             gust: d.wind_gusts_10m_max[i],
             direction: d.wind_direction_10m_dominant[i],
             rain: d.precipitation_probability_max[i],
-            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i], selectedLocation.id === 6)
+            assessment: getLakeAssessment(selectedLocation, d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
         }));
 
         /*
@@ -4454,7 +4493,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
                 today.wind = currentWind;
                 today.direction = currentDirection;
-                today.assessment = getLakeAssessment(currentDirection, currentWind, selectedLocation.id === 6);
+                today.assessment = getLakeAssessment(selectedLocation, currentDirection, currentWind);
             }
             if (Number.isFinite(currentTemp)) {
                 today.maxTemp = currentTemp;
@@ -5651,6 +5690,7 @@ languageText.uk = Object.assign({}, languageText.en, {
     "Comfortable water temperature": "Комфортна температура води", "Cold water": "Холодна вода", "Very cold water": "Дуже холодна вода",
     "Light wind": "Легкий вітер", "Moderate wind": "Помірний вітер", "Strong wind": "Сильний вітер",
     "Sheltered side": "Захищений бік",
+    "Conditions": "Умови",
     "Unable to calculate the journey.": "Не вдалося розрахувати поїздку.",
     "Journey time is an estimate and does not include traffic, stops or delays.": "Час поїздки є приблизним і не враховує затори, зупинки чи затримки."
 });
@@ -6133,11 +6173,11 @@ Object.keys(extraLanguageText).forEach(lang => {
 });
 // Additional labels used by dynamically generated forecast/condition cards.
 const dynamicLabelTranslations = {
-  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Information not available for this location":"此位置暂无可用信息"},
-  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
-  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Information not available for this location":"Información no disponible para esta ubicación"},
-  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Information not available for this location":"Informations non disponibles pour cet emplacement"},
-  uk: {"Lake water temperature":"Температура води в озері","Weather":"Погода","Sheltered side":"Захищений бік","Information not available for this location":"Інформація недоступна для цього місця"}
+  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Conditions":"状况","Information not available for this location":"此位置暂无可用信息"},
+  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Conditions":"स्थितियाँ","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
+  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Conditions":"Condiciones","Information not available for this location":"Información no disponible para esta ubicación"},
+  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Conditions":"Conditions","Information not available for this location":"Informations non disponibles pour cet emplacement"},
+  uk: {"Lake water temperature":"Температура води в озері","Weather":"Погода","Sheltered side":"Захищений бік","Conditions":"Умови","Information not available for this location":"Інформація недоступна для цього місця"}
 };
 /* Ukrainian labels for dynamically generated cards and release notes. */
 Object.assign(languageText.uk, {
