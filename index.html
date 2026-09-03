@@ -2369,6 +2369,7 @@ const swimLocations = [
 
     {
         id: 6,
+        country: "Ireland",
         name: "Youghal Quay",
         county: "Tipperary",
         latitude: 52.898509,
@@ -2378,6 +2379,7 @@ const swimLocations = [
     },
     {
         id: 8,
+        country: "Ireland",
         name: "Portumna Harbour",
         county: "Galway",
         latitude: 53.083405,
@@ -2387,6 +2389,7 @@ const swimLocations = [
     },
     {
         id: 9,
+        country: "Ireland",
         name: "Twomilegate",
         county: "Clare",
         latitude: 52.83623,
@@ -2396,8 +2399,9 @@ const swimLocations = [
     },
     {
         id: 13,
+        country: "Ukraine",
         name: "Blue Lake",
-        county: "Kyiv Ukraine",
+        county: "Kyiv Oblast",
         latitude: 50.2486488821285,
         longitude: 30.56133373633814,
         distance: "TBC",
@@ -2405,8 +2409,9 @@ const swimLocations = [
     },
     {
         id: 14,
+        country: "Ukraine",
         name: "Gloria Lake",
-        county: "Kyiv Ukraine",
+        county: "Kyiv Oblast",
         latitude: 50.56906891068027,
         longitude: 29.922190199229075,
         distance: "TBC",
@@ -2419,6 +2424,7 @@ const swimLocations = [
 
     {
         id: 11,
+        country: "French Polynesia",
         name: "Taapuna Beach Sand Bank",
         county: "Tahiti",
         latitude: -17.60008633464791,
@@ -2434,6 +2440,7 @@ const swimLocations = [
 
     {
         id: 1,
+        country: "Ireland",
         name: "Blackhead Lighthouse and Gleninagh Pier",
         county: "Clare",
         latitude: 53.148,
@@ -2444,6 +2451,7 @@ const swimLocations = [
     },
     {
         id: 2,
+        country: "Ireland",
         name: "Fanore Beach",
         county: "Clare",
         latitude: 53.125,
@@ -2454,6 +2462,7 @@ const swimLocations = [
     },
     {
         id: 3,
+        country: "Ireland",
         name: "Lahinch Beach",
         county: "Clare",
         latitude: 53.053,
@@ -2464,6 +2473,7 @@ const swimLocations = [
     },
     {
         id: 4,
+        country: "Ireland",
         name: "Kilkee Bay",
         county: "Clare",
         latitude: 52.679141,
@@ -2474,6 +2484,7 @@ const swimLocations = [
     },
     {
         id: 5,
+        country: "Ireland",
         name: "Whitestrand",
         county: "Clare",
         latitude: 52.747723,
@@ -2484,6 +2495,7 @@ const swimLocations = [
     },
     {
         id: 7,
+        country: "Ireland",
         name: "Lambay Island",
         county: "Dublin",
         latitude: 53.49222995430973,
@@ -2494,6 +2506,7 @@ const swimLocations = [
     },
     {
         id: 10,
+        country: "French Polynesia",
         name: "Venus Point Bay",
         county: "Tahiti",
         latitude: -17.495652593749423,
@@ -2504,6 +2517,7 @@ const swimLocations = [
     },
     {
         id: 12,
+        country: "French Polynesia",
         name: "Channel Tahiti to Moorea",
         county: "Tahiti",
         latitude: -17.596466756769523,
@@ -2745,40 +2759,114 @@ function loadLocations() {
     const select =
         document.getElementById("locationSelect");
 
-    // Group locations clearly in the dropdown: lakes first, then sea locations.
-    const lakeGroup = document.createElement("optgroup");
-    lakeGroup.label = "🏞️ Lake Locations";
+    if (!select) return;
 
-    const seaGroup = document.createElement("optgroup");
-    seaGroup.label = "🌊 Sea Locations";
+    select.innerHTML = "";
+
+    /*
+       Group locations first by type (Lake / Sea),
+       then by country. This keeps the list easy to
+       scan as more international locations are added.
+    */
+
+    const groups = {};
 
     swimLocations.forEach(location => {
 
-        const option = document.createElement("option");
+        // Lagoons are treated as marine/sea locations.
+        const typeKey =
+            location.type === "lake"
+                ? "lake"
+                : "sea";
 
-        option.value = location.id;
+        const typeLabel =
+            typeKey === "lake"
+                ? "🏞️ Lakes"
+                : "🌊 Sea";
+
+        const country =
+            location.country ||
+            (location.region === "french-polynesia"
+                ? "French Polynesia"
+                : "Other");
+
+        const flag =
+            country === "Ireland" ? "🇮🇪" :
+            country === "Ukraine" ? "🇺🇦" :
+            country === "French Polynesia" ? "🇵🇫" :
+            "🌍";
+
+        const key =
+            `${typeKey}|${country}`;
+
+        if (!groups[key]) {
+
+            groups[key] = {
+                type: typeKey,
+                country,
+                label: `${typeLabel} — ${flag} ${country}`,
+                options: []
+            };
+
+        }
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            location.id;
 
         option.textContent =
             location.name +
-            " (" +
-            location.county +
-            ")";
+            (location.county
+                ? " (" + location.county + ")"
+                : "");
 
-        if (location.type === "lake") {
-            lakeGroup.appendChild(option);
-        } else {
-            seaGroup.appendChild(option);
-        }
+        groups[key].options.push(option);
 
     });
 
-    select.appendChild(lakeGroup);
-    select.appendChild(seaGroup);
+    Object.values(groups)
+        .sort((a, b) => {
+
+            // Lakes first, then Sea.
+            if (a.type !== b.type) {
+                return a.type === "lake" ? -1 : 1;
+            }
+
+            // Countries alphabetically within each type.
+            return a.country.localeCompare(b.country);
+
+        })
+        .forEach(group => {
+
+            const optgroup =
+                document.createElement("optgroup");
+
+            optgroup.label =
+                group.label;
+
+            group.options
+                .sort((a, b) =>
+                    a.textContent.localeCompare(
+                        b.textContent
+                    )
+                )
+                .forEach(option =>
+                    optgroup.appendChild(option)
+                );
+
+            select.appendChild(optgroup);
+
+        });
 
     // Make Youghal Quay the default location.
-    const youghalOption = Array.from(select.options).find(option =>
-        option.textContent.toLowerCase().includes("youghal quay")
-    );
+    const youghalOption =
+        Array.from(select.options).find(option =>
+            option.textContent
+                .toLowerCase()
+                .includes("youghal quay")
+        );
 
     if (youghalOption) {
         select.value = youghalOption.value;
@@ -2933,64 +3021,51 @@ if (seaTidesCard) {
                LAKE WATER TEMPERATURE
                ========================= */
 
-            /*
-               Reliable lake water temperature is currently available
-               only for Youghal Quay. Do not use the Youghal temperature
-               for any other lake.
-            */
-            if (selectedLocation.id === 6) {
-                try {
+            try {
 
-                    const waterTempResponse =
-                        await fetch(
-                            "lake-temperature.json?t=" +
-                            Date.now()
-                        );
-
-                    if (waterTempResponse.ok) {
-                        const waterTempData =
-                            await waterTempResponse.json();
-
-                        lakeWaterTemperature =
-                            Number(
-                                waterTempData.temperature
-                            );
-
-                        if (!Number.isFinite(lakeWaterTemperature)) {
-                            lakeWaterTemperature = null;
-                        }
-
-                        console.log(
-                            "🌡️ YOUGHAL LAKE WATER TEMPERATURE:",
-                            lakeWaterTemperature,
-                            "°C"
-                        );
-                    }
-
-                }
-                catch (error) {
-
-                    console.warn(
-                        "YOUGHAL LAKE WATER TEMPERATURE UNAVAILABLE:",
-                        error
+                const waterTempResponse =
+                    await fetch(
+                        "lake-temperature.json?t=" +
+                        Date.now()
                     );
 
-                    lakeWaterTemperature = null;
+                const waterTempData =
+                    await waterTempResponse.json();
 
-                }
+                lakeWaterTemperature =
+                    Number(
+                        waterTempData.temperature
+                    );
+
+                console.log(
+                    "🌡️ LAKE WATER TEMPERATURE:",
+                    lakeWaterTemperature,
+                    "°C"
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "LAKE WATER TEMPERATURE ERROR:",
+                    error
+                );
+
+                lakeWaterTemperature = null;
+
             }
 
 
             const windSpeed = Number(current.wind_speed_10m);
             const windDegrees = Number(current.wind_direction_10m);
             const windDirection = getWindDirection(windDegrees);
-            const assessment = getLakeAssessment(windDegrees, windSpeed, selectedLocation);
+            const assessment = getLakeAssessment(windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
-                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Not available for this location")}</strong><br>
+                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Unavailable")}</strong><br>
                     💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
@@ -4194,98 +4269,49 @@ function closeSeaForecastDetail() {
    LAKE FORECAST
    ========================= */
 
-function getLakeAssessment(windDegrees, windSpeed, location = null) {
-
+function getLakeAssessment(windDegrees, windSpeed) {
     let condition;
     let impact;
     let advice;
 
-    const isYoughal =
-        location && location.id === 6;
-
-    /* =========================
-       YOUGHAL-SPECIFIC LOCAL KNOWLEDGE
-       ========================= */
-
-    if (isYoughal) {
-
-        if (windDegrees >= 157.5 && windDegrees < 202.5) {
-            condition = "🟢 CALM TO SLIGHT CHOP";
-            impact = "Youghal side: Calm · Tomona side: A little choppier";
-            advice = "Youghal side is the better option in a southerly wind.";
-        }
-        else if (windDegrees >= 337.5 || windDegrees < 22.5) {
-            condition = "🟢 CALM TO SLIGHT CHOP";
-            impact = "Youghal side: A little choppier · Tomona side: Calm";
-            advice = "Tomona side is the better option in a northerly wind.";
-        }
-        else if (windDegrees >= 202.5 && windDegrees < 247.5) {
-            condition = "🟠 INCREASING CHOP";
-            impact = "Both sides becoming more exposed";
-            advice = "South-westerly wind creates increasing chop.";
-        }
-        else if (windDegrees >= 247.5 && windDegrees < 292.5) {
-            condition = "🔴 CHOPPY";
-            impact = "Both sides exposed to chop";
-            advice = "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind.";
-        }
-        else if (windDegrees >= 292.5 && windDegrees < 337.5) {
-            condition = "🟠 INCREASING CHOP";
-            impact = "Both sides becoming more exposed";
-            advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
-        }
-        else if (windDegrees >= 67.5 && windDegrees < 112.5) {
-            condition = "🟡 SLIGHTLY CHOPPY";
-            impact = "Both sides somewhat sheltered";
-            advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
-        }
-        else if (windDegrees >= 22.5 && windDegrees < 67.5) {
-            condition = "🟡 SLIGHTLY CHOPPY";
-            impact = "Generally sheltered with some chop";
-            advice = "North-easterly wind should produce relatively modest chop.";
-        }
-        else {
-            condition = "🟢 CALM TO SLIGHT CHOP";
-            impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
-            advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
-        }
-
+    if (windDegrees >= 157.5 && windDegrees < 202.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Youghal side: Calm · Tomona side: A little choppier";
+        advice = "Youghal side is the better option in a southerly wind.";
+    } else if (windDegrees >= 337.5 || windDegrees < 22.5) {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Youghal side: A little choppier · Tomona side: Calm";
+        advice = "Tomona side is the better option in a northerly wind.";
+    } else if (windDegrees >= 202.5 && windDegrees < 247.5) {
+        condition = "🟠 INCREASING CHOP";
+        impact = "Both sides becoming more exposed";
+        advice = "South-westerly wind creates increasing chop.";
+    } else if (windDegrees >= 247.5 && windDegrees < 292.5) {
+        condition = "🔴 CHOPPY";
+        impact = "Both sides exposed to chop";
+        advice = "Westerly wind creates chop across the lake. Swimming towards Caddy's Point and Garrykennedy means swimming into the wind.";
+    } else if (windDegrees >= 292.5 && windDegrees < 337.5) {
+        condition = "🟠 INCREASING CHOP";
+        impact = "Both sides becoming more exposed";
+        advice = "North-westerly wind creates increasing chop, particularly on exposed sections.";
+    } else if (windDegrees >= 67.5 && windDegrees < 112.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        impact = "Both sides somewhat sheltered";
+        advice = "Easterly wind is generally more sheltered than westerly, but some chop is expected.";
+    } else if (windDegrees >= 22.5 && windDegrees < 67.5) {
+        condition = "🟡 SLIGHTLY CHOPPY";
+        impact = "Generally sheltered with some chop";
+        advice = "North-easterly wind should produce relatively modest chop.";
+    } else {
+        condition = "🟢 CALM TO SLIGHT CHOP";
+        impact = "Youghal side: Generally sheltered · Tomona side: Some exposure";
+        advice = "South-easterly wind should leave the Youghal side relatively sheltered.";
     }
 
-    /* =========================
-       GENERIC LAKE ASSESSMENT
-       ========================= */
-
-    else {
-
-        if (windSpeed <= 3) {
-            condition = "🟢 CALM TO SLIGHT CHOP";
-            impact = "Light winds should keep the lake relatively calm";
-            advice = "Light winds are favourable for generally calm lake conditions.";
-        }
-        else if (windSpeed <= 5) {
-            condition = "🟡 SLIGHTLY CHOPPY";
-            impact = "Some surface chop is possible";
-            advice = "Moderate winds may produce some chop, depending on the lake's exposure.";
-        }
-        else if (windSpeed <= 7) {
-            condition = "🟠 INCREASING CHOP";
-            impact = "More noticeable surface chop is likely";
-            advice = "Stronger winds are likely to make the lake increasingly choppy.";
-        }
-        else {
-            condition = "🔴 CHOPPY / STRONG WIND";
-            impact = "Strong winds may create difficult swimming conditions";
-            advice = "Strong winds can make lake conditions significantly rougher. Take extra care.";
-        }
-
-    }
-
-    if (windSpeed > 7 && condition !== "🔴 CHOPPY / STRONG WIND") {
+    if (windSpeed > 7) {
         condition = "🔴 CHOPPY / STRONG WIND";
         advice += " Strong wind may make conditions significantly rougher than normal.";
-    }
-    else if (windSpeed > 5 && windSpeed <= 7) {
+    } else if (windSpeed > 5) {
         advice += " Moderate wind — expect increased chop.";
     }
 
@@ -4354,19 +4380,15 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         const d = data.daily;
 
         let waterTemp = null;
-
-        /* Reliable lake water temperature is currently available only for Youghal Quay. */
-        if (selectedLocation.id === 6) {
-            try {
-                const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
-                if (tempResponse.ok) {
-                    const tempData = await tempResponse.json();
-                    const parsed = Number(tempData.temperature);
-                    if (Number.isFinite(parsed)) waterTemp = parsed;
-                }
-            } catch (e) {
-                console.warn("Youghal lake water temperature unavailable for forecast", e);
+        try {
+            const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
+            if (tempResponse.ok) {
+                const tempData = await tempResponse.json();
+                const parsed = Number(tempData.temperature);
+                if (Number.isFinite(parsed)) waterTemp = parsed;
             }
+        } catch (e) {
+            console.warn("Lake water temperature unavailable for forecast", e);
         }
 
         const forecast = d.time.map((date, i) => ({
@@ -4378,7 +4400,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             gust: d.wind_gusts_10m_max[i],
             direction: d.wind_direction_10m_dominant[i],
             rain: d.precipitation_probability_max[i],
-            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i], selectedLocation)
+            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
         }));
 
         /*
@@ -4396,7 +4418,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
                 today.wind = currentWind;
                 today.direction = currentDirection;
-                today.assessment = getLakeAssessment(currentDirection, currentWind, selectedLocation);
+                today.assessment = getLakeAssessment(currentDirection, currentWind);
             }
             if (Number.isFinite(currentTemp)) {
                 today.maxTemp = currentTemp;
@@ -4469,7 +4491,7 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : translateString("Not available for this location")}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : "Unavailable"}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
@@ -5343,7 +5365,6 @@ const languageText = {
         "Lake water": "Lake water",
         "Sea water": "Sea water",
         "Unavailable": "Unavailable",
-        "Not available for this location": "Not available for this location",
         "Today": "Today",
         "Close": "Close",
         "Phone": "Phone",
@@ -5386,7 +5407,6 @@ const languageText = {
         "Gusts": "阵风", "Rain probability": "降雨概率", "Wave height": "浪高",
         "Wave period": "浪周期", "Wave direction": "浪向", "Swell direction": "涌浪方向",
         "Lake water": "湖水", "Sea water": "海水", "Unavailable": "暂无数据",
-        "Not available for this location": "此地点暂无数据",
         "Today": "今天", "Close": "关闭", "Phone": "手机", "Desktop PC": "桌面电脑",
         "Lake Locations": "湖泊地点", "Sea Locations": "海滨地点", "Lagoon Locations": "泻湖地点"
     },
@@ -5425,7 +5445,6 @@ const languageText = {
         "Gusts": "हवा के झोंके", "Rain probability": "बारिश की संभावना", "Wave height": "लहरों की ऊँचाई",
         "Wave period": "लहरों की अवधि", "Wave direction": "लहरों की दिशा", "Swell direction": "स्वेल की दिशा",
         "Lake water": "झील का पानी", "Sea water": "समुद्र का पानी", "Unavailable": "उपलब्ध नहीं",
-        "Not available for this location": "इस स्थान के लिए उपलब्ध नहीं",
         "Today": "आज", "Close": "बंद करें", "Phone": "फोन", "Desktop PC": "डेस्कटॉप कंप्यूटर",
         "Lake Locations": "झील के स्थान", "Sea Locations": "समुद्री स्थान", "Lagoon Locations": "लैगून स्थान"
     },
@@ -5462,7 +5481,6 @@ const languageText = {
         "Gusts": "Ráfagas", "Rain probability": "Probabilidad de lluvia", "Wave height": "Altura de las olas",
         "Wave period": "Período de las olas", "Wave direction": "Dirección de las olas", "Swell direction": "Dirección del oleaje",
         "Lake water": "Agua del lago", "Sea water": "Agua del mar", "Unavailable": "No disponible",
-        "Not available for this location": "No disponible para esta ubicación",
         "Today": "Hoy", "Close": "Cerrar", "Phone": "Teléfono", "Desktop PC": "PC de escritorio",
         "Lake Locations": "Lugares de lago", "Sea Locations": "Lugares de mar", "Lagoon Locations": "Lugares de laguna"
     },
@@ -5499,7 +5517,6 @@ const languageText = {
         "Gusts": "Rafales", "Rain probability": "Probabilité de pluie", "Wave height": "Hauteur des vagues",
         "Wave period": "Période des vagues", "Wave direction": "Direction des vagues", "Swell direction": "Direction de la houle",
         "Lake water": "Eau du lac", "Sea water": "Eau de mer", "Unavailable": "Indisponible",
-        "Not available for this location": "Non disponible pour cet emplacement",
         "Today": "Aujourd'hui", "Close": "Fermer", "Phone": "Téléphone", "Desktop PC": "Ordinateur",
         "Lake Locations": "Lieux de lac", "Sea Locations": "Lieux de mer", "Lagoon Locations": "Lieux de lagon"
     }
