@@ -3019,38 +3019,51 @@ if (seaTidesCard) {
 
             /* =========================
                LAKE WATER TEMPERATURE
+
+               Reliable lake water temperature is
+               currently available only for Youghal Quay.
+               Do NOT use the Youghal value for other lakes.
                ========================= */
 
-            try {
+            if (selectedLocation.id === 6) {
 
-                const waterTempResponse =
-                    await fetch(
-                        "lake-temperature.json?t=" +
-                        Date.now()
+                try {
+
+                    const waterTempResponse =
+                        await fetch(
+                            "lake-temperature.json?t=" +
+                            Date.now()
+                        );
+
+                    const waterTempData =
+                        await waterTempResponse.json();
+
+                    lakeWaterTemperature =
+                        Number(
+                            waterTempData.temperature
+                        );
+
+                    console.log(
+                        "🌡️ YOUGHAL LAKE WATER TEMPERATURE:",
+                        lakeWaterTemperature,
+                        "°C"
                     );
 
-                const waterTempData =
-                    await waterTempResponse.json();
+                }
+                catch (error) {
 
-                lakeWaterTemperature =
-                    Number(
-                        waterTempData.temperature
+                    console.warn(
+                        "Youghal lake water temperature unavailable:",
+                        error
                     );
 
-                console.log(
-                    "🌡️ LAKE WATER TEMPERATURE:",
-                    lakeWaterTemperature,
-                    "°C"
-                );
+                    lakeWaterTemperature = null;
 
-            }
-            catch (error) {
+                }
 
-                console.error(
-                    "LAKE WATER TEMPERATURE ERROR:",
-                    error
-                );
+            } else {
 
+                // No reliable water-temperature source for this lake.
                 lakeWaterTemperature = null;
 
             }
@@ -3065,7 +3078,7 @@ if (seaTidesCard) {
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
-                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Unavailable")}</strong><br>
+                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Information not available for this location")}</strong><br>
                     💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
@@ -4380,15 +4393,20 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         const d = data.daily;
 
         let waterTemp = null;
-        try {
-            const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
-            if (tempResponse.ok) {
-                const tempData = await tempResponse.json();
-                const parsed = Number(tempData.temperature);
-                if (Number.isFinite(parsed)) waterTemp = parsed;
+
+        // Reliable lake water temperature is currently available
+        // only for Youghal Quay. Never reuse that value for another lake.
+        if (selectedLocation.id === 6) {
+            try {
+                const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
+                if (tempResponse.ok) {
+                    const tempData = await tempResponse.json();
+                    const parsed = Number(tempData.temperature);
+                    if (Number.isFinite(parsed)) waterTemp = parsed;
+                }
+            } catch (e) {
+                console.warn("Youghal lake water temperature unavailable for forecast", e);
             }
-        } catch (e) {
-            console.warn("Lake water temperature unavailable for forecast", e);
         }
 
         const forecast = d.time.map((date, i) => ({
@@ -4491,7 +4509,7 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : "Unavailable"}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : translateString("Information not available for this location")}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
@@ -5887,10 +5905,10 @@ Object.keys(extraLanguageText).forEach(lang => {
 });
 // Additional labels used by dynamically generated forecast/condition cards.
 const dynamicLabelTranslations = {
-  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧"},
-  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा"},
-  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido"},
-  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité"}
+  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Information not available for this location":"此位置暂无可用信息"},
+  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
+  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Information not available for this location":"Información no disponible para esta ubicación"},
+  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Information not available for this location":"Informations non disponibles pour cet emplacement"}
 };
 Object.keys(dynamicLabelTranslations).forEach(lang => {
   if (languageText[lang]) Object.assign(languageText[lang], dynamicLabelTranslations[lang]);
