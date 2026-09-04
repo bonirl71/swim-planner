@@ -2185,7 +2185,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.5</div>
+        <div class="app-revision">REV 2.7.6</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2196,7 +2196,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.5</strong></span>
+                ℹ️ <span>App Version <strong>2.7.6</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2234,7 +2234,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.5</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.6</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2943,7 +2943,8 @@ function updateDesktopSeaActions(location) {
     const actions = document.getElementById("desktopSeaActions");
     if (!actions) return;
     actions.style.display =
-        (location && location.type !== "lake" && location.tideStation)
+        (location && location.type !== "lake" &&
+         (location.tideStation || location.canadianTideStationCode))
             ? "grid"
             : "none";
 }
@@ -2951,7 +2952,7 @@ function updateDesktopSeaActions(location) {
 async function fetchCanadianTideData(stationCode, fromDate, toDate) {
 
     const stationsResponse = await fetch(
-        "https://api-iwls.dfo-mpo.gc.ca/api/v1/stations?code=" + encodeURIComponent(String(stationCode).padStart(5, "0"))
+        "https://api-sine.dfo-mpo.gc.ca/api/v1/stations?code=" + encodeURIComponent(String(stationCode).padStart(5, "0"))
     );
 
     if (!stationsResponse.ok) {
@@ -2961,7 +2962,9 @@ async function fetchCanadianTideData(stationCode, fromDate, toDate) {
     const stationsPayload = await stationsResponse.json();
     const stations = Array.isArray(stationsPayload)
         ? stationsPayload
-        : (stationsPayload.stations || stationsPayload.content || []);
+        : (stationsPayload && stationsPayload.id
+            ? [stationsPayload]
+            : (stationsPayload.stations || stationsPayload.content || []));
 
     const station = stations.find(item => {
         const candidates = [
@@ -3004,7 +3007,10 @@ async function fetchCanadianTideData(stationCode, fromDate, toDate) {
         throw new Error("Canadian tide data unavailable");
     }
 
-    const events = await response.json();
+    const payload = await response.json();
+    const events = Array.isArray(payload)
+        ? payload
+        : (payload.data || payload.content || payload.events || payload.hilo || []);
 
     if (!Array.isArray(events)) {
         throw new Error("Unexpected Canadian tide data format");
@@ -3013,7 +3019,9 @@ async function fetchCanadianTideData(stationCode, fromDate, toDate) {
     return events
         .filter(event => event && event.eventDate && Number.isFinite(Number(event.value)))
         .map(event => ({
-            type: null,
+            type: /high/i.test(String(event.event || event.type || "")) ? "High Tide"
+                : /low/i.test(String(event.event || event.type || "")) ? "Low Tide"
+                : null,
             time: new Date(event.eventDate),
             height: Number(event.value)
         }));
@@ -3433,9 +3441,11 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
 
                 if (!previous || !next) continue;
 
-                current.type = current.height >= previous.height && current.height >= next.height
-                    ? "High Tide"
-                    : "Low Tide";
+                if (!current.type) {
+                    current.type = current.height >= previous.height && current.height >= next.height
+                        ? "High Tide"
+                        : "Low Tide";
+                }
 
                 tideEvents.push(current);
             }
@@ -3722,7 +3732,7 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
                             minute: "2-digit",
                             hour12: false,
                             timeZone:
-                                "Europe/Dublin"
+                                tideDisplayTimeZone
                         }
                     )
                     +
@@ -4138,18 +4148,20 @@ async function loadSeaForecast(selectedLocation) {
     try {
         const latitude = selectedLocation.latitude;
         const longitude = selectedLocation.longitude;
+        const forecastTimeZone = selectedLocation.tideTimeZone || "Europe/Dublin";
+        const forecastTimeZoneParam = encodeURIComponent(forecastTimeZone);
 
         const weatherUrl =
             `https://api.open-meteo.com/v1/forecast` +
             `?latitude=${latitude}&longitude=${longitude}` +
             `&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,precipitation_probability` +
-            `&forecast_days=7&wind_speed_unit=ms&timezone=Europe%2FDublin`;
+            `&forecast_days=7&wind_speed_unit=ms&timezone=${forecastTimeZoneParam}`;
 
         const marineUrl =
             `https://marine-api.open-meteo.com/v1/marine` +
             `?latitude=${latitude}&longitude=${longitude}` +
             `&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature` +
-            `&forecast_days=7&timezone=Europe%2FDublin`;
+            `&forecast_days=7&timezone=${forecastTimeZoneParam}`;
 
         const [weatherResponse, marineResponse] = await Promise.all([
             fetch(weatherUrl),
@@ -4236,7 +4248,7 @@ async function loadSeaForecast(selectedLocation) {
             };
         }).filter(Boolean);
 
-        window.currentSeaForecast = { forecast, location: selectedLocation };
+        window.currentSeaForecast = { forecast, location: selectedLocation, timeZone: forecastTimeZone };
 
         daysContainer.innerHTML = forecast.map((day, index) => `
             <button type="button" class="forecast-day${index === 0 ? " active" : ""}" onclick="showSeaForecastDay(${index})">
@@ -4352,7 +4364,7 @@ function showMobileSeaTides(index) {
     const date = state.forecast[index].date;
     const tides = (window.currentSeaTides && window.currentSeaTides.tides || [])
         .filter(tide => {
-            const d = new Date(tide.time).toLocaleDateString("en-CA", { timeZone: "Europe/Dublin" });
+            const d = new Date(tide.time).toLocaleDateString("en-CA", { timeZone: state.timeZone || "Europe/Dublin" });
             return d === date;
         });
 
@@ -4360,7 +4372,7 @@ function showMobileSeaTides(index) {
         <div class="mobile-extra-panel">
             <h4>🌊 Tides for ${new Date(date + "T12:00:00").toLocaleDateString("en-IE", {weekday:"long", day:"numeric", month:"long"})}</h4>
             ${tides.length ? tides.map(tide => `
-                <div class="mobile-tide-row"><strong>${tide.type}</strong><br>${new Date(tide.time).toLocaleTimeString("en-IE", {hour:"2-digit", minute:"2-digit", timeZone:"Europe/Dublin"})} — ${formatTideHeight(tide.height, 2)}</div>
+                <div class="mobile-tide-row"><strong>${tide.type}</strong><br>${new Date(tide.time).toLocaleTimeString("en-IE", {hour:"2-digit", minute:"2-digit", timeZone:state.timeZone || "Europe/Dublin"})} — ${formatTideHeight(tide.height, 2)}</div>
             `).join("") : "<p>No tide information is available for this day.</p>"}
         </div>`;
 }
@@ -4424,7 +4436,7 @@ function openMobileTravelPlanner(index) {
                     <option value="${tide.time.toISOString()}">
                         ${tide.time.toLocaleTimeString("en-IE", {
                             hour:"2-digit", minute:"2-digit", hour12:false,
-                            timeZone:"Europe/Dublin"
+                            timeZone:state.timeZone || "Europe/Dublin"
                         })} — ${formatTideHeight(tide.height, 2)}
                     </option>
                 `).join("")}
@@ -5441,7 +5453,7 @@ async function calculateJourney() {
                    FORMAT DATE / TIME
                    ========================= */
 
-                function formatDateTime(date) {
+                function formatDateTime(date, timeZone) {
 
                     return date.toLocaleString(
                         "en-IE",
@@ -5452,8 +5464,7 @@ async function calculateJourney() {
                             hour: "2-digit",
                             minute: "2-digit",
                             hour12: false,
-                            timeZone:
-                                "Europe/Dublin"
+                            ...(timeZone ? { timeZone } : {})
                         }
                     );
 
@@ -5479,7 +5490,7 @@ async function calculateJourney() {
                 🌊 <strong>High Tide:</strong>
                 <br>
 
-                ${formatDateTime(highTide)}
+                ${formatDateTime(highTide, selectedLocation.tideTimeZone || "Europe/Dublin")}
 
                 <br><br>
 
@@ -6725,7 +6736,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.2";
+const SWIM_RELEASE_VERSION = "2.7.6";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
