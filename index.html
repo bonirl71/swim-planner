@@ -3052,7 +3052,8 @@ if (seaTidesCard) {
             const lakeWaterTempFile =
                 selectedLocation.id === 6
                     ? "lake-temperature.json"
-                    : selectedLocation.id === 15 || selectedLocation.id === 16
+                    : selectedLocation.region === "canada" &&
+                      (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")
                         ? "buntzen-lake-temperature.json"
                         : null;
 
@@ -3117,7 +3118,7 @@ if (seaTidesCard) {
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
-                    ${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? `🏞️ ${translateString("Lake water temperature")}${lakeWaterTempEstimated ? " (estimated)" : ""}: <strong>${formatTemperature(lakeWaterTemperature, 1)}</strong><br>` : selectedLocation.id === 17 ? `<span class="lake-water-temp-unavailable">🏞️ ${translateString("Information not available for this location")}</span><br>` : ""}
+                    ${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? `🏞️ ${translateString("Lake water temperature")}${lakeWaterTempEstimated ? " (estimated)" : ""}: <strong>${formatTemperature(lakeWaterTemperature, 1)}</strong><br>` : selectedLocation.region === "canada" && selectedLocation.name === "Blueberry Docks" ? `<span class="lake-water-temp-unavailable">🏞️ ${translateString("Information not available for this location")}</span><br>` : ""}
                     💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
@@ -4503,7 +4504,8 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         const waterTempFile =
             selectedLocation.id === 6
                 ? "lake-temperature.json"
-                : selectedLocation.id === 15 || selectedLocation.id === 16
+                : selectedLocation.region === "canada" &&
+                  (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")
                     ? "buntzen-lake-temperature.json"
                     : null;
 
@@ -4623,7 +4625,7 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            ${state.waterTemp !== null ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}${state.waterTempEstimated ? " (estimated)" : ""}</span><span class="forecast-metric-value">${formatTemperature(state.waterTemp, 1)}</span></div>` : state.location.id === 17 ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${translateString("Information not available for this location")}</span></div>` : ""}
+            ${state.waterTemp !== null ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}${state.waterTempEstimated ? " (estimated)" : ""}</span><span class="forecast-metric-value">${formatTemperature(state.waterTemp, 1)}</span></div>` : state.location.region === "canada" && state.location.name === "Blueberry Docks" ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${translateString("Information not available for this location")}</span></div>` : ""}
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
