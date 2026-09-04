@@ -1,3 +1,4 @@
+<!-- Revision 2.7.3: shared Lough Derg lake temperature + persistent header revision marker -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -960,6 +961,13 @@ body.dark-theme .journey-leave {
     margin: 5px 0 0;
     color: #6b7b88;
     font-size: 14px;
+}
+
+.app-menu-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .app-menu {
@@ -2175,9 +2183,10 @@ body.dark-theme .sea-forecast-summary {
         <p>Sea &amp; lake conditions, forecasts and swim planning</p>
     </div>
 
-    <details class="app-menu" id="appMenu">
-        <div class="app-revision">REV 2.7.2</div>
-        <summary aria-label="Open app menu">☰</summary>
+    <div class="app-menu-wrap">
+        <div class="app-revision">REV 2.7.3</div>
+        <details class="app-menu" id="appMenu">
+            <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
             <button type="button" class="menu-item" onclick="openGuide()">
                 📖 <span>How to Use</span>
@@ -2186,7 +2195,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.2</strong></span>
+                ℹ️ <span>App Version <strong>2.7.3</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2211,6 +2220,7 @@ body.dark-theme .sea-forecast-summary {
             </label>
         </div>
     </details>
+    </div>
 
 </header>
 
@@ -2223,7 +2233,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.2</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.3</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -3061,13 +3071,13 @@ if (seaTidesCard) {
             /* =========================
                LAKE WATER TEMPERATURE
 
-               Only use a location-specific source. Buntzen is an estimated
-               third-party value and is kept separate from Youghal.
+               Use the shared Lough Derg source for Youghal Quay, Portumna Harbour and
+               Twomilegate; Canadian Sasamat and Buntzen use their shared estimate.
                If no source is available, omit the water-temperature row.
                ========================= */
 
             const lakeWaterTempFile =
-                selectedLocation.id === 6
+                [6, 8, 9].includes(selectedLocation.id)
                     ? "lake-temperature.json"
                     : null;
 
@@ -4522,7 +4532,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         // Youghal uses the existing local JSON source; Buntzen uses a separate
         // source file so the two locations can never accidentally share a value.
         const waterTempFile =
-            selectedLocation.id === 6
+            [6, 8, 9].includes(selectedLocation.id)
                 ? "lake-temperature.json"
                 : null;
 
