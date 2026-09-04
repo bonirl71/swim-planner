@@ -2765,25 +2765,18 @@ function loadLocations() {
     select.innerHTML = "";
 
     /*
-       Group locations first by type (Lake / Sea),
-       then by country. This keeps the list easy to
-       scan as more international locations are added.
+       Group locations by COUNTRY.
+       Within each country, locations are sorted by type
+       (Lakes, Lagoons, Sea) and then by location name.
+
+       This keeps the dropdown organised by country while
+       still making the type of each location immediately
+       obvious.
     */
 
-    const groups = {};
+    const countryGroups = {};
 
     swimLocations.forEach(location => {
-
-        // Lagoons are treated as marine/sea locations.
-        const typeKey =
-            location.type === "lake"
-                ? "lake"
-                : "sea";
-
-        const typeLabel =
-            typeKey === "lake"
-                ? "🏞️ Lakes"
-                : "🌊 Sea";
 
         const country =
             location.country ||
@@ -2791,71 +2784,77 @@ function loadLocations() {
                 ? "French Polynesia"
                 : "Other");
 
-        const flag =
-            country === "Ireland" ? "🇮🇪" :
-            country === "Ukraine" ? "🇺🇦" :
-            country === "French Polynesia" ? "🇵🇫" :
-            "🌍";
-
-        const key =
-            `${typeKey}|${country}`;
-
-        if (!groups[key]) {
-
-            groups[key] = {
-                type: typeKey,
-                country,
-                label: `${typeKey === "lake" ? translateString("Lake Locations") : translateString("Sea Locations")} — ${flag} ${country}`,
-                options: []
-            };
-
+        if (!countryGroups[country]) {
+            countryGroups[country] = [];
         }
 
-        const option =
-            document.createElement("option");
-
-        option.value =
-            location.id;
-
-        option.textContent =
-            location.name +
-            (location.county
-                ? " (" + location.county + ")"
-                : "");
-
-        groups[key].options.push(option);
+        countryGroups[country].push(location);
 
     });
 
-    Object.values(groups)
-        .sort((a, b) => {
+    const countryFlags = {
+        "Ireland": "🇮🇪",
+        "Ukraine": "🇺🇦",
+        "French Polynesia": "🇵🇫",
+        "Canada": "🇨🇦"
+    };
 
-            // Lakes first, then Sea.
-            if (a.type !== b.type) {
-                return a.type === "lake" ? -1 : 1;
-            }
+    const typeOrder = {
+        lake: 1,
+        lagoon: 2,
+        sea: 3
+    };
 
-            // Countries alphabetically within each type.
-            return a.country.localeCompare(b.country);
-
-        })
-        .forEach(group => {
+    Object.keys(countryGroups)
+        .sort((a, b) => a.localeCompare(b))
+        .forEach(country => {
 
             const optgroup =
                 document.createElement("optgroup");
 
             optgroup.label =
-                group.label;
+                `${countryFlags[country] || "🌍"} ${country}`;
 
-            group.options
-                .sort((a, b) =>
-                    a.textContent.localeCompare(
-                        b.textContent
-                    )
-                )
-                .forEach(option =>
-                    optgroup.appendChild(option)
-                );
+            countryGroups[country]
+                .sort((a, b) => {
+
+                    const typeA =
+                        typeOrder[a.type] || 99;
+
+                    const typeB =
+                        typeOrder[b.type] || 99;
+
+                    if (typeA !== typeB) {
+                        return typeA - typeB;
+                    }
+
+                    return a.name.localeCompare(b.name);
+
+                })
+                .forEach(location => {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        location.id;
+
+                    const typeIcon =
+                        location.type === "lake"
+                            ? "🏞️"
+                            : location.type === "lagoon"
+                                ? "🏝️"
+                                : "🌊";
+
+                    option.textContent =
+                        `${typeIcon} ${location.name}` +
+                        (location.county
+                            ? ` (${location.county})`
+                            : "");
+
+                    optgroup.appendChild(option);
+
+                });
 
             select.appendChild(optgroup);
 
@@ -2874,7 +2873,6 @@ function loadLocations() {
     }
 
 }
-
 
 function getLocationDisplayName(location) {
     if (!location) return "";
