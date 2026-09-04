@@ -1,3 +1,4 @@
+<!-- Revision 2.7.2 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -960,6 +961,23 @@ body.dark-theme .journey-leave {
     margin: 5px 0 0;
     color: #6b7b88;
     font-size: 14px;
+}
+
+.app-menu-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.revision-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: #5c8299;
+    line-height: 1;
+    margin-right: 2px;
 }
 
 .app-menu {
@@ -2160,7 +2178,9 @@ body.dark-theme .sea-forecast-summary {
         <p>Sea &amp; lake conditions, forecasts and swim planning</p>
     </div>
 
-    <details class="app-menu" id="appMenu">
+    <div class="app-menu-wrap">
+        <div class="revision-label">REV 2.7.2</div>
+        <details class="app-menu" id="appMenu">
         <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
             <button type="button" class="menu-item" onclick="openGuide()">
@@ -2170,7 +2190,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.1</strong></span>
+                ℹ️ <span>App Version <strong>2.7.2</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2194,7 +2214,8 @@ body.dark-theme .sea-forecast-summary {
                 </select>
             </label>
         </div>
-    </details>
+        </details>
+    </div>
 
 </header>
 
@@ -2207,7 +2228,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.1</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.2</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2868,9 +2889,14 @@ function loadLocations() {
             location.type === "lagoon" ? "Lagoon" :
             "Sea";
 
+        const locationArea =
+            location.county
+                ? location.county + (country === "Canada" ? ", Canada" : "")
+                : (country === "Canada" ? "Canada" : "");
+
         option.textContent =
             `${typeIcon} ${typeLabel} — ${location.name}` +
-            (location.county ? " (" + location.county + ")" : "");
+            (locationArea ? " (" + locationArea + ")" : "");
 
         groups[country].options.push(option);
     });
@@ -3052,10 +3078,15 @@ if (seaTidesCard) {
             const lakeWaterTempFile =
                 selectedLocation.id === 6
                     ? "lake-temperature.json"
-                    : selectedLocation.region === "canada" &&
-                      (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")
-                        ? "buntzen-lake-temperature.json"
-                        : null;
+                    : null;
+
+            // Canadian lakes: Sasamat and Buntzen share the same current
+            // estimated temperature. Blueberry Docks has no usable source.
+            if (selectedLocation.region === "canada" &&
+                (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")) {
+                lakeWaterTemperature = 19.7;
+                lakeWaterTempEstimated = true;
+            }
 
             let lakeWaterTempEstimated = false;
 
@@ -4504,10 +4535,15 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         const waterTempFile =
             selectedLocation.id === 6
                 ? "lake-temperature.json"
-                : selectedLocation.region === "canada" &&
-                  (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")
-                    ? "buntzen-lake-temperature.json"
-                    : null;
+                : null;
+
+        // Canadian lakes: Sasamat and Buntzen share the same current
+        // estimated temperature. Blueberry Docks has no usable source.
+        if (selectedLocation.region === "canada" &&
+            (selectedLocation.name === "Sasamat Lake" || selectedLocation.name === "Buntzen Lake")) {
+            waterTemp = 19.7;
+            waterTempEstimated = true;
+        }
 
         if (waterTempFile) {
             try {
