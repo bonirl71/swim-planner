@@ -1,4 +1,3 @@
-<!-- Revision 2.7.2 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -963,26 +962,24 @@ body.dark-theme .journey-leave {
     font-size: 14px;
 }
 
-.app-menu-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-    flex-shrink: 0;
-}
-
-.revision-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    color: #5c8299;
-    line-height: 1;
-    margin-right: 2px;
-}
-
 .app-menu {
     position: relative;
     flex-shrink: 0;
+}
+
+.app-revision {
+    width: 50px;
+    margin: 0 auto 3px auto;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: #5c8299;
+}
+
+body.dark-theme .app-revision {
+    color: #7fa6ba;
 }
 
 .app-menu summary {
@@ -2178,9 +2175,8 @@ body.dark-theme .sea-forecast-summary {
         <p>Sea &amp; lake conditions, forecasts and swim planning</p>
     </div>
 
-    <div class="app-menu-wrap">
-        <div class="revision-label">REV 2.7.2</div>
-        <details class="app-menu" id="appMenu">
+    <details class="app-menu" id="appMenu">
+        <div class="app-revision">REV 2.7.2</div>
         <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
             <button type="button" class="menu-item" onclick="openGuide()">
@@ -2214,8 +2210,7 @@ body.dark-theme .sea-forecast-summary {
                 </select>
             </label>
         </div>
-        </details>
-    </div>
+    </details>
 
 </header>
 
@@ -2889,14 +2884,9 @@ function loadLocations() {
             location.type === "lagoon" ? "Lagoon" :
             "Sea";
 
-        const locationArea =
-            location.county
-                ? location.county + (country === "Canada" ? ", Canada" : "")
-                : (country === "Canada" ? "Canada" : "");
-
         option.textContent =
             `${typeIcon} ${typeLabel} — ${location.name}` +
-            (locationArea ? " (" + locationArea + ")" : "");
+            (location.county ? " (" + location.county + ")" : "");
 
         groups[country].options.push(option);
     });
@@ -3023,6 +3013,7 @@ if (seaTidesCard) {
         let tideData = null;
 
         let lakeWaterTemperature = null;
+        let lakeWaterTempEstimated = false;
 
 
         if (selectedLocation.type !== "lake") {
@@ -3088,9 +3079,7 @@ if (seaTidesCard) {
                 lakeWaterTempEstimated = true;
             }
 
-            let lakeWaterTempEstimated = false;
-
-            if (lakeWaterTempFile) {
+             if (lakeWaterTempFile) {
 
                 try {
 
@@ -3149,7 +3138,7 @@ if (seaTidesCard) {
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
-                    ${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? `🏞️ ${translateString("Lake water temperature")}${lakeWaterTempEstimated ? " (estimated)" : ""}: <strong>${formatTemperature(lakeWaterTemperature, 1)}</strong><br>` : selectedLocation.region === "canada" && selectedLocation.name === "Blueberry Docks" ? `<span class="lake-water-temp-unavailable">🏞️ ${translateString("Information not available for this location")}</span><br>` : ""}
+                    ${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? `🏞️ ${translateString("Lake water temperature")}${lakeWaterTempEstimated ? " (estimated)" : ""}: <strong>${formatTemperature(lakeWaterTemperature, 1)}</strong><br>` : selectedLocation.region === "canada" && selectedLocation.name === "Blueberry Docks" ? `<span class="lake-water-temp-unavailable">🏞️ ${translateString("Lake water temperature")}: ${translateString("Information not available for this location")}</span><br>` : ""}
                     💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
@@ -4661,7 +4650,7 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            ${state.waterTemp !== null ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}${state.waterTempEstimated ? " (estimated)" : ""}</span><span class="forecast-metric-value">${formatTemperature(state.waterTemp, 1)}</span></div>` : state.location.region === "canada" && state.location.name === "Blueberry Docks" ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${translateString("Information not available for this location")}</span></div>` : ""}
+            ${state.waterTemp !== null ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}${state.waterTempEstimated ? " (estimated)" : ""}</span><span class="forecast-metric-value">${formatTemperature(state.waterTemp, 1)}</span></div>` : state.location.region === "canada" && state.location.name === "Blueberry Docks" ? `<div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water temperature")}</span><span class="forecast-metric-value">${translateString("Information not available for this location")}</span></div>` : ""}
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
@@ -6598,7 +6587,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.1";
+const SWIM_RELEASE_VERSION = "2.7.2";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
