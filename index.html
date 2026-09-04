@@ -314,20 +314,33 @@ body {
 
 select {
     width: 100%;
-
-    padding: 14px;
-
-    border-radius: 10px;
-
+    min-height: 52px;
+    padding: 13px 44px 13px 15px;
+    border-radius: 12px;
     border: 1px solid #b8d7e8;
-
-    background: white;
-
+    background-color: white;
     color: #123;
-
-    font-size: 17px;
-
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
     cursor: pointer;
+}
+
+/* Keep the location picker especially clean on desktop and mobile.
+   The option list itself remains native so Android/iOS/desktop browsers
+   can use their own reliable picker UI. */
+#locationSelect {
+    min-height: 54px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+#locationSelect optgroup {
+    font-weight: 700;
+}
+
+#locationSelect option {
+    font-weight: 500;
 }
 
 
@@ -905,8 +918,12 @@ body.dark-theme .journey-leave {
 
     select {
         font-size: 16px;
+        padding: 12px 13px;
+    }
 
-        padding: 13px;
+    #locationSelect {
+        min-height: 52px;
+        font-size: 16px;
     }
 
     button {
@@ -2170,7 +2187,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.1</strong></span>
+                ℹ️ <span>App Version <strong>2.6.0</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2190,7 +2207,6 @@ body.dark-theme .sea-forecast-summary {
                     <option value="hi">हिन्दी</option>
                     <option value="es">Español</option>
                     <option value="fr">Français</option>
-                    <option value="uk">Українська</option>
                 </select>
             </label>
         </div>
@@ -2207,17 +2223,17 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.1</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.6.1</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
             <p class="release-intro">Here’s what’s new in this release:</p>
             <ul class="release-list">
-                <li><span class="release-icon">🌍</span><div><strong>Ukrainian language added</strong><br>Ukrainian is now available throughout the app, including menus, forecasts and dynamic information.</div></li>
-                <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Lake wind assessments are now location-specific. Youghal Quay keeps its local wind guidance; Twomilegate uses its known east/north-east exposure; other lakes do not receive invented compass-direction claims.</div></li>
-                <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
-                <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
-                <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
+                <li><span class="release-icon">🌍</span><div><strong>New languages</strong><br>English, Chinese, Hindi, Spanish and French are now available.</div></li>
+                <li><span class="release-icon">🌡️</span><div><strong>Temperature &amp; measurement units</strong><br>Switch between Metric (°C, km, m) and Imperial (°F, miles, ft) units from the menu.</div></li>
+                <li><span class="release-icon">📍</span><div><strong>More swim locations</strong><br>New lake and Tahiti locations have been added.</div></li>
+                <li><span class="release-icon">🌦️</span><div><strong>Improved forecast information</strong><br>Forecast details, conditions and swim recommendations have been improved.</div></li>
+                <li><span class="release-icon">📱</span><div><strong>Improved mobile experience</strong><br>Forecast and information panels have been refined for easier use on phones and tablets.</div></li>
             </ul>
             <div class="release-footer">
                 <span>Thanks for using Open Water Swim Planner. 🌊</span>
@@ -2370,7 +2386,6 @@ const swimLocations = [
 
     {
         id: 6,
-        country: "Ireland",
         name: "Youghal Quay",
         county: "Tipperary",
         latitude: 52.898509,
@@ -2380,7 +2395,6 @@ const swimLocations = [
     },
     {
         id: 8,
-        country: "Ireland",
         name: "Portumna Harbour",
         county: "Galway",
         latitude: 53.083405,
@@ -2390,31 +2404,10 @@ const swimLocations = [
     },
     {
         id: 9,
-        country: "Ireland",
         name: "Twomilegate",
         county: "Clare",
         latitude: 52.83623,
         longitude: -8.46424,
-        distance: "TBC",
-        type: "lake"
-    },
-    {
-        id: 13,
-        country: "Ukraine",
-        name: "Blue Lake (Kyiv Ukraine)",
-        county: "Kyiv Oblast",
-        latitude: 50.2486488821285,
-        longitude: 30.56133373633814,
-        distance: "TBC",
-        type: "lake"
-    },
-    {
-        id: 14,
-        country: "Ukraine",
-        name: "Gloria Lake (Kyiv Ukraine)",
-        county: "Kyiv Oblast",
-        latitude: 50.56906891068027,
-        longitude: 29.922190199229075,
         distance: "TBC",
         type: "lake"
     },
@@ -2425,7 +2418,6 @@ const swimLocations = [
 
     {
         id: 11,
-        country: "French Polynesia",
         name: "Taapuna Beach Sand Bank",
         county: "Tahiti",
         latitude: -17.60008633464791,
@@ -2441,7 +2433,6 @@ const swimLocations = [
 
     {
         id: 1,
-        country: "Ireland",
         name: "Blackhead Lighthouse and Gleninagh Pier",
         county: "Clare",
         latitude: 53.148,
@@ -2452,7 +2443,6 @@ const swimLocations = [
     },
     {
         id: 2,
-        country: "Ireland",
         name: "Fanore Beach",
         county: "Clare",
         latitude: 53.125,
@@ -2463,7 +2453,6 @@ const swimLocations = [
     },
     {
         id: 3,
-        country: "Ireland",
         name: "Lahinch Beach",
         county: "Clare",
         latitude: 53.053,
@@ -2474,7 +2463,6 @@ const swimLocations = [
     },
     {
         id: 4,
-        country: "Ireland",
         name: "Kilkee Bay",
         county: "Clare",
         latitude: 52.679141,
@@ -2485,7 +2473,6 @@ const swimLocations = [
     },
     {
         id: 5,
-        country: "Ireland",
         name: "Whitestrand",
         county: "Clare",
         latitude: 52.747723,
@@ -2496,7 +2483,6 @@ const swimLocations = [
     },
     {
         id: 7,
-        country: "Ireland",
         name: "Lambay Island",
         county: "Dublin",
         latitude: 53.49222995430973,
@@ -2507,7 +2493,6 @@ const swimLocations = [
     },
     {
         id: 10,
-        country: "French Polynesia",
         name: "Venus Point Bay",
         county: "Tahiti",
         latitude: -17.495652593749423,
@@ -2518,7 +2503,6 @@ const swimLocations = [
     },
     {
         id: 12,
-        country: "French Polynesia",
         name: "Channel Tahiti to Moorea",
         county: "Tahiti",
         latitude: -17.596466756769523,
@@ -2760,114 +2744,39 @@ function loadLocations() {
     const select =
         document.getElementById("locationSelect");
 
-    if (!select) return;
+    // Keep the picker uncluttered: locations are grouped by water type
+    // and the county/region is not repeated on every option.
+    const lakeGroup = document.createElement("optgroup");
+    lakeGroup.label = "🏞️ Lakes";
 
-    select.innerHTML = "";
+    const lagoonGroup = document.createElement("optgroup");
+    lagoonGroup.label = "🏝️ Lagoons";
 
-    /*
-       Group locations first by type (Lake / Sea),
-       then by country. This keeps the list easy to
-       scan as more international locations are added.
-    */
-
-    const groups = {};
+    const seaGroup = document.createElement("optgroup");
+    seaGroup.label = "🌊 Sea";
 
     swimLocations.forEach(location => {
+        const option = document.createElement("option");
+        option.value = location.id;
+        option.textContent = location.name;
 
-        // Lagoons are treated as marine/sea locations.
-        const typeKey =
-            location.type === "lake"
-                ? "lake"
-                : "sea";
-
-        const typeLabel =
-            typeKey === "lake"
-                ? "🏞️ Lakes"
-                : "🌊 Sea";
-
-        const country =
-            location.country ||
-            (location.region === "french-polynesia"
-                ? "French Polynesia"
-                : "Other");
-
-        const flag =
-            country === "Ireland" ? "🇮🇪" :
-            country === "Ukraine" ? "🇺🇦" :
-            country === "French Polynesia" ? "🇵🇫" :
-            "🌍";
-
-        const key =
-            `${typeKey}|${country}`;
-
-        if (!groups[key]) {
-
-            groups[key] = {
-                type: typeKey,
-                country,
-                label: `${typeKey === "lake" ? translateString("Lake Locations") : translateString("Sea Locations")} — ${flag} ${country}`,
-                options: []
-            };
-
+        if (location.type === "lake") {
+            lakeGroup.appendChild(option);
+        } else if (location.type === "lagoon") {
+            lagoonGroup.appendChild(option);
+        } else {
+            seaGroup.appendChild(option);
         }
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            location.id;
-
-        option.textContent =
-            location.name +
-            (location.county
-                ? " (" + location.county + ")"
-                : "");
-
-        groups[key].options.push(option);
-
     });
 
-    Object.values(groups)
-        .sort((a, b) => {
-
-            // Lakes first, then Sea.
-            if (a.type !== b.type) {
-                return a.type === "lake" ? -1 : 1;
-            }
-
-            // Countries alphabetically within each type.
-            return a.country.localeCompare(b.country);
-
-        })
-        .forEach(group => {
-
-            const optgroup =
-                document.createElement("optgroup");
-
-            optgroup.label =
-                group.label;
-
-            group.options
-                .sort((a, b) =>
-                    a.textContent.localeCompare(
-                        b.textContent
-                    )
-                )
-                .forEach(option =>
-                    optgroup.appendChild(option)
-                );
-
-            select.appendChild(optgroup);
-
-        });
+    if (lakeGroup.children.length) select.appendChild(lakeGroup);
+    if (lagoonGroup.children.length) select.appendChild(lagoonGroup);
+    if (seaGroup.children.length) select.appendChild(seaGroup);
 
     // Make Youghal Quay the default location.
-    const youghalOption =
-        Array.from(select.options).find(option =>
-            option.textContent
-                .toLowerCase()
-                .includes("youghal quay")
-        );
+    const youghalOption = Array.from(select.options).find(option =>
+        option.textContent.toLowerCase().includes("youghal quay")
+    );
 
     if (youghalOption) {
         select.value = youghalOption.value;
@@ -3020,51 +2929,38 @@ if (seaTidesCard) {
 
             /* =========================
                LAKE WATER TEMPERATURE
-
-               Reliable lake water temperature is
-               currently available only for Youghal Quay.
-               Do NOT use the Youghal value for other lakes.
                ========================= */
 
-            if (selectedLocation.id === 6) {
+            try {
 
-                try {
-
-                    const waterTempResponse =
-                        await fetch(
-                            "lake-temperature.json?t=" +
-                            Date.now()
-                        );
-
-                    const waterTempData =
-                        await waterTempResponse.json();
-
-                    lakeWaterTemperature =
-                        Number(
-                            waterTempData.temperature
-                        );
-
-                    console.log(
-                        "🌡️ YOUGHAL LAKE WATER TEMPERATURE:",
-                        lakeWaterTemperature,
-                        "°C"
+                const waterTempResponse =
+                    await fetch(
+                        "lake-temperature.json?t=" +
+                        Date.now()
                     );
 
-                }
-                catch (error) {
+                const waterTempData =
+                    await waterTempResponse.json();
 
-                    console.warn(
-                        "Youghal lake water temperature unavailable:",
-                        error
+                lakeWaterTemperature =
+                    Number(
+                        waterTempData.temperature
                     );
 
-                    lakeWaterTemperature = null;
+                console.log(
+                    "🌡️ LAKE WATER TEMPERATURE:",
+                    lakeWaterTemperature,
+                    "°C"
+                );
 
-                }
+            }
+            catch (error) {
 
-            } else {
+                console.error(
+                    "LAKE WATER TEMPERATURE ERROR:",
+                    error
+                );
 
-                // No reliable water-temperature source for this lake.
                 lakeWaterTemperature = null;
 
             }
@@ -3073,13 +2969,13 @@ if (seaTidesCard) {
             const windSpeed = Number(current.wind_speed_10m);
             const windDegrees = Number(current.wind_direction_10m);
             const windDirection = getWindDirection(windDegrees);
-            const assessment = getLakeAssessment(selectedLocation, windDegrees, windSpeed);
+            const assessment = getLakeAssessment(windDegrees, windSpeed);
 
             document.getElementById("conditions").innerHTML = `
                 <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
                 <div class="conditions-metrics">
                     🌡️ ${translateString("Air temperature")}: <strong>${formatTemperature(current.temperature_2m, 1)}</strong><br>
-                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Information not available for this location")}</strong><br>
+                    🏞️ ${translateString("Lake water temperature")}: <strong>${lakeWaterTemperature !== null && Number.isFinite(lakeWaterTemperature) ? formatTemperature(lakeWaterTemperature, 1) : translateString("Unavailable")}</strong><br>
                     💨 ${translateString("Wind")}: <strong>${formatWind(windSpeed, 1)} ${windDirection}</strong> (${windDegrees.toFixed(0)}°)<br>
                     ☁️ ${translateString("Conditions")}: <strong>${getWeatherDescription(current.weather_code)}</strong>
                 </div>
@@ -3091,7 +2987,7 @@ if (seaTidesCard) {
                     <strong>${translateString(assessment.condition)}</strong>
                 </div>
                 ${translateString(assessment.advice)}<br><br>
-                ${selectedLocation.id === 6 ? `<strong>📍 ${translateString("Sheltered side")}</strong><br>` : `<strong>📍 ${translateString("Conditions")}</strong><br>`}
+                <strong>📍 ${translateString("Sheltered side")}</strong><br>
                 ${translateString(assessment.impact)}
             `;
 
@@ -4283,7 +4179,7 @@ function closeSeaForecastDetail() {
    LAKE FORECAST
    ========================= */
 
-function getYoughalLakeAssessment(windDegrees, windSpeed) {
+function getLakeAssessment(windDegrees, windSpeed) {
     let condition;
     let impact;
     let advice;
@@ -4330,69 +4226,6 @@ function getYoughalLakeAssessment(windDegrees, windSpeed) {
     }
 
     return { condition, impact, advice };
-}
-
-/*
-   Lake wind behaviour is location-specific. Do not apply one compass-direction
-   rule to every lake: wind impact depends on the lake shape, fetch and the
-   swimmer's shoreline. Where we do not have reliable local exposure information,
-   the app deliberately avoids inventing directional claims and uses wind speed
-   only.
-*/
-function getLocationSpecificLakeAssessment(selectedLocation, windDegrees, windSpeed) {
-    // Twomilegate is on the western shore of Lough Derg. Local angling guidance
-    // specifically warns about strong easterly and north-easterly winds.
-    if (selectedLocation && selectedLocation.id === 9) {
-        const eastExposure = windDegrees >= 67.5 && windDegrees < 112.5;
-        const northEastExposure = windDegrees >= 22.5 && windDegrees < 67.5;
-
-        if (eastExposure || northEastExposure) {
-            let condition = windSpeed > 5 ? "🔴 EXPOSED / CHOPPY" : "🟠 INCREASING CHOP";
-            let impact = "More exposed to wind-driven chop from this direction";
-            let advice = eastExposure
-                ? "Easterly wind can make Twomilegate more exposed; take extra care as wind strength increases."
-                : "North-easterly wind can make Twomilegate more exposed; take extra care as wind strength increases.";
-
-            if (windSpeed > 7) {
-                condition = "🔴 EXPOSED / STRONG WIND";
-                advice += " Strong wind may make conditions unsuitable for swimming.";
-            } else if (windSpeed > 5) {
-                advice += " Moderate wind — expect increased chop.";
-            }
-            return { condition, impact, advice };
-        }
-    }
-
-    // For locations where we do not yet have verified local wind-exposure
-    // information, do not pretend that N/E/S/W have the same meaning everywhere.
-    if (windSpeed > 7) {
-        return {
-            condition: "🔴 STRONG WIND",
-            impact: "Wind impact depends on the local lake shape and exposure",
-            advice: "Strong wind can make lake conditions rough. Local wind exposure is not yet modelled for this location."
-        };
-    }
-
-    if (windSpeed > 5) {
-        return {
-            condition: "🟠 MODERATE WIND",
-            impact: "Wind impact depends on the local lake shape and exposure",
-            advice: "Moderate wind may increase chop. Local wind exposure is not yet modelled for this location."
-        };
-    }
-
-    return {
-        condition: "🟢 LIGHT WIND",
-        impact: "Generally lower risk of wind-driven chop",
-        advice: "Light wind should limit wind-driven chop, although local shelter and exposure vary by lake."
-    };
-}
-
-function getLakeAssessment(selectedLocation, windDegrees, windSpeed) {
-    if (selectedLocation && selectedLocation.id === 6) {
-        return getYoughalLakeAssessment(windDegrees, windSpeed);
-    }
-    return getLocationSpecificLakeAssessment(selectedLocation, windDegrees, windSpeed);
 }
 
 function getWeatherIcon(code) {
@@ -4457,20 +4290,15 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
         const d = data.daily;
 
         let waterTemp = null;
-
-        // Reliable lake water temperature is currently available
-        // only for Youghal Quay. Never reuse that value for another lake.
-        if (selectedLocation.id === 6) {
-            try {
-                const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
-                if (tempResponse.ok) {
-                    const tempData = await tempResponse.json();
-                    const parsed = Number(tempData.temperature);
-                    if (Number.isFinite(parsed)) waterTemp = parsed;
-                }
-            } catch (e) {
-                console.warn("Youghal lake water temperature unavailable for forecast", e);
+        try {
+            const tempResponse = await fetch("lake-temperature.json?t=" + Date.now());
+            if (tempResponse.ok) {
+                const tempData = await tempResponse.json();
+                const parsed = Number(tempData.temperature);
+                if (Number.isFinite(parsed)) waterTemp = parsed;
             }
+        } catch (e) {
+            console.warn("Lake water temperature unavailable for forecast", e);
         }
 
         const forecast = d.time.map((date, i) => ({
@@ -4482,7 +4310,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             gust: d.wind_gusts_10m_max[i],
             direction: d.wind_direction_10m_dominant[i],
             rain: d.precipitation_probability_max[i],
-            assessment: getLakeAssessment(selectedLocation, d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
+            assessment: getLakeAssessment(d.wind_direction_10m_dominant[i], d.wind_speed_10m_max[i])
         }));
 
         /*
@@ -4500,7 +4328,7 @@ async function loadLakeForecast(selectedLocation, currentConditions = null) {
             if (Number.isFinite(currentWind) && Number.isFinite(currentDirection)) {
                 today.wind = currentWind;
                 today.direction = currentDirection;
-                today.assessment = getLakeAssessment(selectedLocation, currentDirection, currentWind);
+                today.assessment = getLakeAssessment(currentDirection, currentWind);
             }
             if (Number.isFinite(currentTemp)) {
                 today.maxTemp = currentTemp;
@@ -4573,7 +4401,7 @@ function showLakeForecastDay(index) {
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Wind")}</span><span class="forecast-metric-value">${formatWind(day.wind, 0)} ${getCompassDirection(day.direction)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Gusts")}</span><span class="forecast-metric-value">${formatWind(day.gust, 0)}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Rain probability")}</span><span class="forecast-metric-value">${day.rain ?? "—"}%</span></div>
-            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : translateString("Information not available for this location")}</span></div>
+            <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Lake water")}</span><span class="forecast-metric-value">${state.waterTemp !== null ? formatTemperature(state.waterTemp, 1) : "Unavailable"}</span></div>
             <div class="forecast-metric"><span class="forecast-metric-label">${translateString("Weather")}</span><span class="forecast-metric-value">${getWeatherDescription(day.weatherCode)}</span></div>
         </div>
 
@@ -5388,8 +5216,7 @@ const languageNames = {
     zh: "中文",
     hi: "हिन्दी",
     es: "Español",
-    fr: "Français",
-    uk: "Українська"
+    fr: "Français"
 };
 
 const languageText = {
@@ -5604,102 +5431,6 @@ const languageText = {
         "Lake Locations": "Lieux de lac", "Sea Locations": "Lieux de mer", "Lagoon Locations": "Lieux de lagon"
     }
 };
-
-/* Ukrainian language support. Start with the complete English dictionary so no UI string is ever lost, then override every user-facing label used by the app. */
-languageText.uk = Object.assign({}, languageText.en, {
-    "How to Use the Swim Planner": "Як користуватися планувальником плавання",
-    "How to Use": "Як користуватися",
-    "App Version": "Версія застосунку",
-    "Dark Theme": "Темна тема",
-    "Light Theme": "Світла тема",
-    "Units": "Одиниці",
-    "Language": "Мова",
-    "Choose Swim Location": "Виберіть місце для плавання",
-    "Current Conditions": "Поточні умови",
-    "Swim Recommendation": "Рекомендація для плавання",
-    "Sea Forecast": "Прогноз для моря",
-    "Lake Forecast": "Прогноз для озера",
-    "Tide Outlook": "Прогноз припливів і відпливів",
-    "Journey Planner": "Планувальник поїздки",
-    "Click for tide info": "Натисніть для інформації про припливи",
-    "Click to plan your journey": "Натисніть, щоб спланувати поїздку",
-    "Show current conditions": "Показати поточні умови",
-    "Select a day to see the expected weather, wind, waves and sea conditions.": "Виберіть день, щоб переглянути очікувану погоду, вітер, хвилі та морські умови.",
-    "Select a day to see the expected weather, wind and lake conditions.": "Виберіть день, щоб переглянути очікувану погоду, вітер та умови на озері.",
-    "Select a high tide to see the surrounding tide times.": "Виберіть приплив, щоб переглянути час сусідніх припливів і відпливів.",
-    "Choose the high tide you want to swim for:": "Виберіть приплив, для якого ви плануєте плавання:",
-    "Calculate Journey From My Location": "Розрахувати поїздку від мого місцезнаходження",
-    "Predict Swim Conditions": "Прогнозувати умови для плавання",
-    "Check swim conditions first...": "Спочатку перевірте умови для плавання...",
-    "Waiting for location and tide information...": "Очікування інформації про місце та припливи...",
-    "Select a location and check conditions.": "Виберіть місце та перевірте умови.",
-    "Waiting for data...": "Очікування даних...",
-    "Getting current conditions...": "Отримання поточних умов...",
-    "Loading conditions...": "Завантаження умов...",
-    "Loading recommendation...": "Завантаження рекомендації...",
-    "Loading sea forecast...": "Завантаження прогнозу для моря...",
-    "Loading lake forecast...": "Завантаження прогнозу для озера...",
-    "Unable to load the sea forecast. Please try again.": "Не вдалося завантажити прогноз для моря. Спробуйте ще раз.",
-    "Unable to load the lake forecast. Please try again.": "Не вдалося завантажити прогноз для озера. Спробуйте ще раз.",
-    "Please choose a high tide first.": "Спочатку виберіть приплив.",
-    "Getting forecast conditions for your swim...": "Отримання прогнозу умов для вашого плавання...",
-    "Swim Score": "Оцінка плавання",
-    "Excellent conditions": "Відмінні умови",
-    "Good conditions": "Хороші умови",
-    "Challenging conditions": "Складні умови",
-    "Poor conditions": "Погані умови",
-    "Air temperature": "Температура повітря",
-    "Water temperature": "Температура води",
-    "Wind speed": "Швидкість вітру",
-    "Wind direction": "Напрямок вітру",
-    "Gusts": "Пориви",
-    "Rain probability": "Ймовірність дощу",
-    "Wave height": "Висота хвиль",
-    "Wave period": "Період хвиль",
-    "Wave direction": "Напрямок хвиль",
-    "Swell direction": "Напрямок брижів",
-    "Lake water": "Вода в озері",
-    "Sea water": "Морська вода",
-    "Unavailable": "Недоступно",
-    "Today": "Сьогодні",
-    "Close": "Закрити",
-    "Phone": "Телефон",
-    "Desktop PC": "Настільний ПК",
-    "Lake Locations": "Озера",
-    "Sea Locations": "Морські місця",
-    "Lagoon Locations": "Лагуни",
-    "Forecast guidance only": "Лише інформаційний прогноз",
-    "Air temperature": "Температура повітря",
-    "Wind": "Вітер",
-    "Conditions": "Погодні умови",
-    "Clear sky ☀️": "Ясне небо ☀️",
-    "Cloudy ☁️": "Хмарно ☁️",
-    "Fog 🌫️": "Туман 🌫️",
-    "Rain 🌧️": "Дощ 🌧️",
-    "Snow ❄️": "Сніг ❄️",
-    "Rain showers 🌦️": "Зливи 🌦️",
-    "Thunderstorm ⛈️": "Гроза ⛈️",
-    "Unknown": "Невідомо",
-    "North": "Північ", "North-East": "Північний схід", "East": "Схід",
-    "South-East": "Південний схід", "South": "Південь", "South-West": "Південний захід",
-    "West": "Захід", "North-West": "Північний захід",
-    "Selected high tide": "Вибраний приплив", "High Tide": "Приплив", "Low Tide": "Відплив",
-    "Tides for": "Припливи для", "Full forecast": "Повний прогноз", "Plan your swim": "Спланувати плавання",
-    "Predicted Swim Conditions": "Прогнозовані умови для плавання", "Predicted Swim Score": "Прогнозована оцінка плавання",
-    "Strong wind may make conditions significantly rougher than normal.": "Сильний вітер може зробити умови значно складнішими, ніж зазвичай.",
-    "Moderate wind — expect increased chop.": "Помірний вітер — очікується більше хвиль.",
-    "CALM TO SLIGHT CHOP": "СПОКІЙНО АБО ЛЕГКІ ХВИЛІ",
-    "INCREASING CHOP": "ХВИЛІ ПОСИЛЮЮТЬСЯ",
-    "CHOPPY": "ХВИЛЯСТО",
-    "SLIGHTLY CHOPPY": "НЕЗНАЧНО ХВИЛЯСТО",
-    "CHOPPY / STRONG WIND": "ХВИЛЯСТО / СИЛЬНИЙ ВІТЕР",
-    "Small waves": "Невеликі хвилі", "Moderate waves": "Помірні хвилі", "Large waves": "Великі хвилі",
-    "Comfortable water temperature": "Комфортна температура води", "Cold water": "Холодна вода", "Very cold water": "Дуже холодна вода",
-    "Light wind": "Легкий вітер", "Moderate wind": "Помірний вітер", "Strong wind": "Сильний вітер",
-    "Sheltered side": "Захищений бік",
-    "Unable to calculate the journey.": "Не вдалося розрахувати поїздку.",
-    "Journey time is an estimate and does not include traffic, stops or delays.": "Час поїздки є приблизним і не враховує затори, зупинки чи затримки."
-});
 
 function getLanguage() {
     const saved = localStorage.getItem(SWIM_LANGUAGE_KEY);
@@ -6060,156 +5791,17 @@ const extraLanguageText = {
         "Open the menu to access this guide and see the current App Version.": "इस गाइड और वर्तमान ऐप संस्करण को देखने के लिए मेनू खोलें।",
         "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "पूर्वानुमान की स्थितियाँ बदल सकती हैं, खासकर कई दिन पहले के पूर्वानुमान। अनुमान केवल मार्गदर्शन हैं और इन्हें तैराकी की सुरक्षा के आकलन के रूप में नहीं लेना चाहिए। तैरने से पहले हमेशा नवीनतम पूर्वानुमान और स्थानीय स्थितियाँ जाँचें।"
     }
-,
-    uk: {
-        "How to Use the Swim Planner": "Як користуватися планувальником плавання",
-        "How to Use": "Як користуватися",
-        "App Version": "Версія застосунку",
-        "Dark Theme": "Темна тема",
-        "Light Theme": "Світла тема",
-        "Units": "Одиниці",
-        "Language": "Мова",
-        "Choose Swim Location": "Виберіть місце для плавання",
-        "Current Conditions": "Поточні умови",
-        "Swim Recommendation": "Рекомендація для плавання",
-        "Sea Forecast": "Прогноз для моря",
-        "Lake Forecast": "Прогноз для озера",
-        "Tide Outlook": "Прогноз припливів і відпливів",
-        "Journey Planner": "Планувальник поїздки",
-        "Click for tide info": "Натисніть для інформації про припливи",
-        "Click to plan your journey": "Натисніть, щоб спланувати поїздку",
-        "Show current conditions": "Показати поточні умови",
-        "Select a day to see the expected weather, wind, waves and sea conditions.": "Виберіть день, щоб переглянути очікувану погоду, вітер, хвилі та морські умови.",
-        "Select a day to see the expected weather, wind and lake conditions.": "Виберіть день, щоб переглянути очікувану погоду, вітер та умови на озері.",
-        "Select a high tide to see the surrounding tide times.": "Виберіть приплив, щоб переглянути час сусідніх припливів і відпливів.",
-        "Choose the high tide you want to swim for:": "Виберіть приплив, для якого ви плануєте плавання:",
-        "Calculate Journey From My Location": "Розрахувати поїздку від мого місцезнаходження",
-        "Predict Swim Conditions": "Прогнозувати умови для плавання",
-        "Check swim conditions first...": "Спочатку перевірте умови для плавання...",
-        "Waiting for location and tide information...": "Очікування інформації про місце та припливи...",
-        "Select a location and check conditions.": "Виберіть місце та перевірте умови.",
-        "Waiting for data...": "Очікування даних...",
-        "Getting current conditions...": "Отримання поточних умов...",
-        "Loading conditions...": "Завантаження умов...",
-        "Loading recommendation...": "Завантаження рекомендації...",
-        "Loading sea forecast...": "Завантаження прогнозу для моря...",
-        "Loading lake forecast...": "Завантаження прогнозу для озера...",
-        "Unable to load the sea forecast. Please try again.": "Не вдалося завантажити прогноз для моря. Спробуйте ще раз.",
-        "Unable to load the lake forecast. Please try again.": "Не вдалося завантажити прогноз для озера. Спробуйте ще раз.",
-        "Please choose a high tide first.": "Спочатку виберіть приплив.",
-        "Getting forecast conditions for your swim...": "Отримання прогнозу умов для вашого плавання...",
-        "Swim Score": "Оцінка плавання",
-        "Excellent conditions": "Відмінні умови",
-        "Good conditions": "Хороші умови",
-        "Challenging conditions": "Складні умови",
-        "Poor conditions": "Погані умови",
-        "Air temperature": "Температура повітря",
-        "Water temperature": "Температура води",
-        "Wind speed": "Швидкість вітру",
-        "Wind direction": "Напрямок вітру",
-        "Gusts": "Пориви",
-        "Rain probability": "Ймовірність дощу",
-        "Wave height": "Висота хвиль",
-        "Wave period": "Період хвиль",
-        "Wave direction": "Напрямок хвиль",
-        "Swell direction": "Напрямок брижів",
-        "Lake water": "Вода в озері",
-        "Sea water": "Морська вода",
-        "Unavailable": "Недоступно",
-        "Today": "Сьогодні",
-        "Close": "Закрити",
-        "Phone": "Телефон",
-        "Desktop PC": "Настільний ПК",
-        "Lake Locations": "Озера",
-        "Sea Locations": "Морські місця",
-        "Lagoon Locations": "Лагуни"
-    },
-    "uk": {
-        "Sea Swim Planner": "Планувальник морського плавання",
-        "Open Water Swim Planner": "Планувальник плавання у відкритій воді",
-        "Sea & lake conditions, forecasts and swim planning": "Морські та озерні умови, прогнози та планування плавання",
-        "7-DAY OUTLOOK": "ПРОГНОЗ НА 7 ДНІВ",
-        "SWIM LOCATION": "МІСЦЕ ДЛЯ ПЛАВАННЯ",
-        "Choose your swim location.": "Виберіть місце для плавання.",
-        "View the forecast.": "Переглянути прогноз.",
-        "Select a day.": "Виберіть день.",
-        "Current conditions.": "Поточні умови.",
-        "Close a pop-up.": "Закрити спливаюче вікно.",
-        "Use the Close button or X when available.": "Використовуйте кнопку Закрити або X, якщо вона доступна.",
-        "Sea locations — Tide Info.": "Морські місця — інформація про припливи.",
-        "When viewing a sea forecast day, choose the tide option if you want tide information for that date.": "Під час перегляду прогнозу для моря виберіть параметр припливів, якщо хочете отримати інформацію про припливи на цю дату.",
-        "Sea locations — Make Travel Plans.": "Морські місця — планування поїздки.",
-        "Make travel plans": "Спланувати поїздку",
-        "Lake locations.": "Озерні місця.",
-        "Lake forecasts do not use sea tide information. Select a forecast day to see the lake information for that date.": "Прогнози для озер не використовують інформацію про морські припливи. Виберіть день прогнозу, щоб переглянути інформацію про озеро на цю дату.",
-        "Close a pop-up.": "Закрити спливаюче вікно.",
-        "Use the Close button or X when available.": "Використовуйте кнопку Закрити або X, якщо вона доступна.",
-        "Units.": "Одиниці.",
-        "Use the Units option in the header menu to switch between Metric (km, °C, metres) and Imperial (miles, °F, feet). Wind speed changes between m/s and mph.": "Використовуйте параметр Одиниці у верхньому меню, щоб перемикатися між метричними (км, °C, метри) та імперськими (милі, °F, фути) одиницями. Швидкість вітру перемикається між м/с та миль/год.",
-        "Light / Dark theme.": "Світла / темна тема.",
-        "Use the theme option in the header to switch themes. Dark theme is the default.": "Використовуйте параметр теми у верхній частині екрана, щоб перемикати теми. Темна тема використовується за замовчуванням.",
-        "App information.": "Інформація про застосунок.",
-        "Open the menu to access this guide and see the current App Version.": "Відкрийте меню, щоб переглянути цей посібник і поточну версію застосунку.",
-        "Forecast guidance only": "Лише інформаційний прогноз",
-        "Forecast conditions can change, particularly several days in advance. Predictions are a guide only and should not be relied upon as an assessment of swimming safety. Always check the latest forecast and local conditions before swimming.": "Прогнозовані умови можуть змінюватися, особливо за кілька днів наперед. Прогноз є лише орієнтиром і не повинен використовуватися для оцінки безпеки плавання. Перед плаванням завжди перевіряйте найсвіжіший прогноз і місцеві умови.",
-        "Selected high tide": "Вибраний приплив", "High Tide": "Приплив", "Low Tide": "Відплив",
-        "Full forecast": "Повний прогноз", "Plan your swim": "Спланувати плавання",
-        "Predicted Swim Conditions": "Прогнозовані умови для плавання", "Predicted Swim Score": "Прогнозована оцінка плавання",
-        "Strong wind may make conditions significantly rougher than normal.": "Сильний вітер може зробити умови значно складнішими, ніж зазвичай.",
-        "Moderate wind — expect increased chop.": "Помірний вітер — очікується більше хвиль.",
-        "CALM TO SLIGHT CHOP": "СПОКІЙНО АБО ЛЕГКІ ХВИЛІ",
-        "INCREASING CHOP": "ХВИЛІ ПОСИЛЮЮТЬСЯ",
-        "CHOPPY": "ХВИЛЯСТО",
-        "SLIGHTLY CHOPPY": "НЕЗНАЧНО ХВИЛЯСТО",
-        "CHOPPY / STRONG WIND": "ХВИЛЯСТО / СИЛЬНИЙ ВІТЕР",
-        "Small waves": "Невеликі хвилі", "Moderate waves": "Помірні хвилі", "Large waves": "Великі хвилі",
-        "Comfortable water temperature": "Комфортна температура води", "Cold water": "Холодна вода", "Very cold water": "Дуже холодна вода",
-        "Light wind": "Легкий вітер", "Moderate wind": "Помірний вітер", "Strong wind": "Сильний вітер",
-        "Unable to calculate the journey.": "Не вдалося розрахувати поїздку.",
-        "Journey time is an estimate and does not include traffic, stops or delays.": "Час поїздки є приблизним і не враховує затори, зупинки чи затримки.",
-        "Youghal Quay is the default location when the app opens. Select another sea or lake location from the location menu if required.": "Youghal Quay є місцем за замовчуванням під час відкриття застосунку. За потреби виберіть інше морське або озерне місце в меню.",
-        "The forecast loads automatically when you choose a location. The 7-day forecast is the main view.": "Прогноз завантажується автоматично після вибору місця. Основним є прогноз на 7 днів.",
-        "Tap a forecast day to open the information for that day. If the selected day is today, it is shown as": "Натисніть день прогнозу, щоб переглянути інформацію за цей день. Якщо вибрано сьогодні, він відображається як",
-        "Current conditions and the Swim Recommendation are kept out of the main phone view to reduce clutter. They remain available on the main desktop view.": "Поточні умови та рекомендація для плавання не відображаються на головному екрані телефона, щоб зменшити перевантаження. Вони доступні в основному вигляді на комп’ютері.",
-        "Lake locations do not display the sea Tide Info or Journey Planner buttons. The lake forecast is presented using lake-specific information.": "Для озерних місць не відображаються кнопки морських припливів або планувальника поїздки. Прогноз для озера використовує інформацію, специфічну для озера."
-    }
 };
 Object.keys(extraLanguageText).forEach(lang => {
     if (languageText[lang]) Object.assign(languageText[lang], extraLanguageText[lang]);
 });
 // Additional labels used by dynamically generated forecast/condition cards.
 const dynamicLabelTranslations = {
-  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧","Information not available for this location":"此位置暂无可用信息"},
-  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा","Information not available for this location":"इस स्थान के लिए जानकारी उपलब्ध नहीं है"},
-  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido","Information not available for this location":"Información no disponible para esta ubicación"},
-  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité","Information not available for this location":"Informations non disponibles pour cet emplacement"},
-  uk: {"Lake water temperature":"Температура води в озері","Weather":"Погода","Sheltered side":"Захищений бік","Information not available for this location":"Інформація недоступна для цього місця"}
+  zh: {"Lake water temperature":"湖水温度","Weather":"天气","Sheltered side":"避风一侧"},
+  hi: {"Lake water temperature":"झील के पानी का तापमान","Weather":"मौसम","Sheltered side":"आश्रय वाला किनारा"},
+  es: {"Lake water temperature":"Temperatura del agua del lago","Weather":"Tiempo","Sheltered side":"Lado protegido"},
+  fr: {"Lake water temperature":"Température de l’eau du lac","Weather":"Météo","Sheltered side":"Côté abrité"}
 };
-/* Ukrainian labels for dynamically generated cards and release notes. */
-Object.assign(languageText.uk, {
-    "Lake water temperature": "Температура води в озері",
-    "Weather": "Погода",
-    "Sheltered side": "Захищений бік",
-    "Show tides for this day": "Показати припливи цього дня",
-    "Make travel plans": "Спланувати поїздку",
-    "Show full forecast details": "Показати повний прогноз",
-    "Plan your swim": "Спланувати плавання",
-    "Predict Swim Conditions": "Прогнозувати умови для плавання",
-    "Here's what’s new in this release:": "Ось що нового в цьому випуску:",
-    "New languages": "Нові мови",
-    "English, Chinese, Hindi, Spanish, French and Ukrainian are now available.": "Тепер доступні англійська, китайська, гінді, іспанська, французька та українська мови.",
-    "Temperature & measurement units": "Температура та одиниці вимірювання",
-    "Switch between Metric (°C, km, m) and Imperial (°F, miles, ft) units from the menu.": "Перемикайтеся між метричними (°C, км, м) та імперськими (°F, милі, фути) одиницями в меню.",
-    "More swim locations": "Більше місць для плавання",
-    "New lake and Tahiti locations have been added.": "Додано нові озерні та таїтянські місця.",
-    "Improved forecast information": "Покращена інформація про прогноз",
-    "Forecast details, conditions and swim recommendations have been improved.": "Деталі прогнозу, умови та рекомендації для плавання було покращено.",
-    "Improved mobile experience": "Покращений мобільний досвід",
-    "Forecast and information panels have been refined for easier use on phones and tablets.": "Панелі прогнозу та інформації вдосконалено для зручнішого використання на телефонах і планшетах.",
-    "Information not available for this location": "Інформація недоступна для цього місця",
-    "Not available for this location": "Недоступно для цього місця"
-});
-
 Object.keys(dynamicLabelTranslations).forEach(lang => {
   if (languageText[lang]) Object.assign(languageText[lang], dynamicLabelTranslations[lang]);
 });
@@ -6217,8 +5809,7 @@ const dynamicUiTranslations = {
   zh: {"Show tides for this day":"显示当天潮汐","Make travel plans":"制定行程","Show full forecast details":"显示完整预报详情","Plan your swim":"规划您的游泳","Predict Swim Conditions":"预测游泳条件"},
   hi: {"Show tides for this day":"इस दिन का ज्वार दिखाएँ","Make travel plans":"यात्रा की योजना बनाएँ","Show full forecast details":"पूरा पूर्वानुमान दिखाएँ","Plan your swim":"अपनी तैराकी की योजना बनाएँ","Predict Swim Conditions":"तैराकी की स्थितियों का अनुमान लगाएँ"},
   es: {"Show tides for this day":"Mostrar las mareas de este día","Make travel plans":"Planificar el viaje","Show full forecast details":"Mostrar el pronóstico completo","Plan your swim":"Planificar tu natación","Predict Swim Conditions":"Predecir las condiciones de natación"},
-  fr: {"Show tides for this day":"Afficher les marées de ce jour","Make travel plans":"Planifier le trajet","Show full forecast details":"Afficher les prévisions complètes","Plan your swim":"Planifier votre baignade","Predict Swim Conditions":"Prévoir les conditions de baignade"},
-  uk: {"Show tides for this day":"Показати припливи цього дня","Make travel plans":"Спланувати поїздку","Show full forecast details":"Показати повний прогноз","Plan your swim":"Спланувати плавання","Predict Swim Conditions":"Прогнозувати умови для плавання"}
+  fr: {"Show tides for this day":"Afficher les marées de ce jour","Make travel plans":"Planifier le trajet","Show full forecast details":"Afficher les prévisions complètes","Plan your swim":"Planifier votre baignade","Predict Swim Conditions":"Prévoir les conditions de baignade"}
 };
 Object.keys(dynamicUiTranslations).forEach(lang => {
   if (languageText[lang]) Object.assign(languageText[lang], dynamicUiTranslations[lang]);
@@ -6263,8 +5854,7 @@ function getLanguageLocale() {
         zh: "zh-CN",
         hi: "hi-IN",
         es: "es-ES",
-        fr: "fr-FR",
-        uk: "uk-UA"
+        fr: "fr-FR"
     }[getLanguage()] || "en-IE";
 }
 
@@ -6289,8 +5879,7 @@ function formatForecastWeekday(date, long = false) {
         zh: ["周日","周一","周二","周三","周四","周五","周六"],
         hi: ["रवि","सोम","मंगल","बुध","गुरु","शुक्र","शनि"],
         es: ["dom","lun","mar","mié","jue","vie","sáb"],
-        fr: ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."],
-        uk: ["нд","пн","вт","ср","чт","пт","сб"]
+        fr: ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."]
     };
     if (!long) return (short[getLanguage()] || short.en)[dayIndex];
     return new Date(date + "T12:00:00").toLocaleDateString(getLanguageLocale(), {weekday:"long", day:"numeric", month:"long"});
@@ -6510,7 +6099,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.1";
+const SWIM_RELEASE_VERSION = "2.6.1";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
