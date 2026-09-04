@@ -2184,7 +2184,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.3</div>
+        <div class="app-revision">REV 2.7.4</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2195,7 +2195,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.3</strong></span>
+                ℹ️ <span>App Version <strong>2.7.4</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2233,7 +2233,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.3</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.4</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2595,7 +2595,9 @@ const swimLocations = [
         longitude: -123.15356858113007,
         distance: "TBC",
         type: "sea",
-        region: "canada"
+        region: "canada",
+        canadianTideStationCode: "07707",
+        tideTimeZone: "America/Vancouver"
     },
     {
         id: 19,
@@ -2606,7 +2608,9 @@ const swimLocations = [
         longitude: -123.19447928835316,
         distance: "TBC",
         type: "sea",
-        region: "canada"
+        region: "canada",
+        canadianTideStationCode: "07707",
+        tideTimeZone: "America/Vancouver"
     },
     {
         id: 20,
@@ -2943,6 +2947,77 @@ function updateDesktopSeaActions(location) {
             : "none";
 }
 
+async function fetchCanadianTideData(stationCode, fromDate, toDate) {
+
+    const stationsResponse = await fetch(
+        "https://api-iwls.dfo-mpo.gc.ca/api/v1/stations"
+    );
+
+    if (!stationsResponse.ok) {
+        throw new Error("Canadian tide station list unavailable");
+    }
+
+    const stationsPayload = await stationsResponse.json();
+    const stations = Array.isArray(stationsPayload)
+        ? stationsPayload
+        : (stationsPayload.stations || stationsPayload.content || []);
+
+    const station = stations.find(item => {
+        const candidates = [
+            item.code,
+            item.stationCode,
+            item.number,
+            item.stationNumber,
+            item.externalCode
+        ];
+        return candidates.some(value =>
+            value !== undefined &&
+            String(value).padStart(5, "0") === String(stationCode).padStart(5, "0")
+        );
+    });
+
+    if (!station) {
+        throw new Error("Canadian tide station " + stationCode + " not found");
+    }
+
+    const stationId =
+        station.id ||
+        station.stationId ||
+        station.uuid;
+
+    if (!stationId) {
+        throw new Error("Canadian tide station ID unavailable");
+    }
+
+    const url =
+        "https://api-iwls.dfo-mpo.gc.ca/api/v1/stations/" +
+        encodeURIComponent(stationId) +
+        "/data?time-series-code=wlp-hilo&from=" +
+        encodeURIComponent(fromDate + "T00:00:00Z") +
+        "&to=" +
+        encodeURIComponent(toDate + "T00:00:00Z");
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error("Canadian tide data unavailable");
+    }
+
+    const events = await response.json();
+
+    if (!Array.isArray(events)) {
+        throw new Error("Unexpected Canadian tide data format");
+    }
+
+    return events
+        .filter(event => event && event.eventDate && Number.isFinite(Number(event.value)))
+        .map(event => ({
+            type: null,
+            time: new Date(event.eventDate),
+            height: Number(event.value)
+        }));
+}
+
 async function checkConditions() {
 
     console.log("checkConditions started");
@@ -3042,6 +3117,28 @@ if (seaTidesCard) {
 
                 tideData =
                     await tideResponse.json();
+            }
+
+            // Canadian locations use the official CHS IWLS API.
+            // Kitsilano and Jericho share CHS station 07707.
+            if (selectedLocation.canadianTideStationCode) {
+                const canadianEvents = await fetchCanadianTideData(
+                    selectedLocation.canadianTideStationCode,
+                    todayString,
+                    sevenDaysLaterString
+                );
+
+                // Convert CHS events into the same internal tide-event format
+                // used by the existing Irish tide code. CHS wlp-hilo already
+                // supplies the high/low events, so no extrema calculation is needed.
+                canadianEvents.forEach(event => {
+                    event.type = "Tide";
+                });
+
+                tideData = {
+                    canadianEvents,
+                    canadian: true
+                };
             }
 
         }
@@ -3189,7 +3286,7 @@ if (lakeForecastCard) {
    Irish Marine Institute tide information is only used for locations
    that explicitly provide a tideStation.
 */
-if (!selectedLocation.tideStation) {
+if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) {
 
     const windSpeed = Number(current.wind_speed_10m);
     const windDirectionDegrees = Number(current.wind_direction_10m);
@@ -3321,10 +3418,32 @@ if (!selectedLocation.tideStation) {
            FIND HIGH & LOW TIDES
            ========================= */
 
+        let tideEvents = [];
+
+        if (tideData && tideData.canadian) {
+
+            // CHS wlp-hilo returns the predicted high/low events directly.
+            // Classify each event from its relationship to neighbouring heights.
+            const events = tideData.canadianEvents.slice().sort((a, b) => a.time - b.time);
+
+            for (let i = 0; i < events.length; i++) {
+                const previous = events[i - 1];
+                const current = events[i];
+                const next = events[i + 1];
+
+                if (!previous || !next) continue;
+
+                current.type = current.height >= previous.height && current.height >= next.height
+                    ? "High Tide"
+                    : "Low Tide";
+
+                tideEvents.push(current);
+            }
+
+        } else {
+
         const tideRows =
             tideData.table.rows;
-
-        let tideEvents = [];
 
 
         for (
@@ -3388,6 +3507,8 @@ if (!selectedLocation.tideStation) {
 
         }
 
+        }
+
 
         /* Remove duplicate events */
 
@@ -3434,6 +3555,9 @@ if (!selectedLocation.tideStation) {
            FORMAT TIDE DISPLAY
            ========================= */
 
+        const tideDisplayTimeZone =
+            selectedLocation.tideTimeZone || "Europe/Dublin";
+
         const now =
             new Date();
 
@@ -3468,7 +3592,7 @@ if (!selectedLocation.tideStation) {
                                 minute: "2-digit",
                                 hour12: false,
                                 timeZone:
-                                    "Europe/Dublin"
+                                    tideDisplayTimeZone
                             }
                         );
 
@@ -3518,7 +3642,7 @@ if (!selectedLocation.tideStation) {
                         minute: "2-digit",
                         hour12: false,
                         timeZone:
-                            "Europe/Dublin"
+                            tideDisplayTimeZone
                     }
                 );
 
@@ -3634,12 +3758,16 @@ if (!selectedLocation.tideStation) {
             option.textContent = tide.time.toLocaleString("en-IE", {
                 weekday: "long", day: "numeric", month: "long",
                 hour: "2-digit", minute: "2-digit", hour12: false,
-                timeZone: "Europe/Dublin"
+                timeZone: tideDisplayTimeZone
             }) + " — High " + formatTideHeight(tide.height, 2);
             seaTideSelect.appendChild(option);
         });
 
-        window.currentSeaTides = { tides: filteredTides, highTides: highTides };
+        window.currentSeaTides = {
+            tides: filteredTides,
+            highTides: highTides,
+            timeZone: tideDisplayTimeZone
+        };
         seaTidesCard.style.display = "block";
         showSeaTide(0);
         seaTideSelect.onchange = function() { showSeaTide(Number(this.value)); };
@@ -6577,7 +6705,7 @@ function showSeaTide(index) {
     const formatTide = tide => tide.time.toLocaleString("en-IE", {
         weekday: "long", day: "numeric", month: "long",
         hour: "2-digit", minute: "2-digit", hour12: false,
-        timeZone: "Europe/Dublin"
+        timeZone: state.timeZone || "Europe/Dublin"
     });
 
     detail.innerHTML = `
