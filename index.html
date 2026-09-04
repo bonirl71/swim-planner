@@ -2418,6 +2418,39 @@ const swimLocations = [
         distance: "TBC",
         type: "lake"
     },
+    {
+        id: 15,
+        country: "Canada",
+        name: "Sasamat Lake",
+        county: "British Columbia",
+        latitude: 49.325304671756726,
+        longitude: -122.8873408715719,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
+    {
+        id: 16,
+        country: "Canada",
+        name: "Buntzen Lake",
+        county: "British Columbia",
+        latitude: 49.346026490044565,
+        longitude: -122.85633951434448,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
+    {
+        id: 17,
+        country: "Canada",
+        name: "Blueberry Docks",
+        county: "British Columbia",
+        latitude: 50.11329049803666,
+        longitude: -122.97611917398274,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
 
     // =========================
     // LAGOON LOCATIONS
@@ -2526,6 +2559,39 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         region: "french-polynesia"
+    },
+    {
+        id: 18,
+        country: "Canada",
+        name: "Kitsilano Beach",
+        county: "British Columbia",
+        latitude: 49.27547238434258,
+        longitude: -123.15356858113007,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
+    },
+    {
+        id: 19,
+        country: "Canada",
+        name: "Jericho Beach",
+        county: "British Columbia",
+        latitude: 49.27266634266715,
+        longitude: -123.19447928835316,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
+    },
+    {
+        id: 20,
+        country: "Canada",
+        name: "Beachway Park - Burlington Beach",
+        county: "Ontario",
+        latitude: 43.314917885782094,
+        longitude: -79.80051829204757,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
     }
 ];
 
@@ -2757,121 +2823,80 @@ function calculateSwimScore(
 
 function loadLocations() {
 
-    const select =
-        document.getElementById("locationSelect");
-
+    const select = document.getElementById("locationSelect");
     if (!select) return;
 
     select.innerHTML = "";
 
-    /*
-       Group locations by COUNTRY.
-       Within each country, locations are sorted by type
-       (Lakes, Lagoons, Sea) and then by location name.
-
-       This keeps the dropdown organised by country while
-       still making the type of each location immediately
-       obvious.
-    */
-
-    const countryGroups = {};
+    // Group by country. Each location is explicitly identified
+    // as a Lake, Lagoon or Sea in the dropdown.
+    const groups = {};
 
     swimLocations.forEach(location => {
 
         const country =
             location.country ||
-            (location.region === "french-polynesia"
-                ? "French Polynesia"
-                : "Other");
+            (location.region === "canada" ? "Canada" :
+             location.region === "french-polynesia" ? "French Polynesia" :
+             "Other");
 
-        if (!countryGroups[country]) {
-            countryGroups[country] = [];
+        const flag =
+            country === "Ireland" ? "🇮🇪" :
+            country === "Ukraine" ? "🇺🇦" :
+            country === "Canada" ? "🇨🇦" :
+            country === "French Polynesia" ? "🇵🇫" :
+            "🌍";
+
+        if (!groups[country]) {
+            groups[country] = {
+                country,
+                flag,
+                options: []
+            };
         }
 
-        countryGroups[country].push(location);
+        const option = document.createElement("option");
+        option.value = location.id;
 
+        const typeIcon =
+            location.type === "lake" ? "🏞️" :
+            location.type === "lagoon" ? "🏝️" :
+            "🌊";
+
+        const typeLabel =
+            location.type === "lake" ? "Lake" :
+            location.type === "lagoon" ? "Lagoon" :
+            "Sea";
+
+        option.textContent =
+            `${typeIcon} ${typeLabel} — ${location.name}` +
+            (location.county ? " (" + location.county + ")" : "");
+
+        groups[country].options.push(option);
     });
 
-    const countryFlags = {
-        "Ireland": "🇮🇪",
-        "Ukraine": "🇺🇦",
-        "French Polynesia": "🇵🇫",
-        "Canada": "🇨🇦"
-    };
+    Object.values(groups)
+        .sort((a, b) => a.country.localeCompare(b.country))
+        .forEach(group => {
 
-    const typeOrder = {
-        lake: 1,
-        lagoon: 2,
-        sea: 3
-    };
+            const optgroup = document.createElement("optgroup");
+            optgroup.label = `${group.flag} ${group.country}`;
 
-    Object.keys(countryGroups)
-        .sort((a, b) => a.localeCompare(b))
-        .forEach(country => {
-
-            const optgroup =
-                document.createElement("optgroup");
-
-            optgroup.label =
-                `${countryFlags[country] || "🌍"} ${country}`;
-
-            countryGroups[country]
-                .sort((a, b) => {
-
-                    const typeA =
-                        typeOrder[a.type] || 99;
-
-                    const typeB =
-                        typeOrder[b.type] || 99;
-
-                    if (typeA !== typeB) {
-                        return typeA - typeB;
-                    }
-
-                    return a.name.localeCompare(b.name);
-
-                })
-                .forEach(location => {
-
-                    const option =
-                        document.createElement("option");
-
-                    option.value =
-                        location.id;
-
-                    const typeIcon =
-                        location.type === "lake"
-                            ? "🏞️"
-                            : location.type === "lagoon"
-                                ? "🏝️"
-                                : "🌊";
-
-                    option.textContent =
-                        `${typeIcon} ${location.name}` +
-                        (location.county
-                            ? ` (${location.county})`
-                            : "");
-
-                    optgroup.appendChild(option);
-
-                });
+            group.options
+                .sort((a, b) => a.textContent.localeCompare(b.textContent))
+                .forEach(option => optgroup.appendChild(option));
 
             select.appendChild(optgroup);
-
         });
 
     // Make Youghal Quay the default location.
-    const youghalOption =
-        Array.from(select.options).find(option =>
-            option.textContent
-                .toLowerCase()
-                .includes("youghal quay")
-        );
+    const youghalOption = Array.from(select.options).find(option =>
+        option.textContent.toLowerCase().includes("youghal quay")
+    );
 
     if (youghalOption) {
         select.value = youghalOption.value;
     }
-
 }
 
 function getLocationDisplayName(location) {
