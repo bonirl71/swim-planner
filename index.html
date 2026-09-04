@@ -976,9 +976,10 @@ body.dark-theme .journey-leave {
 }
 
 .app-revision {
-    width: 50px;
+    width: 80px;
     margin: 0 auto 3px auto;
     text-align: center;
+    white-space: nowrap;
     font-size: 11px;
     line-height: 1.1;
     font-weight: 700;
@@ -2184,7 +2185,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.4</div>
+        <div class="app-revision">REV 2.7.5</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2195,7 +2196,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.4</strong></span>
+                ℹ️ <span>App Version <strong>2.7.5</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2233,7 +2234,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.4</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.5</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2950,7 +2951,7 @@ function updateDesktopSeaActions(location) {
 async function fetchCanadianTideData(stationCode, fromDate, toDate) {
 
     const stationsResponse = await fetch(
-        "https://api-iwls.dfo-mpo.gc.ca/api/v1/stations"
+        "https://api-iwls.dfo-mpo.gc.ca/api/v1/stations?code=" + encodeURIComponent(String(stationCode).padStart(5, "0"))
     );
 
     if (!stationsResponse.ok) {
@@ -3122,23 +3123,28 @@ if (seaTidesCard) {
             // Canadian locations use the official CHS IWLS API.
             // Kitsilano and Jericho share CHS station 07707.
             if (selectedLocation.canadianTideStationCode) {
-                const canadianEvents = await fetchCanadianTideData(
-                    selectedLocation.canadianTideStationCode,
-                    todayString,
-                    sevenDaysLaterString
-                );
+                try {
+                    const canadianEvents = await fetchCanadianTideData(
+                        selectedLocation.canadianTideStationCode,
+                        todayString,
+                        sevenDaysLaterString
+                    );
 
-                // Convert CHS events into the same internal tide-event format
-                // used by the existing Irish tide code. CHS wlp-hilo already
-                // supplies the high/low events, so no extrema calculation is needed.
-                canadianEvents.forEach(event => {
-                    event.type = "Tide";
-                });
-
-                tideData = {
-                    canadianEvents,
-                    canadian: true
-                };
+                    // CHS wlp-hilo supplies the predicted high/low events directly.
+                    tideData = {
+                        canadianEvents,
+                        canadian: true
+                    };
+                } catch (canadianTideError) {
+                    // Tide failure must never prevent weather/current conditions
+                    // from loading for an international location.
+                    console.warn(
+                        "Canadian tide data unavailable:",
+                        selectedLocation.name,
+                        canadianTideError
+                    );
+                    tideData = null;
+                }
             }
 
         }
@@ -3399,19 +3405,13 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
 
 
 
-        console.log(
-            "TIDE ROWS:",
-            tideData.table.rows
-        );
-
-        console.log(
-            "TIDE COLUMNS:",
-            tideData.table.columnNames
-        );
-
-        console.table(
-            tideData.table.rows.slice(0, 20)
-        );
+        if (tideData && tideData.canadian) {
+            console.log("CANADIAN TIDE EVENTS:", tideData.canadianEvents);
+        } else if (tideData && tideData.table) {
+            console.log("TIDE ROWS:", tideData.table.rows);
+            console.log("TIDE COLUMNS:", tideData.table.columnNames);
+            console.table(tideData.table.rows.slice(0, 20));
+        }
 
 
         /* =========================
@@ -3440,7 +3440,7 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
                 tideEvents.push(current);
             }
 
-        } else {
+        } else if (tideData && tideData.table) {
 
         const tideRows =
             tideData.table.rows;
