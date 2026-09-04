@@ -31,6 +31,36 @@ const swimLocations = [
         distance: "TBC",
         type: "lake"
     },
+    {
+        id: 13,
+        name: "Sasamat Lake",
+        county: "British Columbia",
+        latitude: 49.325304671756726,
+        longitude: -122.8873408715719,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
+    {
+        id: 14,
+        name: "Buntzen Lake",
+        county: "British Columbia",
+        latitude: 49.346026490044565,
+        longitude: -122.85633951434448,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
+    {
+        id: 17,
+        name: "Blueberry Docks",
+        county: "British Columbia",
+        latitude: 50.11329049803666,
+        longitude: -122.97611917398274,
+        distance: "TBC",
+        type: "lake",
+        region: "canada"
+    },
 
 
     // =========================
@@ -132,5 +162,35 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         region: "french-polynesia"
+    },
+    {
+        id: 15,
+        name: "Kitsilano Beach",
+        county: "British Columbia",
+        latitude: 49.27547238434258,
+        longitude: -123.15356858113007,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
+    },
+    {
+        id: 16,
+        name: "Jericho Beach",
+        county: "British Columbia",
+        latitude: 49.27266634266715,
+        longitude: -123.19447928835316,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
+    },
+    {
+        id: 18,
+        name: "Beachway Park - Burlington Beach",
+        county: "Ontario",
+        latitude: 43.314917885782094,
+        longitude: -79.80051829204757,
+        distance: "TBC",
+        type: "sea",
+        region: "canada"
     }
 ];
