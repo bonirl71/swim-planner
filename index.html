@@ -1,4 +1,4 @@
-<!-- Revision 2.7.3: shared Lough Derg lake temperature + persistent header revision marker -->
+<!-- Revision 2.7.8: mobile location picker labels tightened for one-line display -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -910,18 +910,26 @@ body.dark-theme .journey-leave {
 
     .location-controls select {
         width: 100%;
-        min-height: 50px;
-        padding: 12px 44px 12px 14px;
-        border-radius: 12px;
-        font-size: 16px;
+        min-height: 48px;
+        padding: 10px 40px 10px 12px;
+        border-radius: 11px;
+        font-size: 13px;
         font-weight: 600;
-        line-height: 1.2;
+        line-height: 1.1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         background-position:
-            calc(100% - 20px) 21px,
-            calc(100% - 14px) 21px;
+            calc(100% - 18px) 20px,
+            calc(100% - 12px) 20px;
+    }
+
+    /* Android/iOS native location lists can ignore some select sizing rules.
+       Keep the option labels deliberately compact so each location remains a
+       single line in the phone's native picker. */
+    .location-controls select option {
+        font-size: 13px;
+        white-space: nowrap;
     }
 
     select {
@@ -2255,7 +2263,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.7</div>
+        <div class="app-revision">REV 2.7.8</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2266,7 +2274,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.7</strong></span>
+                ℹ️ <span>App Version <strong>2.7.8</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2304,7 +2312,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.7</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.8</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2315,7 +2323,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
                 <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
-                <li><span class="release-icon">📍</span><div><strong>Cleaner location picker</strong><br>The swim-location selector is now shorter and cleaner, especially on mobile, with the country retained as the group heading.</div></li>
+                <li><span class="release-icon">📍</span><div><strong>Cleaner location picker</strong><br>The swim-location selector is now shorter and cleaner, especially on mobile, with compact labels designed to keep locations on a single line.</div></li>
             </ul>
             <div class="release-footer">
                 <span>Thanks for using Open Water Swim Planner. 🌊</span>
@@ -2961,11 +2969,13 @@ function loadLocations() {
         option.value = location.id;
 
         // Keep the picker compact. The country is already shown by the
-        // optgroup, so repeating the type/country information here makes
-        // the mobile picker unnecessarily long and cluttered.
-        option.textContent =
-            location.name +
-            (location.county ? " (" + location.county + ")" : "");
+        // optgroup, so do not repeat county/type information in the option.
+        // A few very long names get a compact picker label; the full name
+        // remains unchanged everywhere else in the app.
+        const pickerNames = {
+            "Blackhead Lighthouse and Gleninagh Pier": "Blackhead Lighthouse / Gleninagh Pier"
+        };
+        option.textContent = pickerNames[location.name] || location.name;
 
         groups[country].options.push(option);
     });
@@ -6800,7 +6810,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.7";
+const SWIM_RELEASE_VERSION = "2.7.8";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
