@@ -1,4 +1,4 @@
-<!-- Revision 2.7.8: mobile location picker labels tightened for one-line display -->
+<!-- Revision 2.7.9: mobile location picker uses a compact one-line custom list -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1200,6 +1200,175 @@ body.dark-theme .location-controls select:focus {
     box-shadow: 0 0 0 3px rgba(102,199,255,.13);
 }
 
+/* Mobile location picker: use our own compact list instead of the browser's
+   native select sheet, which can enlarge and wrap long option labels on phones. */
+.mobile-location-trigger,
+.mobile-location-picker {
+    display: none;
+}
+
+@media (max-width: 599px) {
+    .location-controls select {
+        display: none !important;
+    }
+
+    .mobile-location-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        width: 100%;
+        min-height: 48px;
+        margin: 0;
+        padding: 10px 13px;
+        border: 1px solid #b8d7e8;
+        border-radius: 11px;
+        background: white;
+        color: #17344a;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.1;
+        text-align: left;
+        box-shadow: 0 2px 7px rgba(20,80,110,.06);
+    }
+
+    body.dark-theme .mobile-location-trigger {
+        background: #263642;
+        border-color: #526875;
+        color: #f0f5f8;
+    }
+
+    .mobile-location-trigger span:first-child {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-location-picker[hidden] {
+        display: none;
+    }
+
+    .mobile-location-picker {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+    }
+
+    .mobile-location-picker:not([hidden]) {
+        display: block;
+    }
+
+    .mobile-location-picker-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,.48);
+    }
+
+    .mobile-location-picker-panel {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 8%;
+        max-height: 84%;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #fff;
+        color: #17232d;
+        box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+
+    body.dark-theme .mobile-location-picker-panel {
+        background: #1d2b36;
+        color: #f0f5f8;
+    }
+
+    .mobile-location-picker-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px 12px;
+        border-bottom: 1px solid #d7e2e8;
+    }
+
+    body.dark-theme .mobile-location-picker-header {
+        border-bottom-color: #40535f;
+    }
+
+    .mobile-location-picker-header h3 {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.2;
+    }
+
+    .mobile-location-picker-close {
+        flex: 0 0 auto;
+        width: 38px !important;
+        height: 38px;
+        min-height: 38px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 50%;
+        font-size: 25px;
+        line-height: 1;
+    }
+
+    .mobile-location-picker-list {
+        overflow-y: auto;
+        max-height: calc(84vh - 76px);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-location-group {
+        padding: 10px 14px 5px;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.2;
+        color: #006994;
+    }
+
+    body.dark-theme .mobile-location-group {
+        color: #79d1ff;
+    }
+
+    .mobile-location-option {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 44px;
+        margin: 0;
+        padding: 8px 14px;
+        border: 0;
+        border-top: 1px solid #e1e7eb;
+        border-radius: 0;
+        background: transparent;
+        color: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.1;
+        text-align: left;
+    }
+
+    body.dark-theme .mobile-location-option {
+        border-top-color: #344853;
+    }
+
+    .mobile-location-option span {
+        display: block;
+        min-width: 0;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-location-option.selected {
+        font-weight: 800;
+        background: rgba(0,119,182,.09);
+    }
+}
+
 .conditions-content, .recommendation-content { min-height: 150px; }
 
 .lake-summary {
@@ -2263,7 +2432,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.8</div>
+        <div class="app-revision">REV 2.7.9</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2274,7 +2443,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.8</strong></span>
+                ℹ️ <span>App Version <strong>2.7.9</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2312,7 +2481,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.8</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.9</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2322,6 +2491,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Lake wind assessments are now location-specific. Youghal Quay keeps its local wind guidance; Twomilegate uses its known east/north-east exposure; other lakes do not receive invented compass-direction claims.</div></li>
                 <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
                 <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
+                <li><span class="release-icon">📱</span><div><strong>Improved mobile location picker</strong><br>Mobile locations now use a compact one-line list with a consistent font size, avoiding long location names wrapping across multiple lines.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
                 <li><span class="release-icon">📍</span><div><strong>Cleaner location picker</strong><br>The swim-location selector is now shorter and cleaner, especially on mobile, with compact labels designed to keep locations on a single line.</div></li>
             </ul>
@@ -2384,7 +2554,24 @@ body.dark-theme .sea-forecast-summary {
         </div>
     </div>
     <div class="location-controls">
-        <select id="locationSelect"></select>
+        <select id="locationSelect" aria-label="Choose swim location"></select>
+        <button type="button" id="mobileLocationTrigger" class="mobile-location-trigger" aria-haspopup="dialog" aria-expanded="false">
+            <span id="mobileLocationTriggerText">Choose location</span>
+            <span aria-hidden="true">⌄</span>
+        </button>
+    </div>
+    <div id="mobileLocationPicker" class="mobile-location-picker" hidden aria-hidden="true">
+        <div class="mobile-location-picker-backdrop" data-mobile-location-close></div>
+        <div class="mobile-location-picker-panel" role="dialog" aria-modal="true" aria-labelledby="mobileLocationPickerTitle">
+            <div class="mobile-location-picker-header">
+                <div>
+                    <div class="eyebrow">SWIM LOCATION</div>
+                    <h3 id="mobileLocationPickerTitle">Choose Swim Location</h3>
+                </div>
+                <button type="button" class="mobile-location-picker-close" data-mobile-location-close aria-label="Close">×</button>
+            </div>
+            <div id="mobileLocationPickerList" class="mobile-location-picker-list"></div>
+        </div>
     </div>
 </div>
 
@@ -3002,6 +3189,78 @@ function loadLocations() {
     if (youghalOption) {
         select.value = youghalOption.value;
     }
+
+    renderMobileLocationPicker();
+    updateMobileLocationTrigger();
+}
+
+function renderMobileLocationPicker() {
+    const select = document.getElementById("locationSelect");
+    const list = document.getElementById("mobileLocationPickerList");
+    const triggerText = document.getElementById("mobileLocationTriggerText");
+    if (!select || !list || !triggerText) return;
+
+    list.innerHTML = "";
+    const groups = Array.from(select.children).filter(el => el.tagName === "OPTGROUP");
+
+    groups.forEach(group => {
+        const heading = document.createElement("div");
+        heading.className = "mobile-location-group";
+        heading.textContent = group.label;
+        list.appendChild(heading);
+
+        Array.from(group.children).forEach(option => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "mobile-location-option";
+            button.dataset.value = option.value;
+            button.innerHTML = "<span></span>";
+            button.querySelector("span").textContent = option.textContent;
+            if (option.value === select.value) button.classList.add("selected");
+
+            button.addEventListener("click", () => {
+                select.value = option.value;
+                select.dispatchEvent(new Event("change", { bubbles: true }));
+                closeMobileLocationPicker();
+                updateMobileLocationTrigger();
+            });
+
+            list.appendChild(button);
+        });
+    });
+
+    updateMobileLocationTrigger();
+}
+
+function updateMobileLocationTrigger() {
+    const select = document.getElementById("locationSelect");
+    const triggerText = document.getElementById("mobileLocationTriggerText");
+    if (!select || !triggerText) return;
+    const selected = select.options[select.selectedIndex];
+    triggerText.textContent = selected ? selected.textContent : "Choose location";
+
+    document.querySelectorAll(".mobile-location-option").forEach(button => {
+        button.classList.toggle("selected", button.dataset.value === select.value);
+    });
+}
+
+function openMobileLocationPicker() {
+    const picker = document.getElementById("mobileLocationPicker");
+    const trigger = document.getElementById("mobileLocationTrigger");
+    if (!picker || !trigger) return;
+    renderMobileLocationPicker();
+    picker.hidden = false;
+    picker.setAttribute("aria-hidden", "false");
+    trigger.setAttribute("aria-expanded", "true");
+}
+
+function closeMobileLocationPicker() {
+    const picker = document.getElementById("mobileLocationPicker");
+    const trigger = document.getElementById("mobileLocationTrigger");
+    if (!picker || !trigger) return;
+    picker.hidden = true;
+    picker.setAttribute("aria-hidden", "true");
+    trigger.setAttribute("aria-expanded", "false");
 }
 
 function getLocationDisplayName(location) {
@@ -6810,7 +7069,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.8";
+const SWIM_RELEASE_VERSION = "2.7.9";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
@@ -6870,6 +7129,24 @@ document.addEventListener("keydown", function(event) {
 /* =========================
    LOCATION CHANGE
    ========================= */
+
+const mobileLocationTrigger = document.getElementById("mobileLocationTrigger");
+if (mobileLocationTrigger) {
+    mobileLocationTrigger.addEventListener("click", openMobileLocationPicker);
+}
+
+document.querySelectorAll("[data-mobile-location-close]").forEach(button => {
+    button.addEventListener("click", closeMobileLocationPicker);
+});
+
+const locationSelectForMobile = document.getElementById("locationSelect");
+if (locationSelectForMobile) {
+    locationSelectForMobile.addEventListener("change", updateMobileLocationTrigger);
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeMobileLocationPicker();
+});
 
 // Populate the swim location dropdown when the app loads.
 
