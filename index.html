@@ -2441,7 +2441,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.8.4</div>
+        <div class="app-revision">REV 2.8.5</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2490,7 +2490,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.4</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.5</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2505,6 +2505,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Single-line mobile locations</strong><br>All mobile location names now use one consistent 12px font and are forced onto a single line, with an ellipsis used only when a name is too long for the screen.</div></li>
                 <li><span class="release-icon">🌊</span><div><strong>Global tide and sea-temperature data</strong><br>Sea locations without a dedicated local tide feed now use Open-Meteo marine data for modelled tide levels and sea-surface temperature, including Malta and the Canary Islands.</div></li>
+                <li><span class="release-icon">💨</span><div><strong>Location-specific wind direction</strong><br>North/west wind-direction scoring and guidance now apply only to Blackhead Lighthouse / Gleninagh Pier. Other sea locations no longer receive Blackhead-specific directional penalties or benefits.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
             </ul>
             <div class="release-footer">
@@ -3105,6 +3106,10 @@ function getCompassDirection(degrees) {
    SWIM SCORE
    ========================= */
 
+function isBlackheadLocation(location = selectedLocation) {
+    return !!location && location.name === "Blackhead Lighthouse and Gleninagh Pier";
+}
+
 function calculateSwimScore(
     waveHeight,
     wavePeriod,
@@ -3147,14 +3152,20 @@ function calculateSwimScore(
         score -= 5;
     }
 
-    /* Wind direction penalty */
+    /*
+       Wind direction is location-specific.
+       The north/west guidance below is ONLY relevant to
+       Blackhead Lighthouse / Gleninagh Pier. Do not apply it
+       to other sea locations.
+    */
+    if (isBlackheadLocation()) {
+        if (windDirection.includes("North")) {
+            score -= 15;
+        }
 
-    if (windDirection.includes("North")) {
-        score -= 15;
-    }
-
-    if (windDirection === "West") {
-        score += 5;
+        if (windDirection === "West") {
+            score += 5;
+        }
     }
 
     return Math.max(score, 0);
@@ -3725,10 +3736,14 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
 
     const reasons = [];
 
-    if (windDirection === "West") {
-        reasons.push("✅ Westerly wind - ideal direction");
-    } else if (windDirection.includes("North")) {
-        reasons.push("⚠️ Northerly wind - less favourable");
+    if (isBlackheadLocation()) {
+        if (windDirection === "West") {
+            reasons.push("✅ Westerly wind - ideal direction");
+        } else if (windDirection.includes("North")) {
+            reasons.push("⚠️ Northerly wind - less favourable");
+        } else {
+            reasons.push("ℹ️ Wind direction: " + windDirection);
+        }
     } else {
         reasons.push("ℹ️ Wind direction: " + windDirection);
     }
@@ -4293,33 +4308,24 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
             );
 
 
-        if (
-            windDirection === "West"
-        ) {
-
+        if (isBlackheadLocation()) {
+            if (windDirection === "West") {
+                reasons.push(
+                    "✅ Westerly wind - ideal direction"
+                );
+            } else if (windDirection.includes("North")) {
+                reasons.push(
+                    "⚠️ Northerly wind - less favourable"
+                );
+            } else {
+                reasons.push(
+                    "ℹ️ Wind direction: " + windDirection
+                );
+            }
+        } else {
             reasons.push(
-                "✅ Westerly wind - ideal direction"
+                "ℹ️ Wind direction: " + windDirection
             );
-
-        }
-
-        else if (
-            windDirection.includes("North")
-        ) {
-
-            reasons.push(
-                "⚠️ Northerly wind - less favourable"
-            );
-
-        }
-
-        else {
-
-            reasons.push(
-                "ℹ️ Wind direction: " +
-                windDirection
-            );
-
         }
 
 
@@ -4529,9 +4535,13 @@ function getSeaForecastAssessment(waveHeight, wavePeriod, windSpeed, windDegrees
     const reasons = [];
     const windDirection = getWindDirection(Number(windDegrees));
 
-    if (windDirection === "West") reasons.push("✅ Westerly wind - ideal direction");
-    else if (windDirection.includes("North")) reasons.push("⚠️ Northerly wind - less favourable");
-    else reasons.push("ℹ️ Wind direction: " + windDirection);
+    if (isBlackheadLocation()) {
+        if (windDirection === "West") reasons.push("✅ Westerly wind - ideal direction");
+        else if (windDirection.includes("North")) reasons.push("⚠️ Northerly wind - less favourable");
+        else reasons.push("ℹ️ Wind direction: " + windDirection);
+    } else {
+        reasons.push("ℹ️ Wind direction: " + windDirection);
+    }
 
     if (Number(windSpeed) <= 3) reasons.push(`✅ Light wind (${formatWind(windSpeed, 1)})`);
     else if (Number(windSpeed) <= 5) reasons.push(`🟡 Moderate wind (${formatWind(windSpeed, 1)})`);
@@ -7162,7 +7172,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.8.4";
+const SWIM_RELEASE_VERSION = "2.8.5";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
