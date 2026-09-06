@@ -2441,7 +2441,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.8.5</div>
+        <div class="app-revision">REV 2.8.7</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2452,7 +2452,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.7.9</strong></span>
+                ℹ️ <span>App Version <strong>2.8.7</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2490,7 +2490,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.6</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.7</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2508,6 +2508,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><span class="release-icon">💨</span><div><strong>Location-specific wind direction</strong><br>North/west wind-direction scoring and guidance now apply only to Blackhead Lighthouse / Gleninagh Pier. Other sea locations no longer receive Blackhead-specific directional penalties or benefits.</div></li>
                 <li><span class="release-icon">🛠️</span><div><strong>More reliable marine loading</strong><br>Current marine conditions and modelled tide data now use separate requests so tide-data issues cannot block the main weather and sea conditions.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
+                <li><span class="release-icon">🚀</span><div><strong>Clean deployment revision</strong><br>This release consolidates the latest tide, sea-temperature, marine-loading and Blackhead-specific wind-direction changes into one deployment-ready index.html.</div></li>
             </ul>
             <div class="release-footer">
                 <span>Thanks for using Open Water Swim Planner. 🌊</span>
@@ -7201,7 +7202,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.8.6";
+const SWIM_RELEASE_VERSION = "2.8.7";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
