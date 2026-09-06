@@ -2490,7 +2490,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.5</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.6</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -2506,6 +2506,7 @@ body.dark-theme .sea-forecast-summary {
                 <li><span class="release-icon">📱</span><div><strong>Single-line mobile locations</strong><br>All mobile location names now use one consistent 12px font and are forced onto a single line, with an ellipsis used only when a name is too long for the screen.</div></li>
                 <li><span class="release-icon">🌊</span><div><strong>Global tide and sea-temperature data</strong><br>Sea locations without a dedicated local tide feed now use Open-Meteo marine data for modelled tide levels and sea-surface temperature, including Malta and the Canary Islands.</div></li>
                 <li><span class="release-icon">💨</span><div><strong>Location-specific wind direction</strong><br>North/west wind-direction scoring and guidance now apply only to Blackhead Lighthouse / Gleninagh Pier. Other sea locations no longer receive Blackhead-specific directional penalties or benefits.</div></li>
+                <li><span class="release-icon">🛠️</span><div><strong>More reliable marine loading</strong><br>Current marine conditions and modelled tide data now use separate requests so tide-data issues cannot block the main weather and sea conditions.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
             </ul>
             <div class="release-footer">
@@ -3467,9 +3468,15 @@ if (seaTidesCard) {
 
     const marineTimeZone = selectedLocation.tideTimeZone || "Europe/Dublin";
 
+    // Keep the current-conditions marine request separate from the modelled
+    // tide request. This prevents an optional tide-data failure from breaking
+    // the core current-conditions data.
     const marineUrl =
         `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}` +
-        `&current=wave_height,wave_period,wave_direction,sea_surface_temperature` +
+        `&current=wave_height,wave_period,wave_direction,sea_surface_temperature`;
+
+    const marineTideUrl =
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}` +
         `&hourly=sea_level_height_msl,sea_surface_temperature` +
         `&forecast_days=8&timezone=${encodeURIComponent(marineTimeZone)}&cell_selection=sea`;
 
@@ -3554,14 +3561,36 @@ if (seaTidesCard) {
             }
 
             // International locations without an official dedicated tide feed
-            // use Open-Meteo's global modelled sea-level data, which includes tides.
+            // use a separate Open-Meteo request for modelled sea level including tides.
+            // This is deliberately separate from current marine conditions so a
+            // tide-model/API problem cannot stop the main weather and marine data.
             if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) {
-                if (marineData && marineData.hourly && Array.isArray(marineData.hourly.time) && Array.isArray(marineData.hourly.sea_level_height_msl)) {
-                    tideData = {
-                        openMeteo: true,
-                        hourly: marineData.hourly,
-                        timeZone: marineData.timezone || marineTimeZone
-                    };
+                try {
+                    const internationalTideResponse = await fetch(marineTideUrl);
+                    if (internationalTideResponse.ok) {
+                        const internationalTideData = await internationalTideResponse.json();
+                        if (internationalTideData && internationalTideData.hourly &&
+                            Array.isArray(internationalTideData.hourly.time) &&
+                            Array.isArray(internationalTideData.hourly.sea_level_height_msl)) {
+                            tideData = {
+                                openMeteo: true,
+                                hourly: internationalTideData.hourly,
+                                timeZone: internationalTideData.timezone || marineTimeZone
+                            };
+                        }
+                    } else {
+                        console.warn(
+                            "Open-Meteo modelled tide request failed:",
+                            internationalTideResponse.status,
+                            selectedLocation.name
+                        );
+                    }
+                } catch (internationalTideError) {
+                    console.warn(
+                        "Open-Meteo modelled tide data unavailable:",
+                        selectedLocation.name,
+                        internationalTideError
+                    );
                 }
             }
 
@@ -7172,7 +7201,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.8.5";
+const SWIM_RELEASE_VERSION = "2.8.6";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
