@@ -1,4 +1,4 @@
-<!-- Revision 2.8.2: mobile location picker uses a compact one-line custom list -->
+<!-- Revision 2.8.9: mobile location picker uses a compact one-line custom list -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2441,7 +2441,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.8.8</div>
+        <div class="app-revision">REV 2.8.9</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2452,7 +2452,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.8.8</strong></span>
+                ℹ️ <span>App Version <strong>2.8.9</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2490,7 +2490,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.8</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.9</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -3422,6 +3422,35 @@ async function fetchCanadianTideData(stationCode, fromDate, toDate) {
         }));
 }
 
+/* =========================
+   ROBUST API FETCH HELPER
+   ========================= */
+async function fetchJsonWithRetry(url, label, retries = 1) {
+    let lastError = null;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch(url, { method: "GET", cache: "no-store" });
+            if (!response.ok) {
+                let detail = "";
+                try {
+                    const body = await response.json();
+                    detail = body && body.reason ? ` — ${body.reason}` : "";
+                } catch (_) {}
+                throw new Error(`${label} returned HTTP ${response.status}${detail}`);
+            }
+            const payload = await response.json();
+            if (!payload || payload.error === true) {
+                throw new Error(`${label} returned an API error${payload && payload.reason ? ` — ${payload.reason}` : ""}`);
+            }
+            return payload;
+        } catch (error) {
+            lastError = error;
+            if (attempt < retries) await new Promise(resolve => setTimeout(resolve, 500));
+        }
+    }
+    throw lastError || new Error(`${label} failed`);
+}
+
 async function checkConditions() {
 
     console.log("checkConditions started");
@@ -3504,13 +3533,15 @@ if (seaTidesCard) {
 
         // Fetch the core weather data first. A failure here should be reported
         // clearly, rather than leaving the recommendation spinner running.
-        const response = await fetch(url);
+        const data = await fetchJsonWithRetry(url, "Weather service", 1);
 
-        if (!response.ok) {
-            throw new Error(`Weather API returned HTTP ${response.status}`);
+        if (!data.current ||
+            !Number.isFinite(Number(data.current.temperature_2m)) ||
+            !Number.isFinite(Number(data.current.wind_speed_10m)) ||
+            !Number.isFinite(Number(data.current.wind_direction_10m)) ||
+            !Number.isFinite(Number(data.current.weather_code))) {
+            throw new Error("Weather service returned incomplete current conditions");
         }
-
-        const data = await response.json();
 
         let marineData = null;
 
@@ -3525,13 +3556,11 @@ if (seaTidesCard) {
             // Marine conditions are useful but must not prevent the air-weather
             // data from displaying if the marine service is temporarily down.
             try {
-                const marineResponse = await fetch(marineUrl);
-
-                if (!marineResponse.ok) {
-                    throw new Error(`Marine API returned HTTP ${marineResponse.status}`);
-                }
-
-                marineData = await marineResponse.json();
+                marineData = await fetchJsonWithRetry(
+                    marineUrl,
+                    "Marine service",
+                    1
+                );
             } catch (marineError) {
                 console.warn(
                     "Marine current conditions unavailable:",
@@ -3596,24 +3625,19 @@ if (seaTidesCard) {
             // tide-model/API problem cannot stop the main weather and marine data.
             if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) {
                 try {
-                    const internationalTideResponse = await fetch(marineTideUrl);
-                    if (internationalTideResponse.ok) {
-                        const internationalTideData = await internationalTideResponse.json();
-                        if (internationalTideData && internationalTideData.hourly &&
-                            Array.isArray(internationalTideData.hourly.time) &&
-                            Array.isArray(internationalTideData.hourly.sea_level_height_msl)) {
-                            tideData = {
-                                openMeteo: true,
-                                hourly: internationalTideData.hourly,
-                                timeZone: internationalTideData.timezone || marineTimeZone
-                            };
-                        }
-                    } else {
-                        console.warn(
-                            "Open-Meteo modelled tide request failed:",
-                            internationalTideResponse.status,
-                            selectedLocation.name
-                        );
+                    const internationalTideData = await fetchJsonWithRetry(
+                        marineTideUrl,
+                        "Modelled tide service",
+                        0
+                    );
+                    if (internationalTideData && internationalTideData.hourly &&
+                        Array.isArray(internationalTideData.hourly.time) &&
+                        Array.isArray(internationalTideData.hourly.sea_level_height_msl)) {
+                        tideData = {
+                            openMeteo: true,
+                            hourly: internationalTideData.hourly,
+                            timeZone: internationalTideData.timezone || marineTimeZone
+                        };
                     }
                 } catch (internationalTideError) {
                     console.warn(
@@ -3890,7 +3914,84 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
     loadSeaForecast(selectedLocation);
 }
 
+/*
+   Render Irish/Canadian current conditions BEFORE optional tide processing.
+   Tide failures must never erase valid weather/marine conditions.
+*/
+if (selectedLocation.type !== "lake" &&
+    (selectedLocation.tideStation || selectedLocation.canadianTideStationCode)) {
 
+    const windSpeed = Number(current.wind_speed_10m);
+    const windDirectionDegrees = Number(current.wind_direction_10m);
+    const windDirection = getWindDirection(windDirectionDegrees);
+
+    if (marineData && marineData.current) {
+        const waveHeight = Number(marineData.current.wave_height);
+        const wavePeriod = Number(marineData.current.wave_period);
+        const waveDirection = Number(marineData.current.wave_direction);
+        const waterTemperature = Number(marineData.current.sea_surface_temperature);
+        const swimScore = Number.isFinite(waveHeight) && Number.isFinite(wavePeriod)
+            ? calculateSwimScore(waveHeight, wavePeriod, windSpeed, windDirection)
+            : null;
+
+        const reasons = [];
+        if (isBlackheadLocation()) {
+            if (windDirection === "West") reasons.push("✅ Westerly wind - ideal direction");
+            else if (windDirection.includes("North")) reasons.push("⚠️ Northerly wind - less favourable");
+            else reasons.push("ℹ️ Wind direction: " + windDirection);
+        } else {
+            reasons.push("ℹ️ Wind direction: " + windDirection);
+        }
+        if (windSpeed <= 3) reasons.push(`✅ Light wind (${formatWind(windSpeed, 1)})`);
+        else if (windSpeed <= 5) reasons.push(`🟡 Moderate wind (${formatWind(windSpeed, 1)})`);
+        else reasons.push(`🔴 Strong wind (${formatWind(windSpeed, 1)})`);
+        if (waveHeight <= 0.5) reasons.push(`✅ Small waves (${formatWaveHeight(waveHeight, 2)})`);
+        else if (waveHeight <= 1) reasons.push(`🟡 Moderate waves (${formatWaveHeight(waveHeight, 2)})`);
+        else reasons.push(`🔴 Large waves (${formatWaveHeight(waveHeight, 2)})`);
+        if (Number.isFinite(waterTemperature)) {
+            if (waterTemperature >= 15) reasons.push(`✅ Comfortable water temperature (${formatTemperature(waterTemperature, 1)})`);
+            else if (waterTemperature >= 12) reasons.push(`🟡 Cold water (${formatTemperature(waterTemperature, 1)})`);
+            else reasons.push(`🔴 Very cold water (${formatTemperature(waterTemperature, 1)})`);
+        }
+
+        let rating = "🔴 POOR CONDITIONS";
+        if (swimScore >= 80) rating = "🟢 EXCELLENT CONDITIONS";
+        else if (swimScore >= 60) rating = "🟡 GOOD CONDITIONS";
+        else if (swimScore >= 40) rating = "🟠 CHALLENGING CONDITIONS";
+
+        document.getElementById("conditions").innerHTML = `
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+            ${translateString("Air temperature")}: ${formatTemperature(current.temperature_2m, 1)}<br>
+            ${translateString("Water temperature")}: ${Number.isFinite(waterTemperature) ? formatTemperature(waterTemperature, 1) : "Unavailable"}<br>
+            ${translateString("Wind speed")}: ${formatWind(windSpeed, 1)}<br>
+            ${translateString("Wind direction")}: ${getCompassDirection(windDirectionDegrees)}<br>
+            ${translateString("Conditions")}: ${getWeatherDescription(current.weather_code)}<br><br>
+            ${translateString("Wave height")}: ${Number.isFinite(waveHeight) ? formatWaveHeight(waveHeight, 2) : "Unavailable"}<br>
+            ${translateString("Wave period")}: ${Number.isFinite(wavePeriod) ? wavePeriod + " s" : "Unavailable"}<br>
+            ${translateString("Swell direction")}: ${Number.isFinite(waveDirection) ? getCompassDirection(waveDirection) + " (" + waveDirection.toFixed(0) + "°)" : "Unavailable"}
+        `;
+
+        document.getElementById("recommendation").innerHTML = `
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+            🏊 ${translateString("Swim Score")}: ${swimScore}/100<br>
+            ${translateString(rating)}<br><br>
+            ${reasons.join("<br>")}
+        `;
+    } else {
+        document.getElementById("conditions").innerHTML = `
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+            ${translateString("Air temperature")}: ${formatTemperature(current.temperature_2m, 1)}<br>
+            ${translateString("Wind speed")}: ${formatWind(windSpeed, 1)}<br>
+            ${translateString("Wind direction")}: ${getWindDirection(windDirectionDegrees)}<br>
+            ${translateString("Conditions")}: ${getWeatherDescription(current.weather_code)}<br><br>
+            ⚠️ Marine conditions are temporarily unavailable.
+        `;
+        document.getElementById("recommendation").innerHTML = `
+            <div class="mobile-context-location">📍 ${getLocationDisplayName(selectedLocation)}</div>
+            ⚠️ Swim score unavailable because wave data could not be loaded.
+        `;
+    }
+}
 
         if (tideData && tideData.canadian) {
             console.log("CANADIAN TIDE EVENTS:", tideData.canadianEvents);
@@ -4589,21 +4690,41 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
 
     catch(error) {
 
-        console.error(
-            "ERROR:",
-            error
-        );
+        console.error("CHECK CONDITIONS ERROR:", error);
 
-        document.getElementById(
-            "conditions"
-        ).innerHTML =
-            "⚠️ Unable to load weather data";
+        const conditionsEl = document.getElementById("conditions");
+        const recommendationEl = document.getElementById("recommendation");
+        const errorMessage = error && error.message
+            ? error.message
+            : "Unknown data-loading error";
 
-        document.getElementById(
-            "recommendation"
-        ).innerHTML =
-            "⚠️ Unable to calculate swim recommendation";
+        const currentLooksLoaded =
+            conditionsEl &&
+            !/Loading conditions|Getting current conditions|Unable to load weather data/i.test(
+                conditionsEl.textContent || ""
+            );
 
+        if (!currentLooksLoaded && conditionsEl) {
+            conditionsEl.innerHTML = `
+                ⚠️ Unable to load weather data.<br>
+                <small>${errorMessage}</small>
+            `;
+        }
+
+        if (recommendationEl &&
+            /Loading recommendation|Unable to calculate swim recommendation/i.test(
+                recommendationEl.textContent || ""
+            )) {
+            recommendationEl.innerHTML = `
+                ⚠️ Swim recommendation unavailable.<br>
+                <small>${errorMessage}</small>
+            `;
+        }
+
+        const seaTidesCardEl = document.getElementById("seaTidesCard");
+        if (seaTidesCardEl && selectedLocation && selectedLocation.type !== "lake") {
+            seaTidesCardEl.style.display = "none";
+        }
     }
 
 }
@@ -7268,7 +7389,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.8.8";
+const SWIM_RELEASE_VERSION = "2.8.9";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
