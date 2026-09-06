@@ -2441,7 +2441,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.8.9</div>
+        <div class="app-revision">REV 2.8.10</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2452,7 +2452,7 @@ body.dark-theme .sea-forecast-summary {
                 🆕 <span>What's New</span>
             </button>
             <div class="menu-item menu-version">
-                ℹ️ <span>App Version <strong>2.8.9</strong></span>
+                ℹ️ <span>App Version <strong>2.8.10</strong></span>
             </div>
             <button type="button" class="menu-item" id="themeMenuButton" onclick="toggleTheme()">
                 🌙 <span>Dark Theme</span>
@@ -2490,7 +2490,7 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.9</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.10</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
@@ -3108,8 +3108,12 @@ function getCompassDirection(degrees) {
    SWIM SCORE
    ========================= */
 
-function isBlackheadLocation(location = selectedLocation) {
-    return !!location && location.name === "Blackhead Lighthouse and Gleninagh Pier";
+function isBlackheadLocation(location = null) {
+    // Never reference checkConditions()'s local selectedLocation directly.
+    // When this helper is called from other functions there is no local variable
+    // with that name, which previously caused: "selectedLocation is not defined".
+    const activeLocation = location || window.currentSelectedLocation || null;
+    return !!activeLocation && activeLocation.name === "Blackhead Lighthouse and Gleninagh Pier";
 }
 
 function calculateSwimScore(
@@ -3465,6 +3469,10 @@ async function checkConditions() {
         swimLocations.find(
             location => location.id == selectedId
         );
+
+    // Make the active location available to helper functions that are called
+    // outside this function's local scope.
+    window.currentSelectedLocation = selectedLocation;
 
     updateDesktopSeaActions(selectedLocation);
 
@@ -7389,7 +7397,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.8.9";
+const SWIM_RELEASE_VERSION = "2.8.10";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
