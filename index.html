@@ -1,4 +1,4 @@
-<!-- Revision 2.7.9: mobile location picker uses a compact one-line custom list -->
+<!-- Revision 2.8.2: mobile location picker uses a compact one-line custom list -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1336,18 +1336,21 @@ body.dark-theme .location-controls select:focus {
         display: flex;
         align-items: center;
         width: 100%;
-        min-height: 44px;
+        min-height: 42px;
         margin: 0;
-        padding: 8px 14px;
+        padding: 7px 14px;
         border: 0;
         border-top: 1px solid #e1e7eb;
         border-radius: 0;
         background: transparent;
         color: inherit;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
-        line-height: 1.1;
+        line-height: 1;
         text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     body.dark-theme .mobile-location-option {
@@ -1356,11 +1359,15 @@ body.dark-theme .location-controls select:focus {
 
     .mobile-location-option span {
         display: block;
+        flex: 1 1 auto;
         min-width: 0;
         width: 100%;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        font-size: 12px;
+        line-height: 1;
     }
 
     .mobile-location-option.selected {
@@ -1554,6 +1561,8 @@ body.dark-theme select { color:#f0f5f8; }
     border-radius: 12px;
     line-height: 1.65;
 }
+
+.tide-source-note { margin:8px 0 10px; font-size:12px; line-height:1.45; opacity:.72; }
 
 .tide-detail-grid {
     display: grid;
@@ -2432,7 +2441,7 @@ body.dark-theme .sea-forecast-summary {
     </div>
 
     <div class="app-menu-wrap">
-        <div class="app-revision">REV 2.7.9</div>
+        <div class="app-revision">REV 2.8.4</div>
         <details class="app-menu" id="appMenu">
             <summary aria-label="Open app menu">☰</summary>
         <div class="app-menu-content">
@@ -2481,19 +2490,22 @@ body.dark-theme .sea-forecast-summary {
             <div class="release-modal-header">
                 <div>
                     <div class="release-eyebrow">🆕 <span>WHAT'S NEW</span></div>
-                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.7.9</h2>
+                    <h2 id="releaseTitle">Open Water Swim Planner — Version 2.8.4</h2>
                 </div>
                 <button type="button" class="guide-close" onclick="closeReleaseNotes()" aria-label="Close release notes">×</button>
             </div>
             <p class="release-intro">Here’s what’s new in this release:</p>
             <ul class="release-list">
+                <li><span class="release-icon">🇲🇹</span><div><strong>New Malta swim location</strong><br>Ghadira Bay has been added as a sea swimming location in Malta.</div></li>
+                <li><span class="release-icon">🇪🇸</span><div><strong>New Spain swim location</strong><br>Puerto del Carmen has been added as a sea swimming location in Lanzarote, Spain.</div></li>
+                <li><span class="release-icon">🇪🇸</span><div><strong>New Spain swim location</strong><br>El Cotillo has been added as a sea swimming location in Fuerteventura, Spain.</div></li>
                 <li><span class="release-icon">🌍</span><div><strong>Ukrainian language added</strong><br>Ukrainian is now available throughout the app, including menus, forecasts and dynamic information.</div></li>
                 <li><span class="release-icon">🏞️</span><div><strong>Improved lake information</strong><br>Lake wind assessments are now location-specific. Youghal Quay keeps its local wind guidance; Twomilegate uses its known east/north-east exposure; other lakes do not receive invented compass-direction claims.</div></li>
                 <li><span class="release-icon">🇺🇦</span><div><strong>Ukraine locations updated</strong><br>Blue Lake and Gloria Lake are now identified as Kyiv Ukraine.</div></li>
                 <li><span class="release-icon">🌡️</span><div><strong>Lake water-temperature information</strong><br>Water temperature is shown only where reliable location-specific information is available.</div></li>
-                <li><span class="release-icon">📱</span><div><strong>Improved mobile location picker</strong><br>Mobile locations now use a compact one-line list with a consistent font size, avoiding long location names wrapping across multiple lines.</div></li>
+                <li><span class="release-icon">📱</span><div><strong>Single-line mobile locations</strong><br>All mobile location names now use one consistent 12px font and are forced onto a single line, with an ellipsis used only when a name is too long for the screen.</div></li>
+                <li><span class="release-icon">🌊</span><div><strong>Global tide and sea-temperature data</strong><br>Sea locations without a dedicated local tide feed now use Open-Meteo marine data for modelled tide levels and sea-surface temperature, including Malta and the Canary Islands.</div></li>
                 <li><span class="release-icon">📱</span><div><strong>Improved app updates</strong><br>The app version and release notification are now kept in sync so new releases can be clearly identified.</div></li>
-                <li><span class="release-icon">📍</span><div><strong>Cleaner location picker</strong><br>The swim-location selector is now shorter and cleaner, especially on mobile, with compact labels designed to keep locations on a single line.</div></li>
             </ul>
             <div class="release-footer">
                 <span>Thanks for using Open Water Swim Planner. 🌊</span>
@@ -2889,6 +2901,42 @@ const swimLocations = [
         distance: "TBC",
         type: "sea",
         region: "canada"
+    },
+    {
+        id: 21,
+        country: "Malta",
+        name: "Ghadira Bay",
+        county: "Malta",
+        latitude: 35.9708913,
+        longitude: 14.3504472,
+        distance: "TBC",
+        type: "sea",
+        region: "malta",
+        tideTimeZone: "Europe/Malta"
+    },
+    {
+        id: 22,
+        country: "Spain",
+        name: "Puerto del Carmen",
+        county: "Lanzarote",
+        latitude: 28.918332,
+        longitude: -13.668681,
+        distance: "TBC",
+        type: "sea",
+        region: "spain",
+        tideTimeZone: "Atlantic/Canary"
+    },
+    {
+        id: 23,
+        country: "Spain",
+        name: "El Cotillo",
+        county: "Fuerteventura",
+        latitude: 28.683787,
+        longitude: -14.011564,
+        distance: "TBC",
+        type: "sea",
+        region: "spain",
+        tideTimeZone: "Atlantic/Canary"
     }
 ];
 
@@ -3142,6 +3190,8 @@ function loadLocations() {
             country === "Ukraine" ? "🇺🇦" :
             country === "Canada" ? "🇨🇦" :
             country === "French Polynesia" ? "🇵🇫" :
+            country === "Malta" ? "🇲🇹" :
+            country === "Spain" ? "🇪🇸" :
             "🌍";
 
         if (!groups[country]) {
@@ -3276,8 +3326,7 @@ function updateDesktopSeaActions(location) {
     const actions = document.getElementById("desktopSeaActions");
     if (!actions) return;
     actions.style.display =
-        (location && location.type !== "lake" &&
-         (location.tideStation || location.canadianTideStationCode))
+        (location && location.type !== "lake")
             ? "grid"
             : "none";
 }
@@ -3405,8 +3454,13 @@ if (seaTidesCard) {
     const url =
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code&wind_speed_unit=ms`;
 
+    const marineTimeZone = selectedLocation.tideTimeZone || "Europe/Dublin";
+
     const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&current=wave_height,wave_period,wave_direction,sea_surface_temperature`;
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}` +
+        `&current=wave_height,wave_period,wave_direction,sea_surface_temperature` +
+        `&hourly=sea_level_height_msl,sea_surface_temperature` +
+        `&forecast_days=8&timezone=${encodeURIComponent(marineTimeZone)}&cell_selection=sea`;
 
     const today =
         new Date();
@@ -3485,6 +3539,18 @@ if (seaTidesCard) {
                         canadianTideError
                     );
                     tideData = null;
+                }
+            }
+
+            // International locations without an official dedicated tide feed
+            // use Open-Meteo's global modelled sea-level data, which includes tides.
+            if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) {
+                if (marineData && marineData.hourly && Array.isArray(marineData.hourly.time) && Array.isArray(marineData.hourly.sea_level_height_msl)) {
+                    tideData = {
+                        openMeteo: true,
+                        hourly: marineData.hourly,
+                        timeZone: marineData.timezone || marineTimeZone
+                    };
                 }
             }
 
@@ -3732,16 +3798,9 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
         ${reasons.join("<br>")}
     `;
 
-    const seaTidesCard = document.getElementById("seaTidesCard");
-    const travelPlannerCard = document.getElementById("travelPlannerCard");
-    if (seaTidesCard) seaTidesCard.style.display = "none";
-    if (travelPlannerCard) travelPlannerCard.style.display = "none";
-
-    window.currentSeaTides = null;
-
-    // International locations still get the full 7-day weather/marine forecast.
+    // The international branch renders the current conditions, then falls through
+    // to the common tide/forecast display below.
     loadSeaForecast(selectedLocation);
-    return;
 }
 
 
@@ -3781,6 +3840,35 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
                 }
 
                 tideEvents.push(current);
+            }
+
+        } else if (tideData && tideData.openMeteo) {
+
+            const tideTimes = tideData.hourly.time || [];
+            const tideHeights = tideData.hourly.sea_level_height_msl || [];
+
+            for (let i = 1; i < tideHeights.length - 1; i++) {
+                const previousHeight = Number(tideHeights[i - 1]);
+                const currentHeight = Number(tideHeights[i]);
+                const nextHeight = Number(tideHeights[i + 1]);
+
+                if (![previousHeight, currentHeight, nextHeight].every(Number.isFinite)) continue;
+
+                if (currentHeight > previousHeight && currentHeight >= nextHeight) {
+                    tideEvents.push({
+                        type: "High Tide",
+                        time: new Date(tideTimes[i]),
+                        height: currentHeight,
+                        modelled: true
+                    });
+                } else if (currentHeight < previousHeight && currentHeight <= nextHeight) {
+                    tideEvents.push({
+                        type: "Low Tide",
+                        time: new Date(tideTimes[i]),
+                        height: currentHeight,
+                        modelled: true
+                    });
+                }
             }
 
         } else if (tideData && tideData.table) {
@@ -4109,7 +4197,11 @@ if (!selectedLocation.tideStation && !selectedLocation.canadianTideStationCode) 
         window.currentSeaTides = {
             tides: filteredTides,
             highTides: highTides,
-            timeZone: tideDisplayTimeZone
+            timeZone: tideDisplayTimeZone,
+            source: tideData && tideData.openMeteo ? "Open-Meteo modelled sea level including tides" :
+                    tideData && tideData.canadian ? "Canadian Hydrographic Service predicted tides" :
+                    selectedLocation.tideStation ? "Irish Marine Institute predicted tides" :
+                    "Tide data"
         };
         seaTidesCard.style.display = "block";
         showSeaTide(0);
@@ -7055,6 +7147,7 @@ function showSeaTide(index) {
     detail.innerHTML = `
         <strong>🌊 Selected high tide</strong><br>
         ${formatTide(selected)} — ${formatTideHeight(selected.height, 2)}
+        ${state.source ? `<div class="tide-source-note">Source: ${state.source}${state.source.includes("modelled") ? " — suitable for swim planning, not navigation." : ""}</div>` : ""}
         <div class="tide-detail-grid">
             ${surrounding.map(tide => `
                 <div class="tide-detail-item">
@@ -7069,7 +7162,7 @@ function showSeaTide(index) {
 /* =========================
    WHAT'S NEW / RELEASE NOTES
    ========================= */
-const SWIM_RELEASE_VERSION = "2.7.9";
+const SWIM_RELEASE_VERSION = "2.8.4";
 const SWIM_RELEASE_KEY = "swimPlannerLastSeenRelease";
 
 function openReleaseNotes(markSeen = false) {
