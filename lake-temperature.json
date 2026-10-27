@@ -1,6 +1,6 @@
 {
-  "temperature": 10.2,
-  "timestamp": "2026-10-27 18:00",
+  "temperature": 10.0,
+  "timestamp": "2026-10-27 22:00",
   "source": "OPW Portumna Bridge",
   "station": "25341",
   "sensor": "0002"
